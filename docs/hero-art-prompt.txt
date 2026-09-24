@@ -1,0 +1,15 @@
+Use case: stylized-concept.
+Asset type: ONE standalone website hero illustration, isolated transparent PNG, square composition approximately 1536 × 1536.
+
+Create a new illustration using the reference image visible in this conversation only as a STYLE AND COMPOSITION reference, not as an image to edit. The useful reference is its thick pale cream isometric typographic roof above a tiny open-front architectural scene, thin dark contours, crisp cel shading, and editorial vector-like finish.
+
+Primary subject: a miniature architectural sculpture whose massive roof spells exactly "MON", with three distinct uppercase letters M, O, N. The spelling must read immediately and unambiguously from left to right. The large chunky extruded roof letters are pale cream / soft pale yellow, with warm off-white top planes, fine dark graphite outlines, and dimensional side faces. Arrange the roof as a coherent isometric sculpture in a three-quarter elevated view, but prioritize legible letters.
+
+Below the lettering: a simple off-white open-front miniature architectural platform, with enough open height to show TWO prominent, fully visible Pokémon. On the LEFT is recognizable Gengar: round violet-purple body, pointed ears, spiky back silhouette, red eyes, short limbs and a broad mischievous white toothy grin. On the RIGHT is recognizable Gible: small blue shark-like Pokémon, large round head, dorsal fin, side head fins, wide toothy mouth, red belly, little arms and legs. Both must be fully visible from head to feet beneath the roof, facing the viewer, unmistakable and large enough to read clearly. Their forms must not merge with the letters, pillars, or each other. No other characters.
+
+Keep the architecture restrained: a smooth thick cream platform, very minimal supports placed behind the Pokémon so neither is obscured, only subtle pale-yellow architectural details. Clean thin dark linework, precise cel-shaded editorial illustration, strong simple silhouettes, smooth matte surfaces. Small lilac and steel-blue shadow faces complement a dark graphite #10151b website. Do not render the website.
+
+Composition: the full three-dimensional sculpture, all three letters, both Pokémon and the complete base are contained well within the canvas, with generous transparent padding on EVERY edge. Balanced roughly square composition. No cropped extremities. Transparent negative space outside the isolated sculpture; actual alpha transparency, not a white or colored background, not a drawn checkerboard.
+
+Text (verbatim): "MON". This is the ONLY text anywhere in the image.
+Avoid: additional typography, labels, logos, watermark, website UI, screenshots, browser frames, scenery, busy clutter, extra creatures, extra copies of the characters, photorealism, soft painterly blur, background panels, halos, ground shadows extending to the canvas edge.
