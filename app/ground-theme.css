@@ -1,0 +1,177 @@
+/* Gible's warm earth palette. The default Gengar theme is left untouched. */
+:root[data-pokemon-theme="gible"] {
+  --background: #17130f;
+  --foreground: #f6edda;
+  --card: #241e17;
+  --card-foreground: #f6edda;
+  --popover: #241e17;
+  --popover-foreground: #f6edda;
+  --primary: #e2b666;
+  --primary-foreground: #24180c;
+  --secondary: #332b20;
+  --secondary-foreground: #f6edda;
+  --muted: #30291f;
+  --muted-foreground: #bdb09a;
+  --accent: #96c4b2;
+  --accent-foreground: #152720;
+  --border: #dbc3922b;
+  --input: #79664a;
+  --ring: #e2b666;
+  --gengar: #e2b666;
+  --gible: #96c4b2;
+  --glass-surface: linear-gradient(140deg, #d5ad6410, #96c4b207);
+  --glass-edge: #d9c49a2c;
+  --glass-shadow: 0 24px 60px -35px #000b, inset 0 1px 0 #fff0ce0d;
+}
+
+[data-pokemon-theme="gible"] body {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse at 6% 3%, #bf874621, transparent 38%),
+    radial-gradient(ellipse at 97% 30%, #64948216, transparent 42%),
+    radial-gradient(ellipse at 5% 82%, #a872361a, transparent 40%);
+}
+[data-pokemon-theme="gible"] ::selection { background: #e2b666; color: #24180c; }
+[data-pokemon-theme="gible"] :is(button, a, [tabindex]):focus-visible { outline-color: #edc87e; }
+[data-pokemon-theme="gible"] .site-header {
+  border-color: #d9c2922c;
+  background: linear-gradient(115deg, #372c1fcf, #1b241fdc);
+  box-shadow: 0 15px 40px -25px #000a, inset 0 1px 0 #fff0ce13;
+}
+[data-pokemon-theme="gible"] .brand-caption { color: #b9ab92; border-color: #d7bd822e; }
+[data-pokemon-theme="gible"] :is(.wordmark strong, .footer-mark) { color: #f6edda; }
+[data-pokemon-theme="gible"] .nav-links a { color: #c8bca5; }
+[data-pokemon-theme="gible"] .nav-links a.active { color: #f1d59b; border-color: #e2b66635; background: #d8a45316; }
+[data-pokemon-theme="gible"] .nav-links a:hover { color: #fff1d2; background: #e2b66610; }
+[data-pokemon-theme="gible"] .nav-links .nav-contact { border-color: #96c4b242; background: #96c4b20d; color: #c7e4d7; }
+[data-pokemon-theme="gible"] .nav-links .nav-contact:hover { border-color: #96c4b273; background: #96c4b21c; }
+[data-pokemon-theme="gible"] .nav-links.open { background: #241e17f5; border-color: #d7bc8540; }
+[data-pokemon-theme="gible"] .menu-toggle { border-color: #d7bc8540; background: #ecd2a008; color: #e8d5b0; }
+
+[data-pokemon-theme="gible"] .eyebrow { color: #c4b391; }
+[data-pokemon-theme="gible"] .illustrated-hero .hero-role { color: #dfbc7b; }
+[data-pokemon-theme="gible"] .illustrated-hero h1 > span { color: #f6edda; }
+[data-pokemon-theme="gible"] .illustrated-hero h1 > span:nth-child(2) { color: #e8c78a; }
+[data-pokemon-theme="gible"] .hero-moniker { color: #e3d8c0; }
+[data-pokemon-theme="gible"] :is(.hero-description, .illustrated-hero .hero-description) { color: #bdaf99; }
+[data-pokemon-theme="gible"] .hero-description strong { color: #f0e6d2; }
+[data-pokemon-theme="gible"] .hero-personality { color: #c9b994; }
+[data-pokemon-theme="gible"] .illustrated-hero .hero-location { color: #ad9e84; }
+[data-pokemon-theme="gible"] .hero-cv-links { color: #d8c397; }
+[data-pokemon-theme="gible"] .hero-cv-links a:hover { color: #fff1d2; }
+[data-pokemon-theme="gible"] .button-primary {
+  color: #24180c;
+  background: linear-gradient(135deg, #ebc580, #cea057);
+  border-color: #f2d49d80;
+  box-shadow: inset 0 1px 0 #fff3d575, 0 7px 28px -17px #dfaa5880;
+}
+[data-pokemon-theme="gible"] .button-primary:hover {
+  background: linear-gradient(135deg, #f5d797, #e0b16b);
+  box-shadow: inset 0 1px 0 #fff7, 0 8px 32px -15px #dfaa5880;
+}
+[data-pokemon-theme="gible"] .text-link { color: #e5dbc7; }
+[data-pokemon-theme="gible"] .text-link:hover { color: #aad6c3; }
+[data-pokemon-theme="gible"] .diorama-glow {
+  background: radial-gradient(ellipse at 30% 53%, #d79b4630, transparent 58%), radial-gradient(ellipse at 76% 66%, #78b8a025, transparent 60%);
+}
+[data-pokemon-theme="gible"] .hero-diorama figcaption.companion-strip {
+  border-color: #dec18b30;
+  background: linear-gradient(110deg, #392b1edc, #24372cdc);
+  box-shadow: inset 0 1px 0 #fff0ce0f, 0 9px 30px -18px #0008;
+}
+[data-pokemon-theme="gible"] .companion + .companion { border-color: #d7c49d24; }
+[data-pokemon-theme="gible"] .companion small { color: #c2b69c; }
+[data-pokemon-theme="gible"] .illustrated-hero .hero-bottom { border-color: #d5bd8b24; background: linear-gradient(100deg, #cfab680c, #96c4b208); }
+[data-pokemon-theme="gible"] .credential svg { color: #d7b470; }
+[data-pokemon-theme="gible"] .credential:nth-child(2) svg { color: #96c4b2; }
+[data-pokemon-theme="gible"] .credential:nth-child(3) svg { color: #c9be92; }
+[data-pokemon-theme="gible"] .credential strong { color: #eadfc8; }
+[data-pokemon-theme="gible"] .credential > span { color: #b4a58a; }
+[data-pokemon-theme="gible"] .scroll-link { color: #b8a685; }
+[data-pokemon-theme="gible"] .tech-strip { background: #1c181290; border-color: #d3bc901f; }
+[data-pokemon-theme="gible"] .tech-item { color: #cdbd9e; }
+[data-pokemon-theme="gible"] .tech-item .tech-symbol { color: #caa669; }
+[data-pokemon-theme="gible"] .tech-item:nth-child(even) .tech-symbol { color: #89b5a0; }
+[data-pokemon-theme="gible"] .tech-label { color: #ab9d83; }
+
+[data-pokemon-theme="gible"] .section-heading h2 span { color: #c8b184; }
+[data-pokemon-theme="gible"] :is(.section-heading > p, .project-info p, .timeline-row p, .craft-intro p, .craft-detail p, .contact-bottom p) { color: #c0b29a; }
+[data-pokemon-theme="gible"] .project-card:nth-child(odd) { --card-tone: #e2b666; }
+[data-pokemon-theme="gible"] .project-card:nth-child(even) { --card-tone: #96c4b2; }
+[data-pokemon-theme="gible"] :is(.project-visual, .project-visual.recruitment, .project-visual.records, .project-visual.hris) { border-color: #dbc08d29; background: linear-gradient(135deg, #bb853321, #5e53300a); }
+[data-pokemon-theme="gible"] :is(.project-visual.recruitment, .project-visual.hris) { background: linear-gradient(135deg, #679c7e20, #5e533009); }
+[data-pokemon-theme="gible"] .visual-top { color: #cbb994; }
+[data-pokemon-theme="gible"] .project-info h3 { color: #f1e7d2; }
+[data-pokemon-theme="gible"] .project-button { border-color: #cbae7342; background: #ddae600d; color: #e0c28b; }
+[data-pokemon-theme="gible"] .project-button:hover { background: var(--card-tone); border-color: var(--card-tone); color: #20190f; }
+[data-pokemon-theme="gible"] .tag { border-color: #d1b07138; background: #e2b6660c; color: #d2be98; }
+[data-pokemon-theme="gible"] .tag:nth-child(2n) { background: #96c4b20d; border-color: #96c4b22d; color: #b4d0bd; }
+[data-pokemon-theme="gible"] :is(.mini-app, .mini-app.recruit) { background: #27231a; color: #e8dec6; border-color: #957b4f60; }
+[data-pokemon-theme="gible"] :is(.mini-app-header, .recruit .mini-app-header) { border-color: #c5a36a2c; background: #57422324; }
+[data-pokemon-theme="gible"] .mini-app-header > span { color: #c0af8d; }
+[data-pokemon-theme="gible"] :is(.mini-logo, .recruit .mini-logo) { color: #f3d297; background: #68502c; }
+[data-pokemon-theme="gible"] :is(.mini-subtitle, .mini-stat span, .mock-caption, .personnel-summary p) { color: #bfae8e; }
+[data-pokemon-theme="gible"] .mini-stat { background: #d8b06d0d; border-color: #e6c58f2b; }
+[data-pokemon-theme="gible"] .mini-stat strong { color: #ebce95; }
+[data-pokemon-theme="gible"] :is(.mini-row, .recruit .mini-row) { border-color: #dac18e23; }
+[data-pokemon-theme="gible"] .mini-badge { background: #8cc5a823; color: #aedcc1; }
+[data-pokemon-theme="gible"] .mini-badge.amber { background: #ddad5726; color: #eed090; }
+[data-pokemon-theme="gible"] .mini-badge.lavender { background: #c88a6029; color: #e2b696; }
+[data-pokemon-theme="gible"] .mini-bar { background: #ddbd831f; }
+[data-pokemon-theme="gible"] .mini-bar i { background: #cfad70; }
+[data-pokemon-theme="gible"] :is(.candidate, .personnel-avatar) { background: #bf97542e; color: #e3c590; }
+[data-pokemon-theme="gible"] .mini-tabs { color: #b9a883; }
+[data-pokemon-theme="gible"] .mini-tabs span:first-child { color: #c1dbbf; border-color: #9ac1a3; }
+[data-pokemon-theme="gible"] .personnel-cards > div { border-color: #d9ba7e2a; background: #d4a75d0b; }
+[data-pokemon-theme="gible"] .paper-preview { background: #f0e6cf; border-color: #bfaa80; }
+[data-pokemon-theme="gible"] .paper-section { background: #dbceb0; }
+[data-pokemon-theme="gible"] :is(.paper-row, .paper-row span) { border-color: #cbbd9d; }
+[data-pokemon-theme="gible"] .paper-line { background: #bcac89; }
+
+[data-pokemon-theme="gible"] .about-band { border-color: #d2b8812f; background: linear-gradient(120deg, #cba45d10, #8cb2940d); }
+[data-pokemon-theme="gible"] .about-band p { color: #c4b592; }
+[data-pokemon-theme="gible"] .about-band p strong { color: #eadfc5; }
+[data-pokemon-theme="gible"] .timeline { background: #d6bb8008; border-color: #d5b97c2b; }
+[data-pokemon-theme="gible"] .timeline-row { border-color: #d7b97d20; }
+[data-pokemon-theme="gible"] .timeline-year { color: #d2b778; }
+[data-pokemon-theme="gible"] .timeline-type { color: #b8a47e; }
+[data-pokemon-theme="gible"] .timeline-icon { color: #e1bb76; border-color: #d8ae6040; background: linear-gradient(145deg, #d6a25724, #d6a2570b); }
+[data-pokemon-theme="gible"] .timeline-row:nth-child(even) .timeline-icon { color: #a3c9b1; border-color: #97c4ab39; background: #96c4b211; }
+[data-pokemon-theme="gible"] .craft-layout { background: linear-gradient(120deg, #b8883917, #729c7512); border-color: #d7b77b39; }
+[data-pokemon-theme="gible"] .craft-tab { border-color: #d5bb842f; color: #c9b792; background: #dab46c0a; }
+[data-pokemon-theme="gible"] .craft-tab svg { color: #cdb075; }
+[data-pokemon-theme="gible"] .craft-tab[aria-selected=true] {
+  background: linear-gradient(125deg, #daa14630, #c8b3771c);
+  color: #f3dba5;
+  border-color: #dfb46c73;
+  box-shadow: inset 0 1px 0 #ffe1a81c, 0 3px 20px -12px #dba04436;
+}
+[data-pokemon-theme="gible"] .craft-tab[aria-selected=true] svg { color: #f0cd8a; }
+[data-pokemon-theme="gible"] .craft-tab:hover:not([aria-selected=true]) { background: #96c4b216; color: #dbebd5; border-color: #9dc59d4f; }
+[data-pokemon-theme="gible"] .craft-detail { background: #12100b55; border-color: #cfb37725; }
+[data-pokemon-theme="gible"] .craft-detail .craft-kicker { color: #c3aa73; }
+
+[data-pokemon-theme="gible"] .contact-section {
+  border-color: #d2ac6550;
+  background: radial-gradient(ellipse at 0 0, #c4904024, transparent 62%), radial-gradient(ellipse at 100% 100%, #7cab8520, transparent 62%), #211b14;
+}
+[data-pokemon-theme="gible"] .contact-section h2 span { color: #e2bc79; }
+[data-pokemon-theme="gible"] .contact-orbit {
+  background: linear-gradient(135deg, #e7c180, #a4c4a1);
+  color: #211d10;
+  border-color: #f1d6a473;
+  box-shadow: inset 0 1px 0 #fff6, 0 12px 35px -22px #d8b06380;
+}
+[data-pokemon-theme="gible"] .email-group a { color: #e7d5ac; text-decoration-color: #c7a66585; }
+[data-pokemon-theme="gible"] .copy-button { border-color: #d3ae6c42; background: #d4a6570c; color: #ddc38e; }
+[data-pokemon-theme="gible"] .copy-button:hover { background: #d4a65723; }
+[data-pokemon-theme="gible"] .footer { background: #100d0824; border-color: #d0b37a24; }
+[data-pokemon-theme="gible"] :is(.footer-left p, .footer-right) { color: #b5a486; }
+[data-pokemon-theme="gible"] .project-dialog { background: linear-gradient(130deg, #3a2d1ef5, #1d261df9); border-color: #dfb87557; }
+[data-pokemon-theme="gible"] :is(.project-dialog [data-slot=dialog-description], .dialog-content li) { color: #d1bea0; }
+[data-pokemon-theme="gible"] .dialog-note { color: #beac8c; border-color: #d0b17333; }
+[data-pokemon-theme="gible"] [data-slot=dialog-overlay] { background: #100b068c; }
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [data-pokemon-theme="gible"] :is(.site-header, .project-card, .about-band, .timeline, .craft-layout, .contact-section, .project-dialog) { background-color: #282116; }
+}

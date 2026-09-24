@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUpRight, Building2, Code2, Download, FileText, Ghost, Hexagon, MapPin, Trophy } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Building2, Code2, Download, FileText, Ghost, Hexagon, MapPin, MousePointer2, Trophy } from "lucide-react";
 
 export default function Hero() {
   return (
@@ -10,6 +10,7 @@ export default function Hero() {
           <p className="hero-moniker">You can call me <strong>Mon.</strong></p>
           <p className="hero-description">I turn complex workflows into thoughtful digital experiences. Built with care. Made to work.</p>
           <p className="hero-personality">Serious about systems. Soft spot for Pokémon.</p>
+          <p className="habitat-hint"><MousePointer2 aria-hidden="true" />Tap a wandering Pokémon to say hello.</p>
           <div className="hero-actions">
             <a className="button-primary" href="#projects">Explore my work <ArrowDown size={17} /></a>
             <a className="text-link" href="https://github.com/monqzxc" target="_blank" rel="noreferrer"><Code2 size={17} />GitHub <ArrowUpRight size={14} /></a>
