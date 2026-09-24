@@ -1,0 +1,52 @@
+/* Separate edge scenes keep the reading area open while giving each habitat a home. */
+.habitat-scenery { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.habitat-scenery::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 35%, var(--background), color-mix(in srgb, var(--background) 75%, transparent) 26%, transparent 68%); opacity: .6; }
+.scenery-distance { position: absolute; inset: 0; width: 100%; height: 100%; }
+.scenery-gengar { background: radial-gradient(ellipse at 0 69%, #64438a12, transparent 35%), radial-gradient(ellipse at 96% 74%, #593d7810, transparent 32%); }
+.scenery-gible { background: radial-gradient(ellipse at 0 75%, #b9873812, transparent 35%), linear-gradient(0deg, #99703410, transparent 35%); }
+.scenery-edge { position: absolute; bottom: 0; width: clamp(270px, 34vw, 520px); height: min(47vh, 450px); opacity: .75; }
+.scenery-edge-left { left: 0; }
+.scenery-edge-right { right: 0; }
+.scenery-graveyard { width: clamp(240px, 31vw, 480px); }
+.scenery-cave, .scenery-pines { opacity: .7; }
+.scenery-celestial { position: absolute; top: 11%; right: 3%; width: clamp(90px, 12vw, 165px); height: auto; }
+.scenery-moon { filter: drop-shadow(0 0 25px #b79aff10); }
+.scenery-sun { top: 14%; right: 4%; width: clamp(100px, 15vw, 200px); }
+.scenery-ground-line { position: absolute; inset: auto 0 0; height: var(--habitat-ground-height, 38px); border-top: 1px solid #8d728721; background: linear-gradient(180deg, #292131b0, #21182bd9); clip-path: polygon(0 9%, 8% 4%, 16% 12%, 24% 4%, 35% 15%, 45% 8%, 56% 16%, 65% 9%, 76% 2%, 86% 12%, 95% 4%, 100% 10%, 100% 100%, 0 100%); }
+.scenery-gible .scenery-ground-line { border-color: #bca46b3a; background: linear-gradient(180deg, #64512b94, #33291eeb); }
+.scenery-mist { position: absolute; width: 56%; height: 13%; min-height: 28px; border-radius: 50%; filter: blur(25px); background: #b398c611; animation: scenery-mist-drift 24s ease-in-out infinite alternate; }
+.scenery-mist-first { left: -15%; bottom: 11%; }
+.scenery-mist-second { right: -15%; bottom: 22%; animation-delay: -11s; animation-duration: 31s; opacity: .7; }
+.scenery-gible .scenery-mist { background: #d5bb7910; height: 7%; }
+.scenery-gible .scenery-mist-first { bottom: 5%; }
+.scenery-gible .scenery-mist-second { bottom: 13%; }
+.scenery-firefly, .scenery-dust { position: absolute; width: 3px; height: 3px; border-radius: 50%; }
+.scenery-firefly { background: #d7b9ed; box-shadow: 0 0 8px 2px #b89fe74a; opacity: .55; animation: scenery-firefly-drift 9s ease-in-out infinite; }
+.scenery-dust { width: 2px; height: 2px; background: #d6bd83; opacity: .35; animation: scenery-dust-rise 12s ease-in-out infinite; }
+.scenery-window-light { animation: scenery-window-glow 12s ease-in-out infinite; }
+@keyframes scenery-mist-drift { from { transform: translate3d(-6%, 0, 0) scaleX(.94); opacity: .45; } to { transform: translate3d(15%, -8%, 0) scaleX(1.08); opacity: .85; } }
+@keyframes scenery-firefly-drift { 0%, 100% { transform: translate3d(0, 0, 0); opacity: .1; } 40% { transform: translate3d(13px, -20px, 0); opacity: .65; } 70% { transform: translate3d(-7px, -35px, 0); opacity: .25; } }
+@keyframes scenery-dust-rise { 0% { transform: translate3d(-8px, 12px, 0); opacity: 0; } 35% { opacity: .4; } 75% { opacity: .2; } 100% { transform: translate3d(18px, -38px, 0); opacity: 0; } }
+@keyframes scenery-window-glow { 0%, 100% { opacity: .55; } 40%, 60% { opacity: .85; } }
+.pokemon-habitat.is-paused :is(.scenery-mist, .scenery-firefly, .scenery-dust, .scenery-window-light) { animation-play-state: paused; }
+@media (max-width: 760px) {
+  .scenery-edge { width: 66%; height: 100%; opacity: .87; }
+  .habitat-scenery::after { opacity: .25; }
+  .scenery-edge-right { width: 59%; }
+  .scenery-manor { left: -4%; }
+  .scenery-graveyard { right: -4%; }
+  .scenery-cave { left: -6%; }
+  .scenery-pines { right: -4%; }
+  .scenery-celestial { width: 82px; top: 0; right: 22%; }
+  .scenery-sun { width: 110px; top: -6%; right: 22%; }
+  .scenery-distance { opacity: .8; }
+  .scenery-ground-line { height: var(--habitat-ground-height, 24px); }
+  .scenery-mist { filter: blur(13px); width: 72%; }
+  .scenery-mist-first { bottom: 16%; }
+  .scenery-mist-second { bottom: 25%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .habitat-scenery :is(.scenery-mist, .scenery-firefly, .scenery-dust, .scenery-window-light) { animation: none; }
+  .scenery-firefly { opacity: .4; }
+  .scenery-dust { opacity: .25; }
+}

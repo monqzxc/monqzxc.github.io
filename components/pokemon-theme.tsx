@@ -3,6 +3,8 @@
 import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Pause, Play } from "lucide-react";
 import { PokemonArt, type PokemonSpecies } from "@/components/pokemon-art";
+import { PokemonScenery } from "@/components/pokemon-scenery";
+import { createPokemonRoutine, isGhostPokemon, nextPokemonRoutine } from "@/lib/pokemon-behavior";
 
 type PokemonTheme = "gengar" | "gible";
 const STORAGE_KEY = "mon-pokemon-theme";
@@ -75,17 +77,49 @@ export function ThemeSelector() {
 
 const residents: Record<PokemonTheme, PokemonSpecies[]> = {
   gengar: ["gengar", "gastly", "haunter", "gastly", "haunter", "gengar"],
-  gible: ["gible", "diglett", "sandshrew", "sandshrew", "gible", "diglett"],
+  gible: ["gible", "diglett", "sandshrew"],
 };
 const names: Record<PokemonSpecies, string> = {
   gengar: "Gengar", gastly: "Gastly", haunter: "Haunter", gible: "Gible", sandshrew: "Sandshrew", diglett: "Diglett",
 };
 
-function PokemonResident({ species, index, ghost }: { species: PokemonSpecies; index: number; ghost: boolean }) {
+type HabitatBounds = { width: number; height: number };
+
+function PokemonResident({ species, index, compact, bounds, size, groundHeight, paused }: {
+  species: PokemonSpecies; index: number; compact: boolean; bounds: HabitatBounds; size: number; groundHeight: number; paused: boolean;
+}) {
+  const ghost = isGhostPokemon(species);
+  const [routine, setRoutine] = useState(() => createPokemonRoutine(species, index, compact));
   const [happy, setHappy] = useState(false);
   const [greeting, setGreeting] = useState(0);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activityTimer = useRef({ cycle: -1, remaining: 0 });
+  const interacting = happy || hovered || focused;
+  const stopped = paused || interacting;
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+
+  // Pause the routine clock together with CSS, including its remaining time.
+  // A greeting or a background tab must never teleport a visible resident.
+  useEffect(() => {
+    const clock = activityTimer.current;
+    if (clock.cycle !== routine.cycle) {
+      clock.cycle = routine.cycle;
+      clock.remaining = routine.duration;
+    }
+    if (stopped) return;
+    const started = performance.now();
+    let finished = false;
+    const timeout = window.setTimeout(() => {
+      finished = true;
+      setRoutine(nextPokemonRoutine(species, index, compact, routine));
+    }, clock.remaining);
+    return () => {
+      window.clearTimeout(timeout);
+      if (!finished) clock.remaining = Math.max(0, clock.remaining - (performance.now() - started));
+    };
+  }, [routine, species, index, compact, stopped]);
 
   function greet() {
     if (timer.current) clearTimeout(timer.current);
@@ -95,19 +129,28 @@ function PokemonResident({ species, index, ghost }: { species: PokemonSpecies; i
   }
 
   const style = {
-    "--wander-duration": `${18 + index * 3}s`,
-    "--appear-duration": `${13 + index * 2}s`,
-    "--pokemon-delay": `${-index * 3 - 4}s`,
-    "--bob-delay": `${-index * 0.3}s`,
+    left: (bounds.width - size) * routine.from.x / 100,
+    // Ground residents stand on the same terrain baseline at every screen height.
+    top: ghost ? (bounds.height - size) * routine.from.y / 100 : Math.max(0, bounds.height - groundHeight - size * .88 + 5),
+    "--travel-x": `${(bounds.width - size) * (routine.to.x - routine.from.x) / 100}px`,
+    "--travel-y": `${ghost ? (bounds.height - size) * (routine.to.y - routine.from.y) / 100 : 0}px`,
+    "--activity-duration": `${routine.duration}ms`,
+    "--facing": routine.facing,
+    "--bob-delay": `${-index * .7}s`,
   } as CSSProperties;
 
   return (
-    <div className={`pokemon-slot pokemon-slot-${index} ${ghost ? "is-ghost" : "is-ground"} ${species === "diglett" ? "is-burrower" : ""} ${happy ? "is-greeting" : ""}`} style={style}>
+    <div className={`pokemon-slot ${ghost ? "is-ghost" : "is-ground"} ${interacting ? "is-interacting" : ""} ${happy ? "is-greeting" : ""}`} data-species={species} data-activity={routine.activity} style={style}>
       <div className="pokemon-traveler">
-        {!ghost && <span className="pokemon-soil" aria-hidden="true" />}
+        {ghost ? <span className="pokemon-portal" aria-hidden="true" /> : <><span className="pokemon-soil" aria-hidden="true" /><span className="pokemon-dust" aria-hidden="true"><i /><i /><i /></span></>}
         <div className="pokemon-presence">
-          <button type="button" className="pokemon-resident" onClick={greet} aria-label={`Say hello to ${names[species]}`}>
-            <span className="pokemon-window"><span className="pokemon-emerge"><PokemonArt species={species} happy={happy} className="pokemon-character" /></span></span>
+          <button type="button" className="pokemon-resident" onClick={greet} aria-label={`Say hello to ${names[species]}`}
+            onPointerEnter={event => { if (event.pointerType === "mouse") setHovered(true); }}
+            onPointerLeave={() => setHovered(false)}
+            onPointerDown={() => setFocused(false)}
+            onFocus={event => setFocused(event.currentTarget.matches(":focus-visible"))}
+            onBlur={() => setFocused(false)}>
+            <span className="pokemon-window"><span className="pokemon-emerge"><span className="pokemon-facing"><PokemonArt species={species} happy={happy} className="pokemon-character" /></span></span></span>
             {happy && <span key={greeting} className="pokemon-hello" aria-hidden="true">Hi! <span>♥</span></span>}
           </button>
         </div>
@@ -119,17 +162,36 @@ function PokemonResident({ species, index, ghost }: { species: PokemonSpecies; i
 
 export function PokemonHabitat() {
   const { theme, paused, ready } = usePokemonTheme();
+  const habitatRef = useRef<HTMLElement>(null);
+  const [bounds, setBounds] = useState<HabitatBounds>({ width: 0, height: 0 });
   const [hidden, setHidden] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
   useEffect(() => {
     const onVisibility = () => setHidden(document.hidden);
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onPreference = () => setReducedMotion(preference.matches);
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setBounds({ width: entry.contentRect.width, height: entry.contentRect.height });
+    });
+    if (habitatRef.current) observer.observe(habitatRef.current);
     onVisibility();
+    onPreference();
     document.addEventListener("visibilitychange", onVisibility);
-    return () => document.removeEventListener("visibilitychange", onVisibility);
+    preference.addEventListener("change", onPreference);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
+      preference.removeEventListener("change", onPreference);
+    };
   }, []);
+  const compact = bounds.width <= 760;
+  const size = compact ? 64 : Math.min(88, Math.max(64, bounds.width * .06));
+  const groundHeight = compact ? 24 : 38;
+  const stopped = paused || hidden || reducedMotion;
   return (
-    <aside className={`pokemon-habitat habitat-${theme} ${paused || hidden ? "is-paused" : ""}`} data-ready={ready} aria-hidden={!ready || undefined} aria-label={theme === "gengar" ? "Ghost Pokémon garden" : "Ground Pokémon garden"}>
-      <div className="habitat-scenery" aria-hidden="true"><span /><span /><span /></div>
-      {ready && residents[theme].map((species, index) => <PokemonResident key={`${theme}-${index}`} species={species} index={index} ghost={theme === "gengar"} />)}
+    <aside ref={habitatRef} className={`pokemon-habitat habitat-${theme} ${stopped ? "is-paused" : ""}`} data-ready={ready} aria-hidden={!ready || undefined} aria-label={theme === "gengar" ? "Moonlit Pokémon graveyard" : "Pokémon mountain trail"} style={{ "--pokemon-size": `${size}px`, "--habitat-ground-height": `${groundHeight}px` } as CSSProperties}>
+      <PokemonScenery theme={theme} />
+      {ready && bounds.width > 0 && (compact ? residents[theme].slice(0, 3) : residents[theme]).map((species, index) => <PokemonResident key={`${theme}-${compact}-${reducedMotion}-${index}`} species={species} index={index} compact={compact} bounds={bounds} size={size} groundHeight={groundHeight} paused={stopped} />)}
     </aside>
   );
 }

@@ -5,6 +5,7 @@ import "./hero.css";
 import "./pokemon-theme.css";
 import "./ground-theme.css";
 import "./pokemon-habitat.css";
+import "./pokemon-scenery.css";
 import "./scroll-reveal.css";
 import { PokemonThemeProvider } from "@/components/pokemon-theme";
 

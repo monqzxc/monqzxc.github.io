@@ -24,7 +24,8 @@ function Smile({ happy, y = 64, teeth = false }: { happy: boolean; y?: number; t
 
 function Gengar({ happy }: { happy: boolean }) {
   return <g stroke="#39224f" strokeWidth="2.5" strokeLinejoin="round">
-    <path d="M33 87l-11 15q8 9 23 0m29-2q16 12 25 2L85 86" fill="#725199" />
+    <g className="pokemon-leg-left" style={{ transformOrigin: "39px 87px", transformBox: "view-box" }}><path d="M33 87l-11 15q8 9 23 0" fill="#725199" /></g>
+    <g className="pokemon-leg-right" style={{ transformOrigin: "81px 87px", transformBox: "view-box" }}><path d="M74 100q16 12 25 2L85 86" fill="#725199" /></g>
     {happy ? <g className="pokemon-wave-hand" style={{ transformOrigin: "29px 66px" }}><path d="M31 76Q17 70 15 55L7 49l4-6 7 4-4-12 6-2 6 14 2-10 6 2-1 16 8 11Z" fill="#9870bd" /></g> : <path d="M30 57 13 68l3 10 15-3m58-18 18 11-3 10-15-3" fill="#8960ac" />}
     <path d="m25 36-4-22 23 15 9-12 10 9 13-9 4 13 20-12-5 29q12 20 6 36-7 22-40 23-35-1-42-24-5-20 6-36Z" fill="#8d62b3" />
     <path d="m28 37-2-14 15 12m44 1 9-9-3 16" fill="#b58bd5" stroke="none" />
@@ -37,8 +38,8 @@ function Gengar({ happy }: { happy: boolean }) {
 
 function Gastly({ happy }: { happy: boolean }) {
   return <g strokeLinejoin="round">
-    <path d="M20 32Q6 19 29 19 26 3 45 13 56 1 66 13 90 0 88 23 112 17 102 39 119 52 104 64 115 84 95 85 97 105 78 99 66 118 54 102 31 114 30 96 8 100 16 78 0 67 17 54 3 42 20 32Z" fill="#a071bd" opacity=".48" />
-    <path d="M25 32Q24 19 44 25 58 10 72 26 94 22 92 41 108 53 95 68 105 83 85 90 79 107 61 96 40 108 33 89 15 87 25 68 12 51 25 32Z" fill="#b188d1" opacity=".58" />
+    <g className="pokemon-mist pokemon-mist-outer" style={{ transformOrigin: "60px 59px", transformBox: "view-box" }}><path d="M20 32Q6 19 29 19 26 3 45 13 56 1 66 13 90 0 88 23 112 17 102 39 119 52 104 64 115 84 95 85 97 105 78 99 66 118 54 102 31 114 30 96 8 100 16 78 0 67 17 54 3 42 20 32Z" fill="#a071bd" opacity=".48" /></g>
+    <g className="pokemon-mist pokemon-mist-inner" style={{ transformOrigin: "60px 59px", transformBox: "view-box" }}><path d="M25 32Q24 19 44 25 58 10 72 26 94 22 92 41 108 53 95 68 105 83 85 90 79 107 61 96 40 108 33 89 15 87 25 68 12 51 25 32Z" fill="#b188d1" opacity=".58" /></g>
     <circle cx="60" cy="59" r="33" fill="#48354f" stroke="#34223c" strokeWidth="2.5" />
     <path d="M32 60q7 26 33 25 19-2 25-16-5 26-31 24-26-1-27-33" fill="#34273e" />
     {happy ? <Eyes happy y={49} color="#f2cceb" /> : <g fill="#fff8ea" stroke="#302238" strokeWidth="2"><path d="m34 40 22 9-10 12q-15-3-12-21Zm52 0-22 9 10 12q15-3 12-21Z" /><path d="M46 47v7m28-7v7" strokeWidth="3" /></g>}
@@ -54,20 +55,26 @@ function Haunter({ happy }: { happy: boolean }) {
     <path d="m28 37 17 0-20-14m53 14 12 0 3-12" fill="#b58ed5" stroke="none" />
     {happy ? <Eyes happy y={46} color="#392341" /> : <g fill="#fff5e9"><path d="m33 39 23 10-13 8Zm52 0-20 10 13 8Z" /><path d="m45 46 1 6m29-6-1 6" fill="none" stroke="#ef7c92" strokeWidth="3" /></g>}
     <Smile happy={happy} y={59} teeth />
-    <g className={happy ? "pokemon-wave-hand" : undefined} style={{ transformOrigin: "23px 73px" }}>
+    <g className={happy ? "pokemon-wave-hand" : "pokemon-idle-hand pokemon-arm-left"} style={{ transformOrigin: "23px 73px", transformBox: "view-box" }}>
       <path d={happy ? "M26 77Q10 71 10 58L3 50l4-5 9 8-4-16 6-1 6 17 4-10 5 3-4 16 6 8Z" : "m22 71-14 9 1 10 6-3 1 9 6-5 5 5 6-10-2-12Z"} />
     </g>
-    <path d="m93 72 15 7 4 10-7-2-1 10-7-6-5 6-7-11 1-11Z" />
+    <g className={happy ? undefined : "pokemon-idle-hand pokemon-arm-right"} style={{ transformOrigin: "96px 75px", transformBox: "view-box" }}><path d="m93 72 15 7 4 10-7-2-1 10-7-6-5 6-7-11 1-11Z" /></g>
   </g>;
 }
 
 function Gible({ happy }: { happy: boolean }) {
   return <g stroke="#25465a" strokeWidth="2.5" strokeLinejoin="round">
-    <path d="m84 83 24 7-17-21" fill="#497b96" />
-    <path d="m39 88-13 14 2 7 21-1 8-13m21-7 17 14-3 7-22-1-8-13" fill="#5993ab" />
-    <path d="m31 105 4-6 4 6 4-5 3 6m30 0 4-6 4 6 4-5 3 6" fill="#faf0d7" strokeWidth="1.5" />
-    {happy ? <g className="pokemon-wave-hand" style={{ transformOrigin: "30px 70px" }}><path d="M32 80Q13 72 13 51l6-5 7 5 1 10 11 7Z" fill="#6ca1b6" /><path d="m14 51 0-8 5 5 3-8 4 11" fill="#fff1d8" strokeWidth="1.5" /></g> : <path d="m31 67-16 14 5 10 16-8" fill="#6096af" />}
-    <path d="m81 69 20 12-5 10-14-8" fill="#6096af" />
+    <g className="pokemon-tail" style={{ transformOrigin: "84px 83px", transformBox: "view-box" }}><path d="m84 83 24 7-17-21" fill="#497b96" /></g>
+    <g className="pokemon-leg-left" style={{ transformOrigin: "44px 91px", transformBox: "view-box" }}>
+      <path d="m39 88-13 14 2 7 21-1 8-13" fill="#5993ab" />
+      <path d="m31 105 4-6 4 6 4-5 3 6" fill="#faf0d7" strokeWidth="1.5" />
+    </g>
+    <g className="pokemon-leg-right" style={{ transformOrigin: "76px 91px", transformBox: "view-box" }}>
+      <path d="m78 88 17 14-3 7-22-1-8-13" fill="#5993ab" />
+      <path d="m76 106 4-6 4 6 4-5 3 6" fill="#faf0d7" strokeWidth="1.5" />
+    </g>
+    {happy ? <g className="pokemon-wave-hand" style={{ transformOrigin: "30px 70px" }}><path d="M32 80Q13 72 13 51l6-5 7 5 1 10 11 7Z" fill="#6ca1b6" /><path d="m14 51 0-8 5 5 3-8 4 11" fill="#fff1d8" strokeWidth="1.5" /></g> : <g className="pokemon-arm-left pokemon-dig-arm" style={{ transformOrigin: "31px 68px", transformBox: "view-box" }}><path d="m31 67-16 14 5 10 16-8" fill="#6096af" /></g>}
+    <g className={happy ? undefined : "pokemon-arm-right pokemon-dig-arm"} style={{ transformOrigin: "82px 70px", transformBox: "view-box" }}><path d="m81 69 20 12-5 10-14-8" fill="#6096af" /></g>
     <path d="m48 28 5-19 20 20" fill="#54829f" />
     <path d="M32 37 13 27l5 22 12 7m56-19 20-10-4 22-13 7" fill="#74a8bd" />
     <path d="M29 48q3-26 30-26 29 0 34 28l-2 35q-5 20-31 20-29 0-34-23Z" fill="#70a3b8" />
@@ -82,11 +89,17 @@ function Gible({ happy }: { happy: boolean }) {
 
 function Sandshrew({ happy }: { happy: boolean }) {
   return <g stroke="#80602f" strokeWidth="2.3" strokeLinejoin="round">
-    <path d="M82 78q24 4 24 20-12 2-23-9" fill="#cda658" />
-    <path d="m37 91-12 14q9 9 25 0m23-14 19 14q-7 10-23 0" fill="#dbb665" />
-    <path d="m27 106 4-6 4 7 4-6 3 7m32 0 4-7 3 7 4-6 4 6" fill="#fff3d6" strokeWidth="1.5" />
-    {happy ? <g className="pokemon-wave-hand" style={{ transformOrigin: "31px 71px" }}><path d="M35 80Q18 74 15 55l9-8 7 9-1 8 9 6Z" fill="#dfbb6d" /><path d="m15 56-2-11 6 5 3-10 4 10 5-7 0 13" fill="#fff1cc" strokeWidth="1.5" /></g> : <path d="m32 68-17 15 7 10 16-9" fill="#d6ad5c" />}
-    <path d="m80 67 17 16-7 10-15-9" fill="#d6ad5c" />
+    <g className="pokemon-tail" style={{ transformOrigin: "82px 82px", transformBox: "view-box" }}><path d="M82 78q24 4 24 20-12 2-23-9" fill="#cda658" /></g>
+    <g className="pokemon-leg-left" style={{ transformOrigin: "40px 92px", transformBox: "view-box" }}>
+      <path d="m37 91-12 14q9 9 25 0" fill="#dbb665" />
+      <path d="m27 106 4-6 4 7 4-6 3 7" fill="#fff3d6" strokeWidth="1.5" />
+    </g>
+    <g className="pokemon-leg-right" style={{ transformOrigin: "76px 92px", transformBox: "view-box" }}>
+      <path d="m73 91 19 14q-7 10-23 0" fill="#dbb665" />
+      <path d="m74 108 4-7 3 7 4-6 4 6" fill="#fff3d6" strokeWidth="1.5" />
+    </g>
+    {happy ? <g className="pokemon-wave-hand" style={{ transformOrigin: "31px 71px" }}><path d="M35 80Q18 74 15 55l9-8 7 9-1 8 9 6Z" fill="#dfbb6d" /><path d="m15 56-2-11 6 5 3-10 4 10 5-7 0 13" fill="#fff1cc" strokeWidth="1.5" /></g> : <g className="pokemon-arm-left pokemon-dig-arm" style={{ transformOrigin: "33px 69px", transformBox: "view-box" }}><path d="m32 68-17 15 7 10 16-9" fill="#d6ad5c" /></g>}
+    <g className={happy ? undefined : "pokemon-arm-right pokemon-dig-arm"} style={{ transformOrigin: "80px 69px", transformBox: "view-box" }}><path d="m80 67 17 16-7 10-15-9" fill="#d6ad5c" /></g>
     <path d="M28 49 27 18q12-5 20 15 14-6 28 1 7-20 19-14l-5 33 1 30q-2 22-30 22-29 0-32-21Z" fill="#dfb969" />
     <path d="m32 25 2 20 8-9Zm55 1-3 18-6-8Z" fill="#a88953" stroke="none" />
     <path d="M39 72q22-16 42 0l-2 20q-20 17-39 0Z" fill="#f4e4b4" stroke="none" />
