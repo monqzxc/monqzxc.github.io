@@ -33,7 +33,11 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | Content | File |
 | --- | --- |
 | Hero introduction and artwork | `components/hero.tsx` |
-| Contact, projects, timeline | `components/portfolio.tsx` |
+| Contact and timeline | `components/portfolio.tsx` |
+| Selected work titles, descriptions, and preview paths | `lib/projects.ts` |
+| Project cards and interactive preview dialogs | `components/project-card.tsx` |
+| Preview card and dialog styles | `app/project-previews.css` |
+| Supplied HTML walkthroughs and shared embed styles | `public/project-previews/` |
 | Base layout and responsive rules | `app/globals.css` |
 | Glass surfaces, typography, and visual refinements | `app/glass-theme.css` |
 | Illustrated hero layout and responsive rules | `app/hero.css` |
@@ -46,7 +50,9 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | Exact artwork prompt and desktop preview | `docs/hero-art-prompt.txt`, `docs/hero-preview.jpg` |
 | Favicon | `public/favicon.svg` |
 
-Project images are illustrative interface previews built from HTML/CSS, not screenshots of live TESDA records. Replace `InterfacePreview` with your own approved screenshots if desired. The email and GitHub links come from your supplied HTML; placeholder social-profile links were omitted.
+Selected work includes Application Exam Management, HRIS Process, Job Application, PCR Management, PDS Generation, and ARTA Client Survey. Each card shows its supplied HTML walkthrough and opens an interactive preview with working step navigation. A separate link opens the complete walkthrough in a new tab. The previews use simplified screens and sample data. The email and GitHub links come from your supplied HTML; placeholder social-profile links were omitted.
+
+The walkthroughs are bundled under `public/project-previews/` so GitHub Pages exports include their HTML, CSS, and JavaScript. Original source folders remain separate. The shared `embed.js` and `embed.css` adapt the same HTML for thumbnails and dialogs; opening a page without a preview parameter shows the full original introduction. Walkthrough fonts request Google Fonts with local system fallbacks.
 
 The hero follows the supplied reference's composition, pairing bold name typography with an isometric MON sculpture above Gengar and Gible. Its transparent PNG was created with the built-in image generation tool and is included at 1254 × 1254 pixels. The exact prompt is included in `docs/hero-art-prompt.txt`.
 

@@ -1,0 +1,79 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../embed.js"></script></head><body>
+<title>HRIS Process</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="walkthrough.css">
+<link rel="stylesheet" href="../embed.css">
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">Portfolio · Human resource information system</div>
+    <h1>HRIS Process</h1>
+    <p class="lede">The organization's structure lives in one place: offices, the plantilla positions under them, and the employees who fill those positions. Hiring, attendance and performance all read from the same records.</p>
+    <div class="stack"><span>Vue 3</span><span>Laravel 11</span><span>MySQL</span><span>Docker</span></div>
+  </header>
+  <div id="walkthrough"></div>
+  <p class="foot">Screens are simplified recreations. All names, ID numbers and figures are sample data.</p>
+</div>
+
+<script>
+// Each step: t = title, d = one-line description, url = fake address bar, html = the mock screen.
+window.WALKTHROUGH = {
+  name: "HRIS Process",
+  steps:[
+  {t:"Office management", d:"The organization tree, heads and parent offices", url:"hris/offices",
+   html:`<div class="sh"><div><h2>Offices</h2><p>Central Office · 4 levels · 38 offices</p></div><span class="pill acc">+ New office</span></div>
+   <div class="tbl-wrap" style="margin-bottom:12px"><table>
+    <tr><th>Office</th><th>Code</th><th>Head</th><th class="r">Staff</th></tr>
+    <tr><td><b>Office of the Head of Agency</b></td><td class="mono">OHA</td><td>E. Navarro</td><td class="r mono">12</td></tr>
+    <tr><td style="padding-left:26px">↳ Office of the Deputy Head for Planning</td><td class="mono">ODHP</td><td>C. Aquino</td><td class="r mono">8</td></tr>
+    <tr style="background:var(--accent-soft)"><td style="padding-left:42px">↳ <b>Planning Office</b></td><td class="mono">PO</td><td>R. Santos</td><td class="r mono">24</td></tr>
+    <tr><td style="padding-left:58px">↳ Management Information Systems Division</td><td class="mono">PO-MISD</td><td>J. Villanueva</td><td class="r mono">11</td></tr>
+    <tr><td style="padding-left:58px">↳ Policy Research Division</td><td class="mono">PO-PRD</td><td>M. Garcia</td><td class="r mono">9</td></tr>
+   </table></div>
+   <div class="grid3">
+    <div class="box"><h3>Parent office</h3><div>Office of the Deputy Head for Planning</div></div>
+    <div class="box"><h3>Rates performance of</h3><div>2 divisions</div></div>
+    <div class="box"><h3>Plantilla items</h3><span class="big mono">24</span></div>
+   </div>`},
+  {t:"Position management", d:"Plantilla items, salary grades and vacancies", url:"hris/positions?office=PO-MISD",
+   html:`<div class="sh"><div><h2>Plantilla positions</h2><p>Management Information Systems Division · 11 items</p></div><span class="pill warn">1 vacant</span></div>
+   <div class="tbl-wrap" style="margin-bottom:12px"><table>
+    <tr><th>Item no.</th><th>Position</th><th class="r">SG</th><th>Incumbent</th><th>Status</th></tr>
+    <tr><td class="mono">CHIEF-3-2020</td><td>Chief Information Technology Officer</td><td class="r mono">24</td><td>J. Villanueva</td><td><span class="pill ok">Filled</span></td></tr>
+    <tr style="background:var(--accent-soft)"><td class="mono">ITO1-12-2026</td><td>Information Technology Officer I</td><td class="r mono">19</td><td class="muted">—</td><td><span class="pill warn">Vacant</span></td></tr>
+    <tr><td class="mono">ISA2-07-2021</td><td>Information Systems Analyst II</td><td class="r mono">15</td><td>A. Dela Cruz</td><td><span class="pill ok">Filled</span></td></tr>
+    <tr><td class="mono">CP1-15-2017</td><td>Computer Programmer I</td><td class="r mono">11</td><td>N. Castillo</td><td><span class="pill ok">Filled</span></td></tr>
+   </table></div>
+   <div class="grid2">
+    <div class="box"><h3>Qualification standards · ITO1-12-2026</h3><dl class="kv"><dt>Education</dt><dd>Bachelor's, IT-related</dd><dt>Experience</dt><dd>2 years</dd><dt>Training</dt><dd>8 hours</dd><dt>Eligibility</dt><dd>Career Service Prof.</dd></dl></div>
+    <div class="box"><h3>Vacancy</h3><dl class="kv"><dt>Posted to careers</dt><dd>Sep 24, 2026</dd><dt>Closing</dt><dd>Oct 15, 2026</dd><dt>Applicants</dt><dd class="mono">14</dd></dl></div>
+   </div>`},
+  {t:"Employee record", d:"The hired applicant fills the item", url:"hris/employees/2026-0412",
+   html:`<div class="sh"><div class="row"><span class="avatar">AD</span><div><h2>Andrea R. Dela Cruz</h2><p>Information Technology Officer I · MIS Division, Planning Office</p></div></div><span class="pill ok">Active</span></div>
+   <div class="grid3" style="margin-bottom:12px">
+    <div class="field"><label>Employee no.</label><div class="mono">2026-0412</div></div>
+    <div class="field"><label>Plantilla item</label><div class="mono">ITO1-12-2026</div></div>
+    <div class="field"><label>Salary grade / step</label><div class="mono">SG 19 · Step 1</div></div>
+    <div class="field"><label>Original appointment</label><div class="mono">2017-06-01</div></div>
+    <div class="field"><label>Current position since</label><div class="mono">2026-12-01</div></div>
+    <div class="field"><label>Status</label><div>Permanent</div></div>
+   </div>
+   <div class="box"><h3>201 file</h3><div class="row" style="gap:6px">
+    <span class="pill ok">Appointment</span><span class="pill ok">Oath of office</span><span class="pill ok">PDS</span><span class="pill ok">Assumption to duty</span><span class="pill ok">SALN</span></div></div>`},
+  {t:"Daily time record", d:"First month on the job, certified", url:"hris/dtr/2026-12",
+   html:`<div class="done-banner"><span class="stamp">Certified</span><div><b>December DTR certified</b><span>Item ITO1-12-2026 is filled · the vacancy is closed on the careers site</span></div></div>
+   <div class="tbl-wrap" style="margin-bottom:12px"><table>
+    <tr><th>Date</th><th class="r">AM in</th><th class="r">AM out</th><th class="r">PM in</th><th class="r">PM out</th><th>Note</th></tr>
+    <tr><td class="mono">Tue 01</td><td class="r mono">07:02</td><td class="r mono">12:00</td><td class="r mono">12:58</td><td class="r mono">16:05</td><td></td></tr>
+    <tr><td class="mono">Wed 02</td><td class="r mono">06:55</td><td class="r mono">12:01</td><td class="r mono">13:00</td><td class="r mono">16:00</td><td></td></tr>
+    <tr><td class="mono">Thu 03</td><td class="r mono">07:10</td><td class="r mono">12:00</td><td class="r mono">12:55</td><td class="r mono">16:12</td><td><span class="pill acc">WFH</span></td></tr>
+    <tr><td class="mono">Fri 04</td><td class="r mono">07:00</td><td class="r mono">12:00</td><td class="r mono">13:00</td><td class="r mono">16:01</td><td></td></tr>
+   </table></div>
+   <div class="grid3"><div class="box"><h3>Days present</h3><span class="big mono">22</span></div><div class="box"><h3>Tardiness</h3><span class="big mono">0m</span></div><div class="box"><h3>Office</h3><div>MIS Division</div></div></div>`}
+  ]
+};
+</script>
+<script src="walkthrough.js"></script>
+
+</body></html>

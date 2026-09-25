@@ -1,0 +1,132 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../embed.js"></script></head><body>
+<title>ARTA Client Survey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="walkthrough.css">
+<link rel="stylesheet" href="../embed.css">
+<style>
+/* Page-specific pieces: QR tiles, the phone-sized client form, the rating scale. */
+.qr-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.qr{border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;gap:6px;justify-items:center;text-align:center}
+.qr svg{width:100%;max-width:92px;height:auto;color:var(--ink)}
+.qr small{font-size:11.5px;color:var(--muted);line-height:1.3}
+.phone{max-width:360px;margin:0 auto;border:1px solid var(--line);border-radius:22px;padding:16px;background:var(--ground)}
+.phone h4{margin:0 0 2px;font-family:var(--display);font-weight:500;font-size:17px}
+.q{border-top:1px solid var(--line);padding-top:10px;margin-top:10px;font-size:13px}
+.q p{margin:0 0 6px}
+.scale{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.scale span{border:1px solid var(--line);border-radius:6px;padding:4px 0;text-align:center;font-size:10.5px;color:var(--muted);background:var(--surface);line-height:1.2}
+.scale span.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:4px}
+.opts span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;background:var(--surface)}
+.opts span.on{border-color:var(--accent);color:var(--accent);font-weight:600}
+.hbar{display:grid;grid-template-columns:120px 1fr 52px;gap:10px;align-items:center;font-size:13px}
+.hbars{display:grid;gap:8px}
+.feed{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:13px}
+.feed li{display:grid;gap:1px}
+.feed b{font-family:var(--mono);font-weight:500;font-size:12px}
+@media (max-width:560px){.qr-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hbar{grid-template-columns:90px 1fr 44px}}
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">Portfolio · Client satisfaction measurement</div>
+    <h1>ARTA Client Survey</h1>
+    <p class="lede">After being served at any TESDA office in the Philippines, clients scan a QR code and rate the service on the Anti-Red Tape Authority's (ARTA) Client Satisfaction Measurement form. Each office's survey focal person tracks its own responses, and the Central Office generates reports for any region or for the whole country.</p>
+    <div class="stack"><span>Laravel 11</span><span>Inertia + Vue</span><span>QR links</span><span>Laravel Excel</span><span>Role-scoped reports</span><span>Activity log</span></div>
+  </header>
+  <div id="walkthrough"></div>
+  <p class="foot">Screens are simplified recreations. All names, reference numbers and figures are sample data.</p>
+</div>
+
+<script>
+// Draws a decorative QR-style square (not a scannable code) from a seed, so each office tile looks distinct.
+function qr(seed){
+  const n = 21; let s = seed, cells = "";
+  const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  const finder = (x,y) => (x<7&&y<7)||(x>=n-7&&y<7)||(x<7&&y>=n-7);
+  for(let y=0;y<n;y++) for(let x=0;x<n;x++){
+    let on;
+    if(finder(x,y)){ const fx=x<7?x:x-(n-7), fy=y<7?y:y-(n-7);
+      on = fx===0||fx===6||fy===0||fy===6||(fx>=2&&fx<=4&&fy>=2&&fy<=4); }
+    else on = rnd() > .52;
+    if(on) cells += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
+  }
+  return `<svg viewBox="-1 -1 23 23" aria-hidden="true"><rect x="-1" y="-1" width="23" height="23" fill="var(--surface)"/><g fill="currentColor">${cells}</g></svg>`;
+}
+const SCALE = ["Strongly disagree","Disagree","Neither","Agree","Strongly agree","N/A"];
+const scale = pick => `<div class="scale">${SCALE.map((l,i)=>`<span class="${i===pick?'on':''}">${l}</span>`).join("")}</div>`;
+
+// Each step: t = title, d = one-line description, url = fake address bar, html = the mock screen.
+window.WALKTHROUGH = {
+  name: "ARTA Client Survey",
+  steps:[
+  {t:"Set up offices & QR codes", d:"Focal persons and a survey link per office", url:"hris/survey/offices",
+   html:`<div class="sh"><div><h2>Survey offices</h2><p>Regional, provincial and district offices and training institutes · each with its own focal person</p></div><span class="pill acc">+ Assign focal</span></div>
+   <div class="tbl-wrap" style="margin-bottom:14px"><table>
+    <tr><th>Office</th><th>Type</th><th>Focal person</th><th class="r">QR links</th></tr>
+    <tr><td>Regional Office VII</td><td>Regional Office</td><td>M. Garcia</td><td class="r mono">4</td></tr>
+    <tr style="background:var(--accent-soft)"><td><b>Provincial Office – Cebu</b></td><td>Provincial Office</td><td>J. Tan</td><td class="r mono">4</td></tr>
+    <tr><td>Provincial Office – Bohol</td><td>Provincial Office</td><td>R. Lopez</td><td class="r mono">4</td></tr>
+    <tr><td>Regional Training Center – Cebu</td><td>Training institute</td><td>A. Uy</td><td class="r mono">2</td></tr>
+   </table></div>
+   <div class="qr-grid">
+    <div class="qr">${qr(11)}<small>External · English</small></div>
+    <div class="qr">${qr(29)}<small>External · Filipino</small></div>
+    <div class="qr">${qr(47)}<small>Internal · English</small></div>
+    <div class="qr">${qr(83)}<small>Internal · Filipino</small></div>
+   </div>`},
+  {t:"Client answers the survey", d:"CSM form on the client's phone", url:"survey/form/po-cebu-external-english",
+   html:`<div class="phone">
+    <h4>Client Satisfaction Measurement</h4>
+    <p class="muted" style="margin:0;font-size:12px">Provincial Office – Cebu · English | <span style="color:var(--accent)">Filipino</span></p>
+    <div class="q"><p>Client type</p><div class="opts"><span class="on">Citizen</span><span>Business</span><span>Government</span></div></div>
+    <div class="q"><p>Service availed <span class="muted">(from this office's Citizen's Charter)</span></p><div class="opts"><span class="on">Assessment and Certification</span></div></div>
+    <div class="q"><p><b>CC1</b> Do you know about the Citizen's Charter?</p><div class="opts"><span class="on">Yes, and I saw it here</span><span>No</span></div></div>
+    <div class="q"><p><b>SQD1</b> I spent a reasonable amount of time on my transaction.</p>${scale(4)}</div>
+    <div class="q"><p><b>SQD7</b> I was treated courteously by the staff.</p>${scale(4)}</div>
+    <div class="q"><p><b>SQD8</b> I got what I needed from the office.</p>${scale(3)}</div>
+    <div class="q"><p>Would you recommend TESDA?</p><div class="opts"><span class="on">Yes</span><span>No</span></div></div>
+   </div>`},
+  {t:"Responses come in", d:"Reference numbers and live counts by region", url:"hris/survey",
+   html:`<div class="sh"><div><h2>Responses · Jul 1 – Sep 25, 2026</h2><p>All TESDA offices nationwide</p></div><span class="pill ok">4,826 responses</span></div>
+   <div class="grid2">
+    <div class="box"><h3>By region</h3><div class="hbars">
+     ${[["NCR",812],["Region IV-A",694],["Region VII",612],["Region III",548],["Region XI",431],["Other regions",1729]].map(([r,v])=>
+      `<div class="hbar"><span>${r}</span><div class="bar"><i style="width:${v/17.29}%"></i></div><span class="mono r" style="text-align:right">${v.toLocaleString()}</span></div>`).join("")}
+    </div></div>
+    <div class="box"><h3>Latest submissions</h3><ul class="feed">
+     <li><b>2026-09-POCB-00142</b><span>Provincial Office – Cebu · Assessment and Certification</span><span class="muted">2 min ago</span></li>
+     <li><b>2026-09-DOQZN-00318</b><span>District Office – Quezon City · Scholarship application</span><span class="muted">5 min ago</span></li>
+     <li><b>2026-09-BARMM-00077</b><span>Regional Office BARMM · Training registration</span><span class="muted">9 min ago</span></li>
+    </ul></div>
+   </div>
+   <p class="muted" style="font-size:12.5px;margin:10px 0 0">Every response gets a reference number: month, office code and a running number for that office.</p>`},
+  {t:"Set up a report", d:"Choose region, office and dates", url:"hris/survey/report",
+   html:`<div class="sh"><div><h2>Generate survey responses</h2><p>Focal persons see only their own office · the Central Office can pick any office, or all of them</p></div><span class="pill acc">Central Office</span></div>
+   <div class="grid2" style="margin-bottom:12px">
+    <div class="field"><label>Location</label><div>Region VII</div></div>
+    <div class="field"><label>Office</label><div>All offices in Region VII</div></div>
+    <div class="field"><label>From</label><div class="mono">2026-07-01</div></div>
+    <div class="field"><label>To</label><div class="mono">2026-09-25</div></div>
+   </div>
+   <div class="box row" style="justify-content:space-between"><div class="row"><span class="big mono">612</span><span class="muted" style="font-size:13px">responses match these filters</span></div><span class="pill acc">Generate Excel</span></div>
+   <p class="muted" style="font-size:12.5px;margin:10px 0 0">Every generated report is written to the activity log: who ran it, for which office and which dates.</p>`},
+  {t:"Download the report", d:"Excel file plus satisfaction scores", url:"hris/survey/report/download",
+   html:`<div class="done-banner"><span class="stamp">Generated</span><div><b>Survey Response from 2026-07-01 to 2026-09-25.xlsx</b><span>612 respondents · Region VII · one row per response, CC1–CC3 and SQD0–SQD8</span></div></div>
+   <div class="tbl-wrap" style="margin-bottom:12px"><table>
+    <tr><th>Transaction no.</th><th>Office</th><th>Service availed</th><th>Type</th><th class="r">SQD0</th><th class="r">SQD1</th><th class="r">SQD7</th><th class="r">SQD8</th><th>Recommend</th></tr>
+    <tr><td class="mono">2026-09-POCB-00142</td><td>PO – Cebu</td><td>Assessment and Certification</td><td>Citizen</td><td class="r mono">5</td><td class="r mono">5</td><td class="r mono">5</td><td class="r mono">4</td><td>Yes</td></tr>
+    <tr><td class="mono">2026-09-POBHL-00061</td><td>PO – Bohol</td><td>Scholarship application</td><td>Citizen</td><td class="r mono">4</td><td class="r mono">4</td><td class="r mono">5</td><td class="r mono">4</td><td>Yes</td></tr>
+    <tr><td class="mono">2026-09-RTCC-00033</td><td>RTC – Cebu</td><td>Training registration</td><td>Business</td><td class="r mono">5</td><td class="r mono">4</td><td class="r mono">5</td><td class="r mono">5</td><td>Yes</td></tr>
+   </table></div>
+   <div class="grid2">
+    <div class="box"><h3>Overall satisfaction</h3><div class="row"><span class="big mono">95.3%</span><span class="pill ok">Outstanding</span></div><p class="muted" style="font-size:12.5px;margin:6px 0 0">Share of Agree + Strongly agree, averaged over SQD1–SQD8</p></div>
+    <div class="box"><h3>Lowest and highest</h3><dl class="kv"><dt>SQD4 Communication</dt><dd class="mono">92.7%</dd><dt>SQD3 Access &amp; facilities</dt><dd class="mono">93.1%</dd><dt>SQD7 Assurance</dt><dd class="mono">97.5%</dd><dt>Would recommend TESDA</dt><dd class="mono">98.0%</dd></dl></div>
+   </div>`}
+  ]
+};
+</script>
+<script src="walkthrough.js"></script>
+
+</body></html>

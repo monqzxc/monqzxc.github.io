@@ -1,0 +1,82 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../embed.js"></script></head><body>
+<title>PDS Generation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="walkthrough.css">
+<link rel="stylesheet" href="../embed.css">
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">Portfolio · HRIS module</div>
+    <h1>PDS Generation</h1>
+    <p class="lede">Employees fill in their Personal Data Sheet once, and the system prints the official CS Form 212 whenever they need it. It is pre-filled from HR records and verifiable by QR code.</p>
+    <div class="stack"><span>Vue 3</span><span>Laravel 11</span><span>PDF generation</span><span>QR verification</span></div>
+  </header>
+  <div id="walkthrough"></div>
+  <p class="foot">Screens are simplified recreations. All names, ID numbers and figures are sample data.</p>
+</div>
+
+<script>
+// Each step: t = title, d = one-line description, url = fake address bar, html = the mock screen.
+window.WALKTHROUGH = {
+  name: "PDS Generation",
+  steps:[
+  {t:"Personal information", d:"Profile fields, IDs and contact details", url:"hris/pds/personal",
+   html:`<div class="sh"><div><h2>Personal Data Sheet</h2><p>CS Form No. 212 · Revised 2017</p></div><span class="pill draft">Draft · autosaved</span></div>
+   <div class="tabs"><span class="on">C1 Personal</span><span>C2 Eligibility &amp; work</span><span>C3 Voluntary &amp; L&amp;D</span><span>C4 Other info</span></div>
+   <div class="grid3" style="margin-bottom:12px">
+    <div class="field"><label>Surname</label><div>Dela Cruz</div></div>
+    <div class="field"><label>First name</label><div>Andrea</div></div>
+    <div class="field"><label>Middle name</label><div>Reyes</div></div>
+    <div class="field"><label>Date of birth</label><div class="mono">1994-03-18</div></div>
+    <div class="field"><label>Civil status</label><div>Single</div></div>
+    <div class="field"><label>Blood type</label><div>O+</div></div>
+   </div>
+   <div class="grid2">
+    <div class="field"><label>GSIS ID no.</label><div class="mono">02-0000-1234-5</div></div>
+    <div class="field"><label>PhilHealth no.</label><div class="mono">12-000000456-7</div></div>
+    <div class="field"><label>Residential address</label><div>Blk 4 Lot 12, Brgy. San Isidro, Quezon City</div></div>
+    <div class="field"><label>Email</label><div>andrea.delacruz@example.gov</div></div>
+   </div>`},
+  {t:"Education & eligibility", d:"Schools, degrees and civil-service exams", url:"hris/pds/education",
+   html:`<div class="sh"><div><h2>Education &amp; eligibility</h2><p>Rows from past records are pulled in automatically</p></div><span class="pill acc">C1 complete</span></div>
+   <div class="tabs"><span class="ok">C1 Personal ✓</span><span class="on">C2 Eligibility &amp; work</span><span>C3 Voluntary &amp; L&amp;D</span><span>C4 Other info</span></div>
+   <div class="tbl-wrap" style="margin-bottom:12px"><table>
+    <tr><th>Level</th><th>School</th><th>Degree</th><th class="r">Year</th></tr>
+    <tr><td>Elementary</td><td>San Isidro Elementary School</td><td>—</td><td class="r mono">2006</td></tr>
+    <tr><td>Secondary</td><td>Quezon City Science HS</td><td>—</td><td class="r mono">2010</td></tr>
+    <tr><td>College</td><td>Polytechnic State University</td><td>BS Information Technology</td><td class="r mono">2014</td></tr>
+   </table></div>
+   <div class="tbl-wrap"><table>
+    <tr><th>Eligibility</th><th class="r">Rating</th><th>Exam date</th><th>Place</th></tr>
+    <tr><td>Career Service Professional</td><td class="r mono">84.52</td><td class="mono">2015-08-09</td><td>Manila</td></tr>
+   </table></div>`},
+  {t:"Work & training", d:"Service record, seminars and trainings", url:"hris/pds/work-experience",
+   html:`<div class="sh"><div><h2>Work experience</h2><p>Government service rows come from the service record</p></div><span class="pill acc">3 of 4 sections done</span></div>
+   <div class="tbl-wrap" style="margin-bottom:14px"><table>
+    <tr><th>From – To</th><th>Position</th><th>Office</th><th class="r">SG</th><th>Gov't</th></tr>
+    <tr><td class="mono">2021-02 – present</td><td>Information Systems Analyst II</td><td>Planning Office</td><td class="r mono">15</td><td>Y</td></tr>
+    <tr><td class="mono">2017-06 – 2021-01</td><td>Computer Programmer I</td><td>Regional Office</td><td class="r mono">11</td><td>Y</td></tr>
+    <tr><td class="mono">2014-07 – 2017-05</td><td>Junior Web Developer</td><td>Private sector</td><td class="r mono">—</td><td>N</td></tr>
+   </table></div>
+   <div class="box"><h3>Learning &amp; development</h3>
+    <ul class="check">
+     <li><span class="tick">✓</span>Data Privacy Act Compliance Seminar<span class="mono muted">16 hrs</span></li>
+     <li><span class="tick">✓</span>Laravel for Government Systems<span class="mono muted">40 hrs</span></li>
+     <li><span class="tick">✓</span>Results-Based Performance Management<span class="mono muted">24 hrs</span></li>
+    </ul></div>`},
+  {t:"Generate the form", d:"Print-ready PDF, QR-verifiable", url:"hris/pds/generate",
+   html:`<div class="done-banner"><span class="stamp">Generated</span><div><b>Your PDS is ready to print</b><span>All four pages filled · verified against your HR record</span></div></div>
+   <div class="sheets" style="margin-bottom:16px">
+    ${["C1","C2","C3","C4"].map(p=>`<div class="sheet"><i class="h"></i><i></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><em>CS Form 212 · ${p}</em></div>`).join("")}
+   </div>
+   <div class="grid2">
+    <div class="box"><h3>Completeness</h3><div class="row"><span class="big mono">100%</span><span class="muted" style="font-size:13px">42 of 42 required fields</span></div></div>
+    <div class="box"><h3>Output</h3><dl class="kv"><dt>Format</dt><dd>PDF · Excel</dd><dt>Verification</dt><dd>QR code on each page</dd><dt>Generated</dt><dd class="mono">2026-09-24 10:14</dd></dl></div>
+   </div>`}
+  ]
+};
+</script>
+<script src="walkthrough.js"></script>
+
+</body></html>

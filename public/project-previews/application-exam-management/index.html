@@ -1,0 +1,87 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../embed.js"></script></head><body>
+<title>Application Exam Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="walkthrough.css">
+<link rel="stylesheet" href="../embed.css">
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">Portfolio · Recruitment</div>
+    <h1>Application Exam Management</h1>
+    <p class="lede">HR builds a competency-based written exam from a coded question bank, sets how many items each position needs per competency and thinking level, and the system draws a separate randomized set for every applicant. Answers are submitted online and scored automatically.</p>
+    <div class="stack"><span>Laravel Nova</span><span>Vue 3</span><span>Inertia</span><span>Excel import</span><span>Randomized item draw</span></div>
+  </header>
+  <div id="walkthrough"></div>
+  <p class="foot">Screens are simplified recreations. All names, questions and figures are sample data.</p>
+</div>
+
+<script>
+// Each step: t = title, d = one-line description, url = fake address bar, html = the mock screen.
+window.WALKTHROUGH = {
+  name: "Application Exam Management",
+  steps:[
+  {t:"Build the question bank", d:"Coded items by level, competency and domain", url:"online-exam/exam-elements",
+   html:`<div class="sh"><div><h2>Question bank</h2><p>412 items · imported from spreadsheet or written here</p></div><span class="pill acc">Import .xlsx</span></div>
+   <div class="tabs"><span>Basic · SG 1–9</span><span>Intermediate · SG 10–17</span><span class="on">Advanced · SG 18–24</span><span>Superior · SG 25+</span></div>
+   <div class="tbl-wrap" style="margin-bottom:12px"><table>
+    <tr><th>Code</th><th>Question</th><th>Competency</th><th>Domain</th></tr>
+    <tr><td class="mono">AEIR142</td><td>Which law sets the norms of conduct for public officials and employees?</td><td>Exemplifying Integrity</td><td>Remembering</td></tr>
+    <tr><td class="mono">ADSEU208</td><td>A client says a request took too long. What should you do first?</td><td>Delivering Service Excellence</td><td>Understanding</td></tr>
+    <tr><td class="mono">ASPMDA311</td><td>Two offices send conflicting data for one report. Which do you use, and why?</td><td>Solving Problems &amp; Making Decisions</td><td>Applying</td></tr>
+    <tr><td class="mono">AISMA455</td><td>A nightly backup job fails on one server only. Which log do you check first?</td><td>Information Systems Management</td><td>Analyzing</td></tr>
+   </table></div>
+   <p class="muted" style="font-size:12.5px;margin:0">Code = level + competency initials + domain + item no. Items that give away each other's answers are marked so they are never drawn together.</p>`},
+  {t:"Set the position blueprint", d:"How many items per competency and domain", url:"online-exam/positions/ITO1-12-2026",
+   html:`<div class="sh"><div><h2>Exam blueprint · Information Technology Officer I</h2><p>SG 19 → Advanced level · 186 matching items in the bank</p></div><span class="pill ok">100 items</span></div>
+   <div class="tbl-wrap" style="margin-bottom:12px"><table>
+    <tr><th>Competency</th><th class="r">Remembering</th><th class="r">Understanding</th><th class="r">Applying</th><th class="r">Analyzing</th><th class="r">Total</th></tr>
+    <tr><td>Exemplifying Integrity</td><td class="r mono">4</td><td class="r mono">4</td><td class="r mono">2</td><td class="r mono">0</td><td class="r mono"><b>10</b></td></tr>
+    <tr><td>Delivering Service Excellence</td><td class="r mono">4</td><td class="r mono">4</td><td class="r mono">2</td><td class="r mono">0</td><td class="r mono"><b>10</b></td></tr>
+    <tr><td>Solving Problems &amp; Making Decisions</td><td class="r mono">2</td><td class="r mono">4</td><td class="r mono">6</td><td class="r mono">8</td><td class="r mono"><b>20</b></td></tr>
+    <tr><td>Information Systems Management</td><td class="r mono">10</td><td class="r mono">15</td><td class="r mono">20</td><td class="r mono">15</td><td class="r mono"><b>60</b></td></tr>
+    <tr style="background:var(--sunk)"><td><b>Total</b></td><td class="r mono">20</td><td class="r mono">27</td><td class="r mono">30</td><td class="r mono">23</td><td class="r mono"><b>100</b></td></tr>
+   </table></div>
+   <div class="bar"><i style="width:40%"></i></div>
+   <p class="muted" style="font-size:12.5px;margin:6px 0 0">Core competencies 40% · technical competency 60%</p>`},
+  {t:"Generate & schedule", d:"A unique randomized set for each applicant", url:"online-exam/exams/new",
+   html:`<div class="sh"><div><h2>Generate exam</h2><p>CBWE · Information Technology Officer I · Oct 22, 2026, 9:00 AM</p></div><span class="pill warn">Scheduled</span></div>
+   <div class="grid3" style="margin-bottom:12px">
+    <div class="field"><label>Job opening</label><div class="mono">ITO1-12-2026</div></div>
+    <div class="field"><label>Examinees</label><div>6 set for written exam</div></div>
+    <div class="field"><label>Items each</label><div class="mono">100</div></div>
+   </div>
+   <div class="tbl-wrap" style="margin-bottom:12px"><table>
+    <tr><th>Examinee</th><th>Exam set</th><th>First items drawn</th><th>Notified</th></tr>
+    <tr><td>A. Dela Cruz</td><td class="mono">SET-0412</td><td class="mono muted">AEIR142, ADSEU219, AISMA455…</td><td><span class="pill ok">Sent</span></td></tr>
+    <tr><td>K. Bautista</td><td class="mono">SET-0413</td><td class="mono muted">AEIR097, ADSEU208, AISMU388…</td><td><span class="pill ok">Sent</span></td></tr>
+    <tr><td>L. Ramos</td><td class="mono">SET-0414</td><td class="mono muted">AEIR151, ADSER176, AISMA402…</td><td><span class="pill ok">Sent</span></td></tr>
+    <tr><td class="muted">+ 3 more</td><td></td><td></td><td></td></tr>
+   </table></div>
+   <p class="muted" style="font-size:12.5px;margin:0">Each set follows the blueprint exactly, but the items are drawn at random, so no two examinees get the same paper.</p>`},
+  {t:"Take the exam & score", d:"Online answer sheet, auto-scored results", url:"online-exam/exams/ITO1-12-2026/results",
+   html:`<div class="done-banner"><span class="stamp">Scored</span><div><b>All 6 examinees completed the exam</b><span>Scored against the answer key · results sent to the selection board</span></div></div>
+   <div class="grid2">
+    <div class="tbl-wrap"><table>
+     <tr><th>Examinee</th><th class="r">Score</th></tr>
+     <tr><td>L. Ramos</td><td class="r mono">90</td></tr>
+     <tr style="background:var(--accent-soft)"><td><b>A. Dela Cruz</b></td><td class="r mono"><b>88</b></td></tr>
+     <tr><td>K. Bautista</td><td class="r mono">85</td></tr>
+     <tr><td>P. Mendoza</td><td class="r mono">79</td></tr>
+     <tr><td>G. Torres</td><td class="r mono">72</td></tr>
+     <tr><td>S. Lim</td><td class="r mono">68</td></tr>
+    </table></div>
+    <div class="box"><h3>A. Dela Cruz · by competency</h3><dl class="kv">
+     <dt>Exemplifying Integrity</dt><dd class="mono">10 / 10</dd>
+     <dt>Service Excellence</dt><dd class="mono">9 / 10</dd>
+     <dt>Problems &amp; Decisions</dt><dd class="mono">17 / 20</dd>
+     <dt>Information Systems</dt><dd class="mono">52 / 60</dd>
+     <dt><b>Total</b></dt><dd class="mono"><b>88 / 100</b></dd>
+    </dl><p class="muted" style="font-size:12.5px;margin:10px 0 0">Answer sheet available as a PDF</p></div>
+   </div>`}
+  ]
+};
+</script>
+<script src="walkthrough.js"></script>
+
+</body></html>
