@@ -94,3 +94,17 @@ The editor does not send CV input to a server or save it to browser storage. A d
 - `public/cv/Anthony-Cabigayan-CV.pdf`: finished one-page CV linked from the hero and editor.
 
 After changing Mon's data, regenerate his static download with `npm run generate:cv` before building. This uses the same PDF renderer as visitor exports. No API key, account, database, or third-party document service is needed. Site sharing controls determine who can access the hosted builder.
+
+## Pokémon tile puzzle
+
+Open `/play/`, or follow **Play tile puzzle** in the homepage's Beyond code section. Choose Gengar, Charizard, Pikachu, Ho-Oh, Rayquaza, Bidoof, Mew, or Mewtwo and a 3×3 or 4×4 board. Every shuffle comes from legal moves, so it is solvable. Click or tap an adjacent tile, or focus the board and use arrow keys to move a tile in that direction. Numbers and the reference picture can be toggled while playing.
+
+The timer starts when playing, pauses on request or when the tab becomes hidden, and resumes without counting time away. The current board, move count, elapsed time, and latest 50 wins use the versioned `mon-tile-puzzle-v1` localStorage key. Records are separated by Pokémon and board size, with best time and fewest moves calculated from the saved wins. Refreshing restores the current board paused; a completed game does not record a duplicate win. Malformed saved data is validated before use, and blocked storage leaves the game playable with an explanatory message. Scores are local to the browser and origin; clearing browser data removes them.
+
+- `components/tile-puzzle.tsx`: game controls, timing, persistence, and scores.
+- `lib/tile-puzzle.ts`: board rules, solvable shuffles, and saved-data validation.
+- `lib/puzzle-pokemon.ts`: image choices, colors, and time formatting.
+- `app/play/puzzle.css`: responsive game layout and tile animation.
+- `public/images/puzzle/`: bundled artwork and source attribution.
+
+Run `npm run test:puzzle` for the puzzle logic and saved-data checks, and `npm run typecheck` for TypeScript. The game and artwork are included in the regular static export and need no API or game server.

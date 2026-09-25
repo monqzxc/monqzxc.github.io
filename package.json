@@ -11,6 +11,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "test:puzzle": "node --experimental-strip-types --test scripts/check-tile-puzzle.mjs",
     "generate:cv": "node scripts/generate-cv.mjs"
   },
   "dependencies": {
