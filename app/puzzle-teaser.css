@@ -1,4 +1,5 @@
 .puzzle-teaser { display: flex; justify-content: space-between; align-items: center; gap: 32px; position: relative; overflow: hidden; margin-top: 24px; padding: 33px 40px; border: 1px solid var(--border); border-radius: 24px; background: linear-gradient(120deg, color-mix(in srgb, var(--primary) 9%, transparent), #ffffff02); transition: border-color .2s; }
+.puzzle-teaser { pointer-events: auto; }
 .puzzle-teaser:hover { border-color: var(--primary); }
 .puzzle-teaser-copy { position: relative; z-index: 1; }
 .puzzle-teaser .eyebrow { font-size: 10px; color: var(--primary); }

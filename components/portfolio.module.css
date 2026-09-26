@@ -1,3 +1,27 @@
+.emailLink {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.emailIcon {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+  border: 2px solid var(--background);
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.emailLink:hover .emailIcon {
+  background: var(--foreground);
+}
+
 .pokeball {
   position: relative;
   flex-shrink: 0;

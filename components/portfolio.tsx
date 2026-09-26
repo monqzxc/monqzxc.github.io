@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, ArrowUpRight, Menu, X, Trophy, Code2, Building2, Layers } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Mail, Menu, X, Trophy, Code2, Building2, Layers } from "lucide-react";
 import ProjectCard from "@/components/project-card";
 import PuzzleTeaser from "@/components/puzzle-teaser";
 import { projects } from "@/lib/projects";
@@ -36,7 +36,10 @@ export default function Portfolio() {
     <div className="eyebrow"><span className="short-line"/>04 / THE NEXT QUEST</div>
     <div className="contact-top">
       <h2>Something in mind?<br/><span>Let’s team up.</span></h2>
-      <span className={styles.pokeball} aria-hidden="true" />
+      <a className={styles.emailLink} href="mailto:suppmon27@gmail.com" aria-label="Send me an email" title="Send me an email">
+        <span className={styles.pokeball} aria-hidden="true" />
+        <Mail className={styles.emailIcon} aria-hidden="true" />
+      </a>
     </div>
     <div className="contact-bottom">
       <p>Open to thoughtful collaborations and enterprise projects. Found me on Upwork? Send me a message there to start our next quest.</p>
