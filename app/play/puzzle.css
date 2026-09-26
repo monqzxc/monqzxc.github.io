@@ -4,6 +4,7 @@
 .puzzle-wordmark-label { color: var(--muted-foreground); font: 11px var(--font-mono); letter-spacing: .15em; padding-left: 20px; border-left: 1px solid var(--border); }
 .puzzle-back { display: inline-flex; align-items: center; gap: 8px; color: var(--muted-foreground); font-size: 13px; min-height: 44px; }
 .puzzle-back:hover { color: var(--foreground); }
+.puzzle-game-nav { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px 24px; }
 .puzzle-main { padding-block: 45px 54px; }
 .puzzle-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin-bottom: 32px; }
 .puzzle-intro .eyebrow { color: var(--puzzle-color); font-size: 11px; letter-spacing: .12em; }

@@ -180,7 +180,7 @@ export default function TilePuzzle() {
       <a className="skip-link" href="#puzzle-main">Skip to puzzle</a>
       <header className="puzzle-topbar">
         <a className="wordmark" href="/" aria-label="Mon home"><strong>mon<span>.</span></strong><span className="puzzle-wordmark-label">PLAYGROUND</span></a>
-        <a className="puzzle-back" href="/#craft-hobbies"><ArrowLeft size={16} /> Back to portfolio</a>
+        <nav className="puzzle-game-nav" aria-label="Playground navigation"><a className="puzzle-back" href="/play/raft/"><Gamepad2 size={16} /> Poké Raft</a><a className="puzzle-back" href="/#craft-hobbies"><ArrowLeft size={16} /> Portfolio</a></nav>
       </header>
       <main id="puzzle-main" className="puzzle-main">
         <div className="puzzle-intro">

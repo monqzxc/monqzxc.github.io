@@ -117,3 +117,20 @@ The timer starts when playing, pauses on request or when the tab becomes hidden,
 
 Run `npm run test:puzzle` for the puzzle logic and saved-data checks, and `npm run typecheck` for TypeScript. The game and artwork are included in the regular static export and need no API or game server.
 >>>>>>> 419397ca94267b008887bf5def4c16038028c18b
+
+## Poké Raft
+
+Open `/play/raft/`, or follow **Play raft battle** on the homepage, for a turn-based artillery game. Play against Easy or Hard AI, or choose two players to take turns on the same device. Pick Pikachu, Gengar, Charizard, or Mew; all four have equal stats.
+
+Adjust the angle and power, account for the wind, and fire toward the rival raft. Wind changes after both players have fired, and nearby impacts can cause splash damage. Each player starts with 100 HP, unlimited standard Energy Orbs, and three stronger special shots. Reduce the rival's HP to zero to win. Easy AI allows more aiming error; Hard AI calculates shots using the current wind.
+
+The game runs locally in the browser with mouse, touch, and keyboard controls. Match state is held in memory and resets on refresh; it is not saved to browser storage. The game uses the existing Pokémon artwork, local fonts, and dark purple visual theme.
+
+- `app/play/raft/page.tsx`: route and page metadata.
+- `components/raft-battle.tsx`: setup, controls, turn handoffs, and match state.
+- `components/raft-arena.tsx`: canvas arena, artwork, and shot animation.
+- `lib/raft-battle.ts`: projectile physics, damage, turns, and AI difficulty.
+- `app/play/raft/raft.css`: responsive layout and game styling.
+- `scripts/check-raft-battle.mjs`: physics, battle rules, and AI checks.
+
+Run `npm run test:raft` for the game logic checks and `npm run typecheck` for TypeScript. Artwork sources remain documented in `public/images/puzzle/README.md`.

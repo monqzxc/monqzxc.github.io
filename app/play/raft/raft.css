@@ -1,0 +1,115 @@
+.raft-page { --raft-purple: #c2a5f5; --raft-gold: #f4d278; --raft-text: #f2f0fa; --raft-muted: #b9b7cb; --raft-line: #c5b7ec24; color: var(--raft-text); min-height: 100vh; background: #0e101b; color-scheme: dark; }
+.raft-page ::selection { background: #c2a5f54d; color: #fff; }
+.raft-page :focus-visible { outline: 2px solid var(--raft-gold); outline-offset: 4px; }
+.raft-topbar, .raft-main, .raft-footer { width: min(1320px, calc(100% - 80px)); margin-inline: auto; }
+.raft-topbar { min-height: 86px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--raft-line); gap: 20px; }
+.raft-wordmark-label { color: var(--raft-muted); font-size: 12px; padding-left: 20px; border-left: 1px solid var(--raft-line); }
+.raft-topbar nav { display: flex; gap: 28px; }
+.raft-topbar nav a { display: flex; align-items: center; gap: 8px; color: var(--raft-muted); min-height: 44px; font-size: 13px; }
+.raft-topbar nav a:hover { color: var(--raft-purple); }
+.raft-main { padding-block: 34px 48px; }
+.raft-intro { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 28px; }
+.raft-intro h1 { margin: 0 0 9px; font-size: clamp(38px, 4vw, 56px); font-weight: 700; line-height: 1.08; letter-spacing: -.04em; }
+.raft-intro h1 span { color: var(--raft-purple); }
+.raft-intro p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--raft-muted); }
+.raft-mode-note { display: flex; align-items: center; gap: 9px; flex-shrink: 0; font-size: 12px; color: var(--raft-muted); padding-bottom: 3px; }
+.raft-layout { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 26px; align-items: start; }
+.raft-game { min-width: 0; }
+.raft-scoreboard { display: flex; justify-content: space-between; position: relative; gap: 64px; padding: 17px 20px; background: #191b2b; border-radius: 14px 14px 0 0; }
+.raft-player { display: flex; align-items: center; gap: 12px; width: 42%; min-width: 0; }
+.raft-player > img { width: 52px; height: 52px; object-fit: contain; }
+.raft-player-info { flex: 1; min-width: 0; }
+.raft-player-name { display: flex; gap: 7px; align-items: baseline; flex-wrap: wrap; margin-bottom: 7px; }
+.raft-player-name strong { font-size: 14px; font-weight: 650; }
+.raft-player-name > span { font-size: 10px; color: var(--raft-muted); }
+.raft-health { height: 6px; background: #ffffff12; border-radius: 3px; overflow: hidden; }
+.raft-health > span { display: block; height: 100%; border-radius: inherit; background: var(--raft-purple); transition: width .4s ease; }
+.raft-player-1 .raft-health > span { background: var(--raft-gold); }
+.raft-health-value { display: block; font: 11px var(--font-mono); font-variant-numeric: tabular-nums; margin-top: 6px; }
+.raft-health-value > span { color: var(--raft-muted); font-size: 9px; }
+.raft-player.is-active .raft-player-name strong { color: var(--raft-purple); }
+.raft-player-1.is-active .raft-player-name strong { color: var(--raft-gold); }
+.raft-versus { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #aaa1bc; font-size: 13px; font-style: italic; }
+.raft-scene { position: relative; overflow: hidden; background: #222740; }
+.raft-canvas { display: block; width: 100%; aspect-ratio: 2; }
+.raft-weather { position: absolute; inset: 15px 17px auto; display: flex; justify-content: space-between; gap: 12px; pointer-events: none; z-index: 1; }
+.raft-weather > span { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; color: #e5e3f5; }
+.raft-weather > span:last-child { background: #111827a8; border-radius: 6px; padding: 7px 10px; margin-top: -6px; font-variant-numeric: tabular-nums; }
+.raft-scene-message { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(340px, calc(100% - 32px)); padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; background: #15182af5; border: 1px solid #c2a5f54d; border-radius: 12px; color: var(--raft-gold); }
+.raft-scene-message > strong { color: var(--raft-text); font-size: 21px; line-height: 1.3; letter-spacing: -.025em; }
+.raft-scene-message > span { color: var(--raft-muted); font-size: 12px; line-height: 1.6; }
+.raft-scene-message .raft-primary { margin-top: 6px; }
+.raft-status { display: flex; align-items: center; gap: 9px; min-height: 52px; background: #1b1e30; border-radius: 0 0 12px 12px; padding: 12px 18px; }
+.raft-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--raft-purple); flex-shrink: 0; }
+.raft-status-dot.is-busy { background: var(--raft-gold); animation: raft-pulse 1s ease-in-out infinite alternate; }
+.raft-status strong { font-size: 12px; font-weight: 500; line-height: 1.6; }
+.raft-round { margin-left: auto; flex-shrink: 0; font: 10px var(--font-mono); color: var(--raft-muted); }
+.raft-below-arena { display: flex; align-items: start; justify-content: space-between; gap: 18px; padding: 16px 0; }
+.raft-below-arena > p { display: flex; align-items: start; gap: 8px; color: var(--raft-muted); font-size: 12px; line-height: 1.7; margin: 5px 0 0; max-width: 53ch; }
+.raft-below-arena > p > svg { flex-shrink: 0; margin-top: 2px; color: var(--raft-purple); }
+.raft-text-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-size: 12px; color: var(--raft-muted); padding: 8px 0; min-height: 44px; flex-shrink: 0; }
+.raft-text-button:hover:not(:disabled) { color: var(--raft-text); }
+.raft-page button:disabled { cursor: not-allowed; opacity: .45; }
+.raft-log { border-top: 1px solid var(--raft-line); padding-top: 18px; }
+.raft-log h2 { font-size: 12px; margin: 0 0 10px; font-weight: 600; }
+.raft-log p, .raft-log li { color: var(--raft-muted); font-size: 12px; line-height: 1.7; margin: 0; }
+.raft-log ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.raft-log .is-latest { color: #d4c5ed; }
+.raft-sidebar { border: 1px solid var(--raft-line); border-radius: 14px; padding: 24px; min-width: 0; background: #151724; }
+.raft-panel-heading { margin-bottom: 23px; }
+.raft-panel-heading h2, .raft-match-result h2 { font-size: 25px; font-weight: 600; letter-spacing: -.03em; line-height: 1.3; margin: 0 0 7px; }
+.raft-panel-heading p, .raft-match-result p { margin: 0; color: var(--raft-muted); font-size: 12px; line-height: 1.7; }
+.raft-fieldset { min-width: 0; padding: 0; border: 0; margin: 0 0 20px; }
+.raft-fieldset legend { display: flex; justify-content: space-between; width: 100%; font-size: 12px; font-weight: 550; margin-bottom: 10px; padding: 0; }
+.raft-fieldset legend > span { color: var(--raft-muted); font-size: 10px; }
+.raft-segmented { display: flex; border: 1px solid var(--raft-line); border-radius: 8px; padding: 3px; gap: 3px; }
+.raft-segmented button { display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; min-height: 38px; font-size: 12px; color: var(--raft-muted); border-radius: 5px; }
+.raft-segmented button[aria-pressed=true] { background: #c2a5f51f; color: #dbc6ff; }
+.raft-segmented button:hover { background: #c2a5f510; }
+.raft-field-hint, .raft-local-hint { font-size: 11px; line-height: 1.65; color: var(--raft-muted); margin: 8px 0 0; }
+.raft-local-hint { margin-bottom: 20px; }
+.raft-crew-picker { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+.raft-crew-picker button { display: flex; flex-direction: column; align-items: center; min-width: 0; position: relative; border: 1px solid transparent; border-radius: 8px; padding: 7px 1px; color: var(--raft-muted); }
+.raft-crew-picker img { width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; }
+.raft-crew-picker button > span { font-size: 9px; margin-top: 6px; }
+.raft-crew-picker button[aria-pressed=true] { border-color: color-mix(in srgb, var(--crew-color) 65%, transparent); background: color-mix(in srgb, var(--crew-color) 10%, transparent); color: var(--crew-color); }
+.raft-crew-picker button:hover { background: #ffffff07; }
+.raft-crew-check { position: absolute; top: 3px; right: 3px; }
+.raft-primary { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; background: var(--raft-purple); color: #1d1530; font-size: 13px; line-height: 1.4; font-weight: 650; padding: 12px 19px; border-radius: 8px; transition: background .15s; }
+.raft-primary:hover:not(:disabled) { background: #d3baff; }
+.raft-start, .raft-fire { width: 100%; }
+.raft-fair-note { text-align: center; font-size: 10px; line-height: 1.7; color: var(--raft-muted); margin: 10px 0 0; }
+.raft-turn-label { display: block; font-size: 12px; color: var(--raft-purple); margin-bottom: 12px; }
+.raft-shots { display: flex; flex-direction: column; gap: 8px; }
+.raft-shots button { display: flex; align-items: center; gap: 12px; border: 1px solid var(--raft-line); border-radius: 8px; padding: 12px; text-align: left; color: var(--raft-muted); }
+.raft-shots button.is-selected { color: var(--raft-purple); background: #c2a5f511; border-color: #c2a5f56b; }
+.raft-shots strong { display: block; font-size: 12px; font-weight: 600; }
+.raft-shots small { display: block; font-size: 10px; color: var(--raft-muted); margin-top: 4px; }
+.raft-slider-group { margin: 25px 0; }
+.raft-slider-group label { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; }
+.raft-slider-group output { font: 21px var(--font-mono); font-variant-numeric: tabular-nums; color: var(--raft-purple); }
+.raft-slider-group input { width: 100%; display: block; height: 32px; margin: 7px 0 1px; accent-color: var(--raft-purple); cursor: pointer; }
+.raft-slider-group input:disabled { opacity: .4; cursor: not-allowed; }
+.raft-range-ends { display: flex; justify-content: space-between; gap: 12px; color: var(--raft-muted); font-size: 10px; }
+.raft-match-result { display: flex; flex-direction: column; align-items: start; }
+.raft-match-result > svg { color: var(--raft-gold); margin-bottom: 20px; }
+.raft-match-result dl { display: flex; gap: 32px; margin: 26px 0; }
+.raft-match-result dt { font-size: 11px; color: var(--raft-muted); }
+.raft-match-result dd { font-size: 18px; margin: 7px 0 0; }
+.raft-match-result .raft-primary { width: 100%; }
+.raft-match-result .raft-text-button { margin: 7px auto 0; }
+.raft-howto { border-top: 1px solid var(--raft-line); margin-top: 28px; padding-top: 19px; }
+.raft-howto summary { font-size: 12px; color: var(--raft-muted); cursor: pointer; padding: 6px 0; min-height: 40px; }
+.raft-howto > div { display: grid; grid-template-columns: 1fr 1fr; column-gap: 50px; }
+.raft-howto p { max-width: 68ch; font-size: 12px; line-height: 1.8; color: var(--raft-muted); }
+.raft-howto strong { color: var(--raft-text); font-weight: 550; }
+.raft-footer { border-top: 1px solid var(--raft-line); display: flex; justify-content: space-between; gap: 24px; padding-block: 22px; color: var(--raft-muted); font-size: 10px; line-height: 1.8; }
+.raft-footer a { text-decoration: underline; text-underline-offset: 3px; }
+.raft-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.raft-confirm { color: #f2f0fa; background: #191b2b; border-color: #c5b7ec33; }
+@keyframes raft-pulse { to { opacity: .35; } }
+@media (min-width: 1450px) { .raft-layout { grid-template-columns: minmax(0, 1fr) 340px; } }
+@media (max-width: 1100px) { .raft-topbar, .raft-main, .raft-footer { width: calc(100% - 48px); } .raft-layout { gap: 20px; grid-template-columns: minmax(0, 1fr) 285px; } .raft-sidebar { padding: 20px; } .raft-mode-note { display: none; } .raft-scoreboard { padding: 15px 12px; gap: 34px; } .raft-player { gap: 7px; width: 45%; } .raft-player > img { width: 38px; height: 38px; } .raft-player-name { gap: 3px 8px; } .raft-player-name strong { font-size: 12px; } }
+@media (max-width: 800px) { .raft-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; } .raft-main { max-width: 660px; } .raft-sidebar { padding: 24px; } .raft-crew-picker { gap: 10px; } .raft-crew-picker img { max-width: 66px; } .raft-crew-picker button > span { font-size: 11px; } .raft-player { width: 42%; } .raft-player > img { width: 45px; height: 45px; } .raft-log { display: none; } .raft-scoreboard { padding: 16px; } .raft-player-name strong { font-size: 13px; } .raft-main { padding-top: 26px; } .raft-howto > div { grid-template-columns: 1fr; } .raft-footer { flex-direction: column; gap: 5px; } }
+@media (max-width: 480px) { .raft-topbar, .raft-main, .raft-footer { width: calc(100% - 32px); } .raft-topbar { min-height: 73px; } .raft-wordmark-label { display: none; } .raft-topbar nav { gap: 18px; } .raft-topbar nav a { font-size: 11px; } .raft-intro { margin-bottom: 22px; } .raft-intro p { font-size: 12px; max-width: 32ch; } .raft-scoreboard { padding: 12px 10px; gap: 32px; } .raft-player { width: 46%; gap: 5px; } .raft-player > img { width: 32px; height: 38px; } .raft-player-name { flex-direction: column; gap: 2px; } .raft-player-name strong { font-size: 11px; } .raft-player-name > span { font-size: 9px; } .raft-health-value { font-size: 10px; } .raft-weather { inset: 12px 10px auto; } .raft-weather > span { font-size: 9px; gap: 4px; } .raft-weather > span:last-child { padding: 5px 7px; margin-top: -4px; } .raft-weather svg { width: 12px; } .raft-status { gap: 7px; padding: 10px 12px; } .raft-status strong { font-size: 11px; } .raft-round { font-size: 9px; } .raft-below-arena { gap: 10px; padding-block: 12px; } .raft-below-arena > p { font-size: 11px; } .raft-below-arena .raft-text-button { font-size: 10px; gap: 4px; } .raft-sidebar { padding: 21px; } .raft-scene-message { padding: 12px 15px; gap: 5px; width: calc(100% - 42px); } .raft-scene-message > svg { display: none; } .raft-scene-message > strong { font-size: 17px; } .raft-scene-message > span { font-size: 10px; } .raft-scene-message .raft-primary { margin-top: 3px; min-height: 42px; padding-block: 9px; } }
+@media (prefers-reduced-motion: reduce) { .raft-page *, .raft-page *::before, .raft-page *::after { animation: none !important; transition: none !important; } }

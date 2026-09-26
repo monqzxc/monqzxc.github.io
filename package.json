@@ -12,6 +12,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test:puzzle": "node --experimental-strip-types --test scripts/check-tile-puzzle.mjs",
+    "test:raft": "node --experimental-strip-types --test scripts/check-raft-battle.mjs",
     "generate:cv": "node scripts/generate-cv.mjs"
   },
   "dependencies": {
