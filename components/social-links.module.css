@@ -1,0 +1,28 @@
+.links {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.email {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  color: var(--accent);
+  transition: background .2s, color .2s;
+}
+
+.email:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .email { transition: none; }
+}

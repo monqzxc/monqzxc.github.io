@@ -1,0 +1,11 @@
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { monCv } from "../lib/cv-data.ts";
+import { createCvDocument } from "../lib/cv-pdf.ts";
+const root = new URL("../", import.meta.url);
+const fonts = await Promise.all(["regular", "semibold"].map(async weight => (await readFile(new URL(`public/fonts/cv-dm-sans-${weight}.ttf`, root))).toString("base64")));
+const result = await createCvDocument(monCv, fonts);
+const output = new URL("public/cv/Anthony-Cabigayan-CV.pdf", root);
+await mkdir(new URL("public/cv/", root), { recursive: true });
+await writeFile(output, Buffer.from(result.doc.output("arraybuffer")));
+console.log(JSON.stringify({ output: fileURLToPath(output), pages: result.pages.length }));

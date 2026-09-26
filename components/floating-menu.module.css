@@ -1,0 +1,243 @@
+.floatingMenu {
+  --radius: 256px;
+  --trigger-size: 68px;
+  --bubble-size: 52px;
+  position: fixed;
+  right: max(30px, env(safe-area-inset-right));
+  bottom: max(34px, calc(env(safe-area-inset-bottom) + 20px));
+  z-index: 40;
+  width: var(--trigger-size);
+  height: var(--trigger-size);
+}
+
+.trigger {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 2px solid color-mix(in srgb, var(--accent) 75%, white);
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--primary-foreground);
+  box-shadow: 0 10px 30px #0009, 0 0 0 6px color-mix(in srgb, var(--accent) 25%, transparent), 0 0 34px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: background .25s, box-shadow .25s, transform .25s;
+}
+
+.trigger:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px #0009, 0 0 0 8px color-mix(in srgb, var(--accent) 32%, transparent), 0 0 42px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.pokeball {
+  position: absolute;
+  inset: 5px;
+  overflow: hidden;
+  border: 2px solid var(--background);
+  border-radius: 50%;
+  background: linear-gradient(to bottom, var(--accent) 0 44%, var(--background) 44% 56%, #f1edf8 56% 100%);
+  box-shadow: inset 0 2px 2px #ffffff60, inset 0 -3px 4px #0002;
+  transform: rotate(-22deg);
+  transition: transform .3s, opacity .2s;
+}
+
+.pokeball::after {
+  content: "";
+  position: absolute;
+  inset: 32%;
+  border: 4px solid var(--background);
+  border-radius: 50%;
+  background: #f1edf8;
+  box-shadow: inset 0 0 0 2px #d7d0e1;
+}
+
+.trigger:hover .pokeball { transform: rotate(0); }
+
+.closeIcon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(.5);
+  transition: opacity .2s, transform .3s;
+}
+
+.triggerLabel {
+  position: absolute;
+  right: calc(100% + 16px);
+  padding: 7px 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 100px;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+  opacity: 1;
+  transform: none;
+  transition: opacity .2s, transform .2s;
+}
+
+.trigger:is(:hover, :focus-visible) .triggerLabel {
+  opacity: 1;
+  transform: none;
+}
+
+.shortcuts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.shortcut {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: block;
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--foreground);
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -50%) scale(.3);
+  transition: transform .3s cubic-bezier(.2, .8, .2, 1), opacity .2s, visibility .3s;
+}
+
+.bubble {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 26%, var(--card));
+  box-shadow: 0 8px 20px #0006, inset 0 1px 0 #ffffff18;
+  transition: background .2s, color .2s, transform .2s;
+}
+
+.shortcut[aria-current="location"] .bubble,
+.shortcut:is(:hover, :focus-visible) .bubble {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  transform: translateY(-3px);
+}
+
+.label {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 50%;
+  padding: 3px 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.email .bubble {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.glow {
+  position: absolute;
+  right: -30px;
+  bottom: -34px;
+  z-index: -1;
+  width: calc(var(--radius) + 170px);
+  height: calc(var(--radius) + 170px);
+  border-radius: 100% 0 0 0;
+  background: radial-gradient(ellipse at bottom right, color-mix(in srgb, var(--background) 96%, transparent) 35%, color-mix(in srgb, var(--background) 85%, transparent) 58%, transparent 72%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .25s;
+}
+
+.floatingMenu[data-open="true"] .trigger {
+  background: var(--primary);
+  box-shadow: 0 10px 35px #0008, 0 0 0 6px color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.floatingMenu[data-open="true"] .pokeball {
+  opacity: 0;
+  transform: rotate(90deg) scale(.5);
+}
+
+.floatingMenu[data-open="true"] .closeIcon { opacity: 1; transform: none; }
+.floatingMenu[data-open="true"] .triggerLabel { opacity: 0; }
+.floatingMenu[data-open="true"] .glow { opacity: 1; }
+
+.floatingMenu[data-open="true"] .shortcut {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+  transform: translate(calc(-50% + var(--x) * var(--radius)), calc(-50% + var(--y) * var(--radius))) scale(1);
+  transition-delay: var(--delay);
+}
+
+@media (max-width: 600px), (max-height: 520px) {
+  .floatingMenu {
+    --radius: 216px;
+    --trigger-size: 60px;
+    --bubble-size: 46px;
+    right: max(18px, env(safe-area-inset-right));
+    bottom: max(30px, calc(env(safe-area-inset-bottom) + 20px));
+  }
+
+  .label { font-size: 10px; padding: 3px 5px; }
+  .glow { right: -18px; bottom: -30px; }
+}
+
+@media (max-height: 360px) {
+  .shortcuts {
+    inset: auto 0 calc(100% + 16px) auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px 8px;
+    width: min(400px, calc(100vw - 36px));
+    max-height: calc(100dvh - 126px);
+    overflow-y: auto;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--card);
+    visibility: hidden;
+  }
+
+  .floatingMenu[data-open="true"] .shortcuts {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .shortcut, .floatingMenu[data-open="true"] .shortcut {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    height: auto;
+    transform: none;
+    transition: none;
+  }
+
+  .bubble { width: 42px; height: 42px; flex-shrink: 0; }
+  .label { position: static; padding: 0; border: 0; white-space: normal; transform: none; }
+  .glow { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floatingMenu *, .floatingMenu[data-open="true"] .shortcut {
+    transition: none;
+  }
+}

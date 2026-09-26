@@ -1,0 +1,143 @@
+/* Theme controls and a small, interactive world at the edges of the page. */
+.portfolio-page { position: relative; isolation: isolate; }
+.portfolio-page > main, .portfolio-page > .footer { position: relative; z-index: 1; }
+/* Empty space lets visitors reach the creatures behind the content. */
+.portfolio-page > main { pointer-events: none; }
+.portfolio-page main :is(.hero-copy, .hero-diorama, .hero-bottom, .tech-strip, .section-heading, .project-card, .about-band, .timeline, .craft-layout, .contact-section) { pointer-events: auto; }
+.site-header .nav { gap: 18px; }
+.site-header .wordmark { margin-right: auto; flex-shrink: 0; }
+.site-header .nav-links { order: 1; }
+.theme-controls { order: 2; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.site-header .menu-toggle { order: 3; flex-shrink: 0; }
+.theme-selector { display: flex; gap: 3px; margin: 0; padding: 4px; min-width: 0; border: 1px solid var(--border); border-radius: 100px; background: color-mix(in srgb, var(--background) 70%, transparent); }
+.theme-choice { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 36px; padding: 3px 10px 3px 5px; border: 1px solid transparent; border-radius: 100px; color: var(--muted-foreground); cursor: pointer; font-size: 12px; font-weight: 600; transition: background .2s, color .2s, border-color .2s; }
+.theme-choice svg { width: 26px; height: 26px; }
+.theme-choice:hover { color: var(--foreground); background: color-mix(in srgb, var(--primary) 8%, transparent); }
+.theme-choice.is-selected { color: var(--foreground); background: color-mix(in srgb, var(--primary) 17%, transparent); border-color: color-mix(in srgb, var(--primary) 32%, transparent); }
+.theme-choice:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 3px; }
+.habitat-pause { display: grid; place-items: center; width: 28px; height: 36px; border: 0; border-radius: 9px; background: transparent; color: var(--muted-foreground); }
+.habitat-pause:hover { color: var(--foreground); background: color-mix(in srgb, var(--primary) 12%, transparent); }
+.habitat-hint { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; color: var(--muted-foreground); font-size: 11px; }
+.habitat-hint svg { width: 12px; height: 12px; }
+
+.pokemon-habitat { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; --pokemon-size: 80px; }
+.pokemon-habitat[data-ready=false] { visibility: hidden; }
+.pokemon-slot { position: absolute; width: var(--pokemon-size); z-index: 1; }
+.pokemon-slot:is([data-activity="walk"], [data-activity="float"]) { animation: pokemon-travel var(--activity-duration) linear both; }
+.pokemon-traveler { position: relative; }
+.pokemon-presence { opacity: .7; }
+.pokemon-resident { display: block; position: relative; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 45%; background: transparent; pointer-events: auto; touch-action: manipulation; }
+.pokemon-window, .pokemon-emerge, .pokemon-facing { display: block; width: 100%; }
+.pokemon-facing { transform: scaleX(var(--facing)); }
+.pokemon-character { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 4px 10px #0003); }
+.pokemon-resident:focus-visible { outline-offset: 1px; }
+.pokemon-slot[data-activity="float"] .pokemon-character { animation: pokemon-float 4s ease-in-out var(--bob-delay) infinite; filter: drop-shadow(0 4px 12px #a271f637); }
+.pokemon-slot[data-activity="appear"] .pokemon-presence { animation: ghost-arrive var(--activity-duration) ease-out both; }
+.pokemon-slot[data-activity="vanish"] .pokemon-presence { animation: ghost-depart var(--activity-duration) ease-in both; }
+.pokemon-slot:is([data-activity="hidden"], [data-activity="underground"]) .pokemon-presence { opacity: 0; visibility: hidden; }
+.pokemon-slot .pokemon-mist { animation: ghost-mist-turn 5s ease-in-out infinite alternate; }
+.pokemon-slot .pokemon-mist-inner { animation-direction: alternate-reverse; animation-duration: 3.5s; }
+.pokemon-slot .pokemon-idle-hand { animation: ghost-hand-drift 2.8s ease-in-out infinite alternate; }
+.pokemon-slot .pokemon-idle-hand.pokemon-arm-right { animation-delay: -1.4s; }
+.pokemon-portal { position: absolute; inset: 8%; border: 1px solid #bca0ef70; border-radius: 50%; background: radial-gradient(ellipse, #aa7cdd1a, transparent 65%); box-shadow: 0 0 17px #9970e532, inset 0 0 12px #9970e524; opacity: 0; }
+.pokemon-slot:is([data-activity="appear"], [data-activity="vanish"]) .pokemon-portal { animation: ghost-portal var(--activity-duration) ease-in-out both; }
+
+.is-ground .pokemon-window { overflow: hidden; border-radius: 0 0 38% 38%; }
+.pokemon-slot[data-activity="walk"] .pokemon-character { animation: pokemon-walk-bob .48s ease-in-out infinite; }
+.pokemon-slot[data-activity="walk"] :is(.pokemon-leg-left, .pokemon-leg-right) { animation: pokemon-step .48s ease-in-out infinite alternate; }
+.pokemon-slot[data-activity="walk"] .pokemon-leg-right { animation-delay: -.48s; }
+.pokemon-slot[data-activity="walk"] :is(.pokemon-arm-left, .pokemon-arm-right) { animation: pokemon-arm-swing .48s ease-in-out infinite alternate; }
+.pokemon-slot[data-activity="walk"] .pokemon-arm-left { animation-delay: -.48s; }
+.pokemon-slot .pokemon-tail { animation: pokemon-tail-sway 2.8s ease-in-out infinite alternate; }
+.pokemon-slot[data-activity="look"] .pokemon-character { animation: pokemon-look 3.4s ease-in-out infinite; }
+.pokemon-slot[data-activity="dig"] .pokemon-character { animation: pokemon-dig .55s ease-in-out infinite; }
+.pokemon-slot[data-activity="dig"] .pokemon-dig-arm { animation: pokemon-shovel .36s ease-in-out infinite alternate; }
+.pokemon-slot[data-activity="dig"] .pokemon-arm-right { animation-delay: -.36s; }
+.pokemon-slot[data-activity="dig"] .pokemon-tail { animation-duration: .45s; }
+.pokemon-slot[data-activity="burrow"] .pokemon-emerge { animation: pokemon-burrow var(--activity-duration) ease-in both; }
+.pokemon-slot[data-activity="emerge"] .pokemon-emerge { animation: pokemon-unearth var(--activity-duration) cubic-bezier(.2,.8,.3,1) both; }
+.pokemon-soil { position: absolute; width: 84%; height: 15%; left: 8%; bottom: 2%; border-radius: 50%; border: 1px solid #c7a16a50; background: radial-gradient(ellipse, #17100ded 20%, #8b673778 70%, transparent 73%); box-shadow: 7px 2px 0 -3px #a9823c50, -6px 3px 0 -4px #a9823c66; opacity: .3; transition: opacity .3s; }
+.pokemon-slot:is([data-activity="dig"], [data-activity="burrow"], [data-activity="underground"], [data-activity="emerge"]) .pokemon-soil { opacity: .8; }
+.pokemon-slot[data-activity="underground"] .pokemon-soil { animation: soil-rumble .5s ease-in-out infinite; }
+.pokemon-dust { position: absolute; inset: 0; pointer-events: none; }
+.pokemon-dust i { position: absolute; left: 30%; bottom: 9%; width: 5px; height: 4px; border-radius: 40%; background: #d0a76e; opacity: 0; --dust-drift: -21px; }
+.pokemon-dust i:nth-child(2) { left: 60%; width: 4px; --dust-drift: 24px; }
+.pokemon-dust i:nth-child(3) { left: 48%; width: 3px; --dust-drift: -7px; }
+.pokemon-slot:is([data-activity="dig"], [data-activity="burrow"], [data-activity="emerge"]) .pokemon-dust i { animation: soil-scatter .65s ease-out infinite; }
+.pokemon-slot[data-activity="walk"] .pokemon-dust i { animation: trail-dust 1s ease-out infinite; }
+.pokemon-slot .pokemon-dust i:nth-child(2) { animation-delay: -.3s; }
+.pokemon-slot .pokemon-dust i:nth-child(3) { animation-delay: -.5s; }
+
+/* Freeze both travel and each body part while the routine clock is paused. */
+.pokemon-habitat.is-paused .pokemon-slot, .pokemon-habitat.is-paused .pokemon-slot *, .pokemon-slot.is-interacting, .pokemon-slot.is-interacting * { animation-play-state: paused !important; }
+.pokemon-slot.is-interacting .pokemon-presence { opacity: 1 !important; visibility: visible; }
+.pokemon-slot.is-interacting .pokemon-emerge { transform: none !important; }
+.pokemon-slot.is-interacting .pokemon-window { overflow: visible; }
+.pokemon-slot.is-greeting .pokemon-character { animation: pokemon-delighted .5s ease-in-out 2; animation-play-state: running !important; }
+.pokemon-slot.is-greeting .pokemon-wave-hand { animation: pokemon-wave .36s ease-in-out infinite alternate; animation-play-state: running !important; }
+.pokemon-slot.is-greeting :is(.pokemon-portal, .pokemon-dust) { visibility: hidden; }
+.pokemon-hello { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; padding: 4px 9px; white-space: nowrap; border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent); border-radius: 12px 12px 12px 3px; background: var(--background); color: var(--foreground); box-shadow: 0 4px 16px #0003; font-size: 11px; }
+.pokemon-hello > span { color: var(--primary); }
+
+@keyframes pokemon-travel { from { transform: translate(0, 0); } to { transform: translate(var(--travel-x), var(--travel-y)); } }
+@keyframes pokemon-float { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-7px) rotate(3deg); } }
+@keyframes ghost-arrive { from { opacity: 0; transform: translateY(8px) scale(.78); } to { opacity: .7; transform: none; } }
+@keyframes ghost-depart { from { opacity: .7; transform: none; } to { opacity: 0; transform: translateY(-10px) scale(.75); } }
+@keyframes ghost-portal { 0%, 100% { opacity: 0; transform: scale(.55); } 45% { opacity: .6; transform: scale(1.15); } }
+@keyframes ghost-mist-turn { from { rotate: -7deg; scale: .97; } to { rotate: 7deg; scale: 1.04; } }
+@keyframes ghost-hand-drift { from { translate: 0 -3px; rotate: -5deg; } to { translate: 0 4px; rotate: 6deg; } }
+@keyframes pokemon-walk-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes pokemon-step { from { rotate: -18deg; translate: 0 -1px; } to { rotate: 18deg; translate: 0 2px; } }
+@keyframes pokemon-arm-swing { from { rotate: -12deg; } to { rotate: 12deg; } }
+@keyframes pokemon-tail-sway { from { rotate: -6deg; } to { rotate: 7deg; } }
+@keyframes pokemon-look { 0%, 25%, 100% { transform: none; } 45%, 60% { transform: rotate(-5deg); } 75%, 85% { transform: rotate(4deg); } }
+@keyframes pokemon-dig { 0%, 100% { transform: translateY(2px) rotate(-5deg); } 50% { transform: translateY(5px) rotate(5deg); } }
+@keyframes pokemon-shovel { from { rotate: -30deg; translate: 0 -2px; } to { rotate: 20deg; translate: 0 5px; } }
+@keyframes pokemon-burrow { from { transform: translateY(0); } to { transform: translateY(105%); } }
+@keyframes pokemon-unearth { from { transform: translateY(105%); } 70% { transform: translateY(-3%); } to { transform: translateY(0); } }
+@keyframes soil-rumble { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(1.06) translateY(-1px); } }
+@keyframes soil-scatter { from { opacity: .8; transform: translate(0, 0) scale(.7); } to { opacity: 0; transform: translate(var(--dust-drift), -21px) scale(1.4); } }
+@keyframes trail-dust { from { opacity: .35; transform: translate(0, 0) scale(.5); } to { opacity: 0; transform: translate(var(--dust-drift), -6px) scale(1.4); } }
+@keyframes pokemon-wave { from { rotate: -18deg; } to { rotate: 22deg; } }
+@keyframes pokemon-delighted { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+
+@media (max-width: 1440px) { .site-header .brand-caption { display: none; } }
+@media (min-width: 761px) and (max-width: 1100px) {
+  .site-header .nav { gap: 10px; padding-inline: 18px; }
+  .nav-links a { font-size: 12px; padding-inline: 7px; }
+  .nav-links .nav-contact { padding-inline: 9px; }
+  .theme-choice { padding-right: 7px; font-size: 11px; gap: 2px; }
+  .theme-choice svg { width: 23px; height: 23px; }
+  .theme-controls { gap: 1px; }
+}
+@media (min-width: 761px) and (max-width: 940px) {
+  .site-header .nav { flex-wrap: wrap; padding-block: 10px; gap: 5px 15px; }
+  .site-header .nav-links { order: 4; justify-content: center; width: 100%; }
+  html { scroll-padding-top: 150px; }
+}
+@media (max-width: 760px) {
+  .site-header .nav { gap: 8px; padding-inline: 12px; }
+  .theme-controls { margin-left: auto; gap: 1px; }
+  .theme-choice { min-height: 34px; font-size: 11px; padding-inline: 4px 7px; gap: 2px; }
+  .theme-choice svg { width: 24px; height: 24px; }
+  .habitat-pause { width: 24px; }
+  .site-header .menu-toggle { padding: 7px; }
+  /* Give all three species their own tappable space on narrow screens. */
+  .pokemon-habitat { position: relative; inset: auto; height: 220px; margin-top: 12px; margin-bottom: -20px; }
+  .pokemon-hello { top: -12px; font-size: 10px; padding: 3px 7px; }
+}
+@media (max-width: 359px) {
+  .site-header .nav { gap: 5px; padding-inline: 9px; }
+  .theme-choice svg { width: 20px; height: 20px; }
+  .theme-choice { padding-inline: 3px 5px; }
+  .theme-selector { padding: 3px; }
+  .site-header .wordmark strong { font-size: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pokemon-habitat *, .pokemon-habitat *::before, .pokemon-habitat *::after { animation: none !important; transition: none !important; }
+  .pokemon-habitat .pokemon-slot .pokemon-presence { opacity: .7 !important; visibility: visible !important; }
+  .pokemon-habitat .pokemon-emerge { transform: none !important; }
+  .pokemon-dust, .pokemon-portal { display: none; }
+  .is-greeting .pokemon-wave-hand { rotate: -18deg; }
+}
+@media print { .pokemon-habitat, .theme-controls, .habitat-hint { display: none; } }

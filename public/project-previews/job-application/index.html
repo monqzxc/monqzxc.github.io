@@ -1,0 +1,74 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../embed.js"></script></head><body>
+<title>Job Application</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="walkthrough.css">
+<link rel="stylesheet" href="../embed.css">
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">Portfolio · Recruitment portal</div>
+    <h1>Job Application</h1>
+    <p class="lede">Applicants find openings, are checked against the position's qualification standards automatically, and move through exams and interviews to appointment without paper forms.</p>
+    <div class="stack"><span>Vue 3</span><span>Laravel 11</span><span>File uploads</span><span>Scoring engine</span></div>
+  </header>
+  <div id="walkthrough"></div>
+  <p class="foot">Screens are simplified recreations. All names, ID numbers and figures are sample data.</p>
+</div>
+
+<script>
+// Each step: t = title, d = one-line description, url = fake address bar, html = the mock screen.
+window.WALKTHROUGH = {
+  name: "Job Application",
+  steps:[
+  {t:"Find an opening", d:"Public listings with qualification standards", url:"careers/openings",
+   html:`<div class="sh"><div><h2>Open positions</h2><p>3 openings · applications close Oct 15, 2026</p></div></div>
+   <div class="jobs">
+    <div class="job sel"><div><b>Information Technology Officer I</b><div class="meta"><span class="mono">Item ITO1-12-2026</span><span>Salary Grade 19</span><span>Central Office</span></div></div><span class="pill acc">Selected</span></div>
+    <div class="job"><div><b>Administrative Officer III</b><div class="meta"><span class="mono">Item ADOF3-04-2026</span><span>Salary Grade 14</span><span>Regional Office</span></div></div><span class="pill draft">View</span></div>
+    <div class="job"><div><b>Training Specialist II</b><div class="meta"><span class="mono">Item TS2-31-2026</span><span>Salary Grade 16</span><span>Provincial Office</span></div></div><span class="pill draft">View</span></div>
+   </div>`},
+  {t:"Apply & upload", d:"Qualification check and document upload", url:"careers/applications/new",
+   html:`<div class="sh"><div><h2>Application · Information Technology Officer I</h2><p>Your profile is checked against the position's qualification standards</p></div><span class="pill ok">Qualified</span></div>
+   <div class="grid2">
+    <div class="box"><h3>Qualification standards</h3><ul class="check">
+     <li><span class="tick">✓</span>Education · Bachelor's, IT-related<span class="muted">BSIT</span></li>
+     <li><span class="tick">✓</span>Experience · 2 years<span class="muted mono">5 yrs</span></li>
+     <li><span class="tick">✓</span>Training · 8 hours<span class="muted mono">80 hrs</span></li>
+     <li><span class="tick">✓</span>Eligibility · Career Service Prof.<span class="muted">Yes</span></li>
+    </ul></div>
+    <div class="box"><h3>Requirements</h3><ul class="check">
+     <li><span class="tick">✓</span>Letter of intent<span class="muted">PDF</span></li>
+     <li><span class="tick">✓</span>Personal Data Sheet<span class="muted">auto</span></li>
+     <li><span class="tick">✓</span>Transcript of records<span class="muted">PDF</span></li>
+     <li><span class="tick pend">…</span>Latest performance rating<span class="muted">uploading</span></li>
+    </ul></div>
+   </div>`},
+  {t:"Exam & interview", d:"Written exam, behavioral interview, ranking", url:"hris/applications/ITO1-12-2026/assessment",
+   html:`<div class="sh"><div><h2>Comparative assessment</h2><p>Information Technology Officer I · 6 qualified applicants</p></div><span class="pill warn">Selection board</span></div>
+   <div class="tbl-wrap"><table>
+    <tr><th>Rank</th><th>Applicant</th><th class="r">Exam</th><th class="r">Interview</th><th class="r">Total</th></tr>
+    <tr style="background:var(--accent-soft)"><td class="mono">1</td><td><b>A. Dela Cruz</b></td><td class="r mono">88</td><td class="r mono">91</td><td class="r mono"><b>89.8</b></td></tr>
+    <tr><td class="mono">2</td><td>K. Bautista</td><td class="r mono">85</td><td class="r mono">87</td><td class="r mono">86.2</td></tr>
+    <tr><td class="mono">3</td><td>L. Ramos</td><td class="r mono">90</td><td class="r mono">80</td><td class="r mono">84.0</td></tr>
+    <tr><td class="mono">4</td><td>P. Mendoza</td><td class="r mono">79</td><td class="r mono">83</td><td class="r mono">81.4</td></tr>
+   </table></div>
+   <p class="muted" style="font-size:12.5px;margin:10px 0 0">Total = exam 40% + interview 60%. Background check follows for the top candidate.</p>`},
+  {t:"Get appointed", d:"Result notice and hand-off to HR", url:"careers/applications/ITO1-12-2026",
+   html:`<div class="done-banner"><span class="stamp">Selected</span><div><b>Congratulations, Andrea</b><span>You were selected for Information Technology Officer I</span></div></div>
+   <div class="grid2">
+    <div class="box"><h3>Your application</h3><ul class="timeline">
+     <li><span>Application submitted</span><time>Sep 30</time></li>
+     <li><span>Written exam</span><time>Oct 22</time></li>
+     <li><span>Behavioral interview</span><time>Oct 29</time></li>
+     <li><span>Background check cleared</span><time>Nov 5</time></li>
+     <li><span>Appointment issued</span><time>Nov 14</time></li>
+    </ul></div>
+    <div class="box"><h3>Next</h3><dl class="kv"><dt>Start date</dt><dd class="mono">2026-12-01</dd><dt>Salary grade</dt><dd>19</dd><dt>Employee record</dt><dd>Created in HRIS</dd><dt>PDS</dt><dd>Carried over</dd></dl></div>
+   </div>`}
+  ]
+};
+</script>
+<script src="walkthrough.js"></script>
+
+</body></html>

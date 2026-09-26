@@ -1,0 +1,30 @@
+/* Content is only hidden after the observer is attached; no-JS stays readable. */
+[data-scroll-reveal] {
+  transition: opacity 650ms cubic-bezier(.2,.65,.3,1),
+              transform 650ms cubic-bezier(.2,.65,.3,1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+[data-reveal-state="pending"] {
+  opacity: 0;
+  transform: translateY(26px);
+}
+[data-reveal-state="visible"] {
+  opacity: 1;
+  transform: none;
+}
+/* Keyboard focus must be visible immediately, including inside project cards. */
+[data-scroll-reveal]:focus-within {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+@media (max-width: 760px) {
+  [data-reveal-state="pending"] { transform: translateY(18px); }
+}
+@media (prefers-reduced-motion: reduce), print {
+  [data-scroll-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

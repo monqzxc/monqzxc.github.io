@@ -1,0 +1,75 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../embed.js"></script></head><body>
+<title>PCR Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="walkthrough.css">
+<link rel="stylesheet" href="../embed.css">
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">Portfolio · Performance management</div>
+    <h1>PCR Management</h1>
+    <p class="lede">Offices commit to yearly targets, log monthly accomplishments and are rated by their parent office. Every change syncs live to everyone viewing the same record.</p>
+    <div class="stack"><span>Vue 3</span><span>Pinia</span><span>Laravel 11</span><span>Sanctum</span><span>Reverb live sync</span></div>
+  </header>
+  <div id="walkthrough"></div>
+  <p class="foot">Screens are simplified recreations. All names, ID numbers and figures are sample data.</p>
+</div>
+
+<script>
+// Each step: t = title, d = one-line description, url = fake address bar, html = the mock screen.
+window.WALKTHROUGH = {
+  name: "PCR Management",
+  steps:[
+  {t:"Set commitments", d:"Offices draft their targets for the year", url:"pqm/pcrs/2026/planning-office",
+   html:`<div class="sh"><div><h2>Office Performance Commitment · 2026</h2><p>Planning Office · Jan–Dec 2026</p></div><span class="pill draft">Draft</span></div>
+   <div class="tbl-wrap"><table>
+    <tr><th>Success indicator</th><th class="r">Target</th><th>Accountable</th></tr>
+    <tr><td colspan="3" style="background:var(--accent-soft);font-weight:600;font-size:12px">Pillar 1 · Access to quality programs</td></tr>
+    <tr><td>Learners enrolled in scholarship programs</td><td class="r mono">1,200</td><td>A. Dela Cruz</td></tr>
+    <tr><td>Graduates assessed for certification</td><td class="r mono">950</td><td>R. Santos</td></tr>
+    <tr><td colspan="3" style="background:var(--accent-soft);font-weight:600;font-size:12px">Pillar 2 · Organizational excellence</td></tr>
+    <tr><td>Monthly reports submitted on time</td><td class="r mono">12</td><td>J. Villanueva</td></tr>
+    <tr><td>Client satisfaction rating (%)</td><td class="r mono">90</td><td>M. Garcia</td></tr>
+   </table></div>`},
+  {t:"Track monthly progress", d:"Accountable staff log accomplishments", url:"pqm/pcrs/2026/planning-office/monthly",
+   html:`<div class="sh"><div><h2>Monthly accomplishments</h2><p>Learners enrolled in scholarship programs · target 1,200</p></div><span class="pill acc">● Live</span></div>
+   <div class="box" style="margin-bottom:12px">
+    <div class="months">
+     ${[[140,"Jan"],[180,"Feb"],[210,"Mar"],[165,"Apr"],[230,"May"],[190,"Jun"]].map(([v,m])=>`<div><small>${v}</small><span class="col" style="height:${v/2.6}px"></span><small>${m}</small></div>`).join("")}
+    </div></div>
+   <div class="grid2">
+    <div class="box"><h3>Year to date</h3><div class="row"><span class="big mono">1,115</span><span class="muted" style="font-size:13px">93% of annual target by June</span></div><div class="bar" style="margin-top:10px"><i style="width:93%"></i></div></div>
+    <div class="box"><h3>Recent entry</h3><dl class="kv"><dt>Month</dt><dd>June</dd><dt>Entered by</dt><dd>A. Dela Cruz</dd><dt>Synced to</dt><dd>3 open sessions</dd></dl></div>
+   </div>`},
+  {t:"Rate performance", d:"Quality, efficiency and timeliness scores", url:"pqm/pcrs/2026/planning-office/rating",
+   html:`<div class="sh"><div><h2>Rating</h2><p>Scale of 1–5 per indicator · reviewed by the parent office</p></div><span class="pill warn">For review</span></div>
+   <div class="tbl-wrap" style="margin-bottom:12px"><table>
+    <tr><th>Indicator</th><th class="r">Q</th><th class="r">E</th><th class="r">T</th><th class="r">Avg</th></tr>
+    <tr><td>Learners enrolled</td><td class="r mono">5</td><td class="r mono">5</td><td class="r mono">4</td><td class="r mono">4.67</td></tr>
+    <tr><td>Graduates assessed</td><td class="r mono">5</td><td class="r mono">4</td><td class="r mono">5</td><td class="r mono">4.67</td></tr>
+    <tr><td>Reports on time</td><td class="r mono">4</td><td class="r mono">5</td><td class="r mono">5</td><td class="r mono">4.67</td></tr>
+    <tr><td>Client satisfaction</td><td class="r mono">5</td><td class="r mono">4</td><td class="r mono">4</td><td class="r mono">4.33</td></tr>
+   </table></div>
+   <div class="grid2">
+    <div class="box"><h3>Self rating</h3><span class="big mono">4.58</span></div>
+    <div class="box"><h3>Reviewer rating</h3><span class="big mono">4.60</span></div>
+   </div>`},
+  {t:"Approve & export", d:"Final rating, full history, official copy", url:"pqm/pcrs/2026/planning-office",
+   html:`<div class="done-banner"><span class="stamp">Approved</span><div><b>Final rating: 4.60 · Outstanding</b><span>Locked and snapshotted · official copy ready to export</span></div></div>
+   <div class="grid2">
+    <div class="box"><h3>Status history</h3><ul class="timeline">
+     <li><span>Commitment submitted</span><time>Jan 15</time></li>
+     <li class="warnd"><span>Returned for revision</span><time>Jan 20</time></li>
+     <li><span>Commitment approved</span><time>Jan 27</time></li>
+     <li><span>Rating submitted</span><time>Dec 10</time></li>
+     <li><span>Final rating approved</span><time>Dec 18</time></li>
+    </ul></div>
+    <div class="box"><h3>Year summary</h3><dl class="kv"><dt>Indicators</dt><dd>4 of 4 met</dd><dt>Enrolled</dt><dd class="mono">1,286 / 1,200</dd><dt>Assessed</dt><dd class="mono">1,004 / 950</dd><dt>Export</dt><dd>Signed PDF</dd></dl></div>
+   </div>`}
+  ]
+};
+</script>
+<script src="walkthrough.js"></script>
+
+</body></html>
