@@ -72,9 +72,9 @@ The interests section includes traveling, running, watching anime, infrastructur
 
 Manrope and DM Sans are bundled as variable WOFF2 fonts and preloaded by the page layout. Font files are served locally; the page does not depend on an external font service. Glass panels use translucent gradients, soft borders, and backdrop blur, with a solid-background fallback where blur is unsupported.
 
-Responsive navigation; project dialogs with focus handling and Escape support; Vue tabs with arrow, Home, and End key navigation; reduced-motion support; and skip navigation. A floating Pokéball opens circular shortcuts for the header destinations, the tile puzzle, and Email. It closes on Escape, outside clicks, or leaving the menu with the keyboard.
+Responsive navigation; project dialogs with focus handling and Escape support; Vue tabs with arrow, Home, and End key navigation; reduced-motion support; and skip navigation. A floating Pokéball with the theme's contrasting accent color opens circular shortcuts for the page destinations, the tile puzzle, and a single **Let’s talk** action. It closes on Escape, outside clicks, or leaving the menu with the keyboard.
 
-The Email shortcut opens a modal with required email and message fields. It posts to `https://formspree.io/f/xvkgbwbr`, shows sending/success/error feedback, and keeps the draft after a failed request. Formspree handles delivery to the recipient configured for that form, so the GitHub Pages site needs no server. Visitors can also open their email app using the direct email link.
+**Let’s talk** in either navigation menu and the email icons beside GitHub open the same modal with required email and message fields. Drafts stay available when switching between these entry points. The form posts to `https://formspree.io/f/xvkgbwbr`, shows sending/success/error feedback, and keeps the draft after a failed request. Formspree handles delivery to the recipient configured for that form, so the GitHub Pages site needs no server. Visitors can also open their email app using the direct email link.
 
 The Vue build flags are configured in `next.config.ts`. The scripts use Webpack so the same explicit flags are applied in development and production.
 

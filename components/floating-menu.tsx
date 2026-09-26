@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { BriefcaseBusiness, Compass, FileUser, Gamepad2, House, Mail, MessageCircle, Route, X } from "lucide-react";
-import ContactModal from "@/components/contact-modal";
+import { BriefcaseBusiness, Compass, FileUser, Gamepad2, House, Mail, Route, X } from "lucide-react";
 import { portfolioSections } from "@/lib/navigation";
 import styles from "./floating-menu.module.css";
 
@@ -14,14 +13,13 @@ const shortcuts = [
     icon: sectionIcons[index],
   })),
   { id: "cv", label: "CV Studio", href: "/cv/", icon: FileUser },
-  { id: "contact", label: "Let’s talk", href: "#contact", icon: MessageCircle },
   { id: "play", label: "Game", href: "/play/", icon: Gamepad2 },
 ];
 
-// Five destinations on the outer arc, three actions on the inner arc.
+// Five destinations on the outer arc, two actions on the inner arc.
 const positions = [
   [0, -1], [-0.383, -0.924], [-0.707, -0.707], [-0.924, -0.383], [-1, 0],
-  [0, -0.52], [-0.368, -0.368], [-0.52, 0],
+  [-0.135, -0.50], [-0.50, -0.135],
 ];
 
 function itemStyle(index: number): CSSProperties {
@@ -32,9 +30,8 @@ function itemStyle(index: number): CSSProperties {
   } as CSSProperties;
 }
 
-export default function FloatingMenu({ active }: { active: string }) {
+export default function FloatingMenu({ active, onContact }: { active: string; onContact: () => void }) {
   const [open, setOpen] = useState(false);
-  const [contactOpen, setContactOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const container = useRef<HTMLDivElement>(null);
 
@@ -64,7 +61,6 @@ export default function FloatingMenu({ active }: { active: string }) {
   }
 
   return (
-    <>
       <div
         ref={container}
         className={styles.floatingMenu}
@@ -103,20 +99,18 @@ export default function FloatingMenu({ active }: { active: string }) {
           <button
             type="button"
             className={`${styles.shortcut} ${styles.email}`}
-            style={itemStyle(7)}
+            style={itemStyle(6)}
             aria-haspopup="dialog"
             onClick={() => {
               closeMenu();
-              setContactOpen(true);
+              onContact();
             }}
           >
             <span className={styles.bubble}><Mail size={21} aria-hidden="true" /></span>
-            <span className={styles.label}>Email</span>
+            <span className={styles.label}>Let’s talk</span>
           </button>
         </nav>
         <div className={styles.glow} aria-hidden="true" />
       </div>
-      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
-    </>
   );
 }

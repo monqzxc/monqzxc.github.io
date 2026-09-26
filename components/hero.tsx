@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUpRight, Building2, Code2, Download, FileText, Ghost, Hexagon, MapPin, MousePointer2, Trophy } from "lucide-react";
+import SocialLinks from "@/components/social-links";
 
-export default function Hero() {
+export default function Hero({ onContact }: { onContact: () => void }) {
   return (
     <section id="about" className="shell hero illustrated-hero">
       <div className="hero-main">
@@ -13,7 +14,7 @@ export default function Hero() {
           <p className="habitat-hint"><MousePointer2 aria-hidden="true" />Tap a wandering Pokémon to say hello.</p>
           <div className="hero-actions">
             <a className="button-primary" href="#projects">Explore my work <ArrowDown size={17} /></a>
-            <a className="text-link" href="https://github.com/monqzxc" target="_blank" rel="noreferrer"><Code2 size={17} />GitHub <ArrowUpRight size={14} /></a>
+            <SocialLinks onContact={onContact} />
           </div>
           <div className="hero-cv-links"><a href="/cv/Anthony-Cabigayan-CV.pdf" download><Download size={15} />Download CV</a><a href="/cv"><FileText size={15} />Create your own CV <ArrowUpRight size={13} /></a></div>
           <span className="hero-location"><MapPin size={14} />Manila, Philippines</span>
