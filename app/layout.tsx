@@ -8,7 +8,7 @@ import "./pokemon-habitat.css";
 import "./pokemon-scenery.css";
 import "./scroll-reveal.css";
 import "./project-previews.css";
-import "./puzzle-teaser.css";
+import "./games.css";
 import { PokemonThemeProvider } from "@/components/pokemon-theme";
 
 export const metadata: Metadata = {

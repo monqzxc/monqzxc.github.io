@@ -76,7 +76,7 @@ The interests section includes traveling, running, watching anime, infrastructur
 
 Manrope and DM Sans are bundled as variable WOFF2 fonts and preloaded by the page layout. Font files are served locally; the page does not depend on an external font service. Glass panels use translucent gradients, soft borders, and backdrop blur, with a solid-background fallback where blur is unsupported.
 
-Responsive navigation; project dialogs with focus handling and Escape support; Vue tabs with arrow, Home, and End key navigation; reduced-motion support; and skip navigation. A floating Pokéball with the theme's contrasting accent color opens circular shortcuts for the page destinations, the tile puzzle, and a single **Let’s talk** action. It closes on Escape, outside clicks, or leaving the menu with the keyboard.
+Responsive navigation; project dialogs with focus handling and Escape support; Vue tabs with arrow, Home, and End key navigation; reduced-motion support; and skip navigation. A floating Pokéball with the theme's contrasting accent color opens circular shortcuts for the page destinations, the games hub, and a single **Let’s talk** action. It closes on Escape, outside clicks, or leaving the menu with the keyboard.
 
 **Let’s talk** in either navigation menu and the email icons beside GitHub open the same modal with required email and message fields. Drafts stay available when switching between these entry points. The form posts to `https://formspree.io/f/xvkgbwbr`, shows sending/success/error feedback, and keeps the draft after a failed request. Formspree handles delivery to the recipient configured for that form, so the GitHub Pages site needs no server. Visitors can also open their email app using the direct email link.
 
@@ -103,9 +103,19 @@ The editor does not send CV input to a server or save it to browser storage. A d
 
 After changing Mon's data, regenerate his static download with `npm run generate:cv` before building. This uses the same PDF renderer as visitor exports. No API key, account, database, or third-party document service is needed. Site sharing controls determine who can access the hosted builder.
 
+## Games hub
+
+Open `/play/`, or follow **Games** from the homepage, to find every game together. The homepage's grouped games section and the hub both use the shared catalog in `lib/games.ts`.
+
+Keep future games in this collection:
+
+1. Create the game route at `app/play/<slug>/page.tsx`.
+2. Add its name, description, player count, category, and artwork to `lib/games.ts`. The entry automatically appears in the homepage collection and games hub.
+3. Include an **All games** link back to `/play/` on the game page. Keep homepage game promotion in the shared collection instead of adding a separate banner for each game.
+
 ## Pokémon tile puzzle
 
-Open `/play/`, or follow **Play tile puzzle** in the homepage's Beyond code section. Choose Gengar, Charizard, Pikachu, Ho-Oh, Rayquaza, Bidoof, Mew, or Mewtwo and a 3×3 or 4×4 board. Every shuffle comes from legal moves, so it is solvable. Click or tap an adjacent tile, or focus the board and use arrow keys to move a tile in that direction. Numbers and the reference picture can be toggled while playing.
+Open `/play/puzzle/`, or choose **Pokémon Tile Puzzle** from the games collection. Choose Gengar, Charizard, Pikachu, Ho-Oh, Rayquaza, Bidoof, Mew, or Mewtwo and a 3×3 or 4×4 board. Every shuffle comes from legal moves, so it is solvable. Click or tap an adjacent tile, or focus the board and use arrow keys to move a tile in that direction. Numbers and the reference picture can be toggled while playing.
 
 The timer starts when playing, pauses on request or when the tab becomes hidden, and resumes without counting time away. The current board, move count, elapsed time, and latest 50 wins use the versioned `mon-tile-puzzle-v1` localStorage key. Records are separated by Pokémon and board size, with best time and fewest moves calculated from the saved wins. Refreshing restores the current board paused; a completed game does not record a duplicate win. Malformed saved data is validated before use, and blocked storage leaves the game playable with an explanatory message. Scores are local to the browser and origin; clearing browser data removes them.
 
@@ -120,7 +130,7 @@ Run `npm run test:puzzle` for the puzzle logic and saved-data checks, and `npm r
 
 ## Poké Raft
 
-Open `/play/raft/`, or follow **Play raft battle** on the homepage, for a turn-based artillery game. Play against Easy or Hard AI, or choose two players to take turns on the same device. Pick Pikachu, Gengar, Charizard, or Mew; all four have equal stats.
+Open `/play/raft/`, or choose **Poké Raft** from the games collection, for a turn-based artillery game. Play against Easy or Hard AI, or choose two players to take turns on the same device. Pick Pikachu, Gengar, Charizard, or Mew; all four have equal stats.
 
 Adjust the angle and power, account for the wind, and fire toward the rival raft. Wind changes after both players have fired, and nearby impacts can cause splash damage. Each player starts with 100 HP, unlimited standard Energy Orbs, and three stronger special shots. Reduce the rival's HP to zero to win. Easy AI allows more aiming error; Hard AI calculates shots using the current wind.
 

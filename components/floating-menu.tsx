@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { BriefcaseBusiness, Compass, FileUser, Gamepad2, House, Mail, Route, X } from "lucide-react";
 import { portfolioSections } from "@/lib/navigation";
+import { GAMES_HREF } from "@/lib/games";
 import styles from "./floating-menu.module.css";
 
 const sectionIcons = [House, BriefcaseBusiness, Route, Compass];
@@ -13,7 +14,7 @@ const shortcuts = [
     icon: sectionIcons[index],
   })),
   { id: "cv", label: "CV Studio", href: "/cv/", icon: FileUser },
-  { id: "play", label: "Game", href: "/play/", icon: Gamepad2 },
+  { id: "play", label: "Games", href: GAMES_HREF, icon: Gamepad2 },
 ];
 
 // Five destinations on the outer arc, two actions on the inner arc.
