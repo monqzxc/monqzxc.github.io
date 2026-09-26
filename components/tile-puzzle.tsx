@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Check, CheckCircle2, Clock3, Eye, EyeOff, Gamepa
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { addPuzzleWin, canMoveTile, createPuzzle, isSolved, moveTile, parsePuzzleSave, STORAGE_KEY, type GridSize, type PuzzleId, type PuzzleSave, type PuzzleSession, type PuzzleWin } from "@/lib/tile-puzzle";
 import { formatPuzzleTime, puzzleImage, puzzlePokemon } from "@/lib/puzzle-pokemon";
+import { GAMES_HREF } from "@/lib/games";
 
 type PuzzleChoice = { pokemon: PuzzleId; size: GridSize };
 
@@ -180,7 +181,7 @@ export default function TilePuzzle() {
       <a className="skip-link" href="#puzzle-main">Skip to puzzle</a>
       <header className="puzzle-topbar">
         <a className="wordmark" href="/" aria-label="Mon home"><strong>mon<span>.</span></strong><span className="puzzle-wordmark-label">PLAYGROUND</span></a>
-        <nav className="puzzle-game-nav" aria-label="Playground navigation"><a className="puzzle-back" href="/play/raft/"><Gamepad2 size={16} /> Poké Raft</a><a className="puzzle-back" href="/#craft-hobbies"><ArrowLeft size={16} /> Portfolio</a></nav>
+        <nav className="puzzle-game-nav" aria-label="Playground navigation"><a className="puzzle-back" href={GAMES_HREF}><Gamepad2 size={16} /> All games</a><a className="puzzle-back" href="/#craft-hobbies"><ArrowLeft size={16} /> Portfolio</a></nav>
       </header>
       <main id="puzzle-main" className="puzzle-main">
         <div className="puzzle-intro">

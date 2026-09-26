@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { ArrowLeft, ArrowRight, Bot, Check, Crosshair, Flag, Gamepad2, RotateCcw, Settings2, Sparkles, Trophy, Users, Waves, Wind } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import RaftArena from "@/components/raft-arena";
+import { GAMES_HREF } from "@/lib/games";
 import { applyShot, chooseAiShot, createBattle, simulateShot, type BattleState, type Difficulty, type Point, type ShotInput, type ShotKind, type ShotResult, type Side } from "@/lib/raft-battle";
 
 const crew = [
@@ -131,7 +132,7 @@ export default function RaftBattle() {
       <a className="skip-link" href="#raft-main">Skip to game</a>
       <header className="raft-topbar">
         <a href="/" className="wordmark" aria-label="Mon home"><strong>mon<span>.</span></strong><span className="raft-wordmark-label">Playground</span></a>
-        <nav aria-label="Playground navigation"><a href="/play/"><Gamepad2 size={16} /> Tile puzzle</a><a href="/#craft-hobbies"><ArrowLeft size={16} /><span>Portfolio</span></a></nav>
+        <nav aria-label="Playground navigation"><a href={GAMES_HREF}><Gamepad2 size={16} /> All games</a><a href="/#craft-hobbies"><ArrowLeft size={16} /><span>Portfolio</span></a></nav>
       </header>
       <main id="raft-main" className="raft-main">
         <div className="raft-intro"><div><h1>Poké <span>Raft.</span></h1><p>A friendly rivalry. A perfectly aimed shot. A very big splash.</p></div><span className="raft-mode-note"><Users size={16} /> One device. One worthy rival.</span></div>

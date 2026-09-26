@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, ArrowUpRight, Menu, X, Trophy, Code2, Building2, Layers } from "lucide-react";
 import ProjectCard from "@/components/project-card";
-import PuzzleTeaser from "@/components/puzzle-teaser";
+import GamesTeaser from "@/components/games-teaser";
 import FloatingMenu from "@/components/floating-menu";
 import ContactModal from "@/components/contact-modal";
 import SocialLinks from "@/components/social-links";
@@ -36,7 +36,7 @@ export default function Portfolio() {
   <section id="projects" className="shell section"><div className="section-heading"><div><div className="eyebrow"><span className="short-line"/>01 / SELECTED WORK</div><h2>Real workflows.<br/><span>Thoughtful solutions.</span></h2></div><p>Six systems built for public service. Open a preview to explore the workflow, from the first step to the final result.</p></div><div className="project-grid">{projects.map(project=><ProjectCard key={project.id} project={project}/>)}</div></section>
   <div className="shell about-band"><div><div className="eyebrow"><span className="short-line"/>THE WAY I BUILD</div><h2>Good software starts<br/>with understanding.</h2></div><p>From the first conversation to the final deployment, I care about how a system fits into someone’s day. My focus is simple: <strong>clear interfaces, dependable foundations, and workflows that make sense.</strong> That’s the thread connecting my work across Laravel, Vue, and enterprise systems.</p></div>
   <section id="timeline" className="shell section"><div className="section-heading"><div><div className="eyebrow"><span className="short-line"/>02 / THE JOURNEY</div><h2>Always building. <span>Always learning.</span></h2></div></div><div className="timeline">{milestones.map(({year,icon:Icon,title,text,type})=><article className="timeline-row" key={year}><span className="timeline-year">{year}</span><span className="timeline-icon"><Icon/></span><div><h3>{title}</h3><p>{text}</p></div><span className="timeline-type">{type}</span></article>)}</div></section>
-  <section id="craft-hobbies" className="shell section craft-section"><div className="craft-layout"><div className="craft-intro"><div className="eyebrow"><span className="short-line"/>03 / BEYOND THE TERMINAL</div><h2>Curiosity doesn't<br/>clock out.</h2><p>New places, long runs, anime, and the small experiments that keep me curious.</p></div><VueCraft/></div><PuzzleTeaser/></section>
+  <section id="craft-hobbies" className="shell section craft-section"><div className="craft-layout"><div className="craft-intro"><div className="eyebrow"><span className="short-line"/>03 / BEYOND THE TERMINAL</div><h2>Curiosity doesn't<br/>clock out.</h2><p>New places, long runs, anime, and the small experiments that keep me curious.</p></div><VueCraft/></div><GamesTeaser/></section>
   <section id="contact" className="shell contact-section">
     <div className="eyebrow"><span className="short-line"/>04 / THE NEXT QUEST</div>
     <div className="contact-top">
