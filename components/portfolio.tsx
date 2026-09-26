@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, ArrowUpRight, Mail, Menu, X, Trophy, Code2, Building2, Layers } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Menu, X, Trophy, Code2, Building2, Layers } from "lucide-react";
 import ProjectCard from "@/components/project-card";
 import PuzzleTeaser from "@/components/puzzle-teaser";
+import FloatingMenu from "@/components/floating-menu";
+import { portfolioSections } from "@/lib/navigation";
 import { projects } from "@/lib/projects";
 import VueCraft from "@/components/vue-craft";
 import Hero from "@/components/hero";
@@ -24,7 +26,7 @@ export default function Portfolio() {
   const menuButton = useRef<HTMLButtonElement>(null);
   useEffect(()=>{const sections=document.querySelectorAll("main section[id]");const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting)setActive(entry.target.id);});},{rootMargin:"-20% 0px -60% 0px",threshold:0});sections.forEach(section=>observer.observe(section));return()=>observer.disconnect();},[]);
   useEffect(()=>{if(!menuOpen)return;const close=(e:KeyboardEvent)=>{if(e.key==="Escape"){setMenuOpen(false);menuButton.current?.focus();}};window.addEventListener("keydown",close);return()=>window.removeEventListener("keydown",close);},[menuOpen]);
-  const links=[["about","About"],["projects","Selected work"],["timeline","Journey"],["craft-hobbies","Beyond code"]];
+  const links=portfolioSections.map(({id,label})=>[id,label]);
   return <div className="portfolio-page"><a className="skip-link" href="#main">Skip to content</a><header className="site-header"><nav className="shell nav" aria-label="Main navigation"><a className="wordmark" href="#about" aria-label="Mon — back to top"><strong>mon<span>.</span></strong><span className="brand-caption">ANTHONY CABIGAYAN<br/>SOFTWARE ENGINEER</span></a><button className="menu-toggle" ref={menuButton} aria-label={menuOpen?"Close menu":"Open menu"} aria-expanded={menuOpen} aria-controls="site-navigation" onClick={()=>setMenuOpen(!menuOpen)}>{menuOpen?<X size={22}/>:<Menu size={22}/>}</button><div id="site-navigation" className={`nav-links ${menuOpen?"open":""}`}>{links.map(([id,label])=><a className={active===id?"active":""} key={id} href={`#${id}`} onClick={()=>setMenuOpen(false)} aria-current={active===id?"location":undefined}>{label}</a>)}<a href="/cv" onClick={()=>setMenuOpen(false)}>CV Studio</a><a className="nav-contact" href="#contact" onClick={()=>setMenuOpen(false)}>Let’s talk <ArrowUpRight size={16}/></a></div><ThemeSelector/></nav></header><PokemonHabitat/>
   <main id="main" ref={revealRef}><Hero/>
   <div className="tech-strip"><div className="shell"><span className="tech-label">TOOLS OF<br/>THE TRADE</span>{[["◇","Laravel"],["∨","Vue.js"],["↗","Inertia.js"],["⌘","React"],["N","Next.js"],["▱","Docker"]].map(([symbol,label])=><span className="tech-item" key={label}><span aria-hidden="true" className="tech-symbol">{symbol}</span>{label}</span>)}</div></div>
@@ -36,10 +38,6 @@ export default function Portfolio() {
     <div className="eyebrow"><span className="short-line"/>04 / THE NEXT QUEST</div>
     <div className="contact-top">
       <h2>Something in mind?<br/><span>Let’s team up.</span></h2>
-      <a className={styles.emailLink} href="mailto:suppmon27@gmail.com" aria-label="Send me an email" title="Send me an email">
-        <span className={styles.pokeball} aria-hidden="true" />
-        <Mail className={styles.emailIcon} aria-hidden="true" />
-      </a>
     </div>
     <div className="contact-bottom">
       <p>Open to thoughtful collaborations and enterprise projects. Found me on Upwork? Send me a message there to start our next quest.</p>
@@ -56,5 +54,5 @@ export default function Portfolio() {
       </div>
     </div>
   </section></main>
-  <footer className="footer"><div className="shell"><div className="footer-left"><span className="footer-mark">mon.</span><p>© {new Date().getFullYear()} Anthony Cabigayan</p></div><div className="footer-right"><span>Thoughtfully built in the Philippines.</span><a href="#about">Back to top <ArrowUp size={14}/></a></div></div></footer></div>;
+  <footer className={`footer ${styles.pageFooter}`}><div className="shell"><div className="footer-left"><span className="footer-mark">mon.</span><p>© {new Date().getFullYear()} Anthony Cabigayan</p></div><div className="footer-right"><span>Thoughtfully built in the Philippines.</span><a href="#about">Back to top <ArrowUp size={14}/></a></div></div></footer><FloatingMenu active={active}/></div>;
 }

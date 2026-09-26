@@ -23,7 +23,7 @@ A pnpm lockfile is also included if you prefer pnpm.
 ## How the frameworks fit together
 
 - **Next.js** provides the App Router, page metadata, pre-rendering, and production build.
-- **React** renders the portfolio and handles navigation, project dialogs, and email copying.
+- **React** renders the portfolio and handles navigation, project dialogs, and the email form.
 - **Vue 3** powers the interactive Beyond the Terminal section. It is loaded dynamically and mounts into a dedicated DOM node. React never renders inside that node, and the Vue app is unmounted when its React wrapper is removed.
 
 The hosted preview uses the same application components with the Sites Vinext adapter. This download runs directly on Next.js and has been checked with a native Next.js production build.
@@ -34,6 +34,8 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | --- | --- |
 | Hero introduction and artwork | `components/hero.tsx` |
 | Contact and timeline | `components/portfolio.tsx` |
+| Floating Pokéball menu and shared section links | `components/floating-menu.tsx`, `lib/navigation.ts` |
+| Email modal and Formspree endpoint | `components/contact-modal.tsx` |
 | Selected work titles, descriptions, and preview paths | `lib/projects.ts` |
 | Project cards and interactive preview dialogs | `components/project-card.tsx` |
 | Preview card and dialog styles | `app/project-previews.css` |
@@ -70,7 +72,9 @@ The interests section includes traveling, running, watching anime, infrastructur
 
 Manrope and DM Sans are bundled as variable WOFF2 fonts and preloaded by the page layout. Font files are served locally; the page does not depend on an external font service. Glass panels use translucent gradients, soft borders, and backdrop blur, with a solid-background fallback where blur is unsupported.
 
-Responsive navigation; project dialogs with focus handling and Escape support; Vue tabs with arrow, Home, and End key navigation; reduced-motion support; skip navigation; email-copy feedback and a fallback if clipboard access is unavailable. There is no contact form or backend: the email links open the visitor's mail application.
+Responsive navigation; project dialogs with focus handling and Escape support; Vue tabs with arrow, Home, and End key navigation; reduced-motion support; and skip navigation. A floating Pokéball opens circular shortcuts for the header destinations, the tile puzzle, and Email. It closes on Escape, outside clicks, or leaving the menu with the keyboard.
+
+The Email shortcut opens a modal with required email and message fields. It posts to `https://formspree.io/f/xvkgbwbr`, shows sending/success/error feedback, and keeps the draft after a failed request. Formspree handles delivery to the recipient configured for that form, so the GitHub Pages site needs no server. Visitors can also open their email app using the direct email link.
 
 The Vue build flags are configured in `next.config.ts`. The scripts use Webpack so the same explicit flags are applied in development and production.
 
