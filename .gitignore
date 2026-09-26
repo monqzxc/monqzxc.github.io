@@ -5,3 +5,5 @@ out/
 .env*
 AGENTS.md
 CLAUDE.md
+.agent
+skills-lock.json
