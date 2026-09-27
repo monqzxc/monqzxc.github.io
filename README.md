@@ -130,17 +130,23 @@ Run `npm run test:puzzle` for the puzzle logic and saved-data checks, and `npm r
 
 ## Poké Raft
 
-Open `/play/raft/`, or choose **Poké Raft** from the games collection, for a turn-based artillery game. Play against Easy or Hard AI, or choose two players to take turns on the same device. Pick Pikachu, Gengar, Charizard, or Mew; all four have equal stats.
+Open `/play/raft/`, or choose **Poké Raft** from the games collection, for a turn-based artillery game. Play against Easy or Hard AI, take turns on the same device, or choose online play to create or join a room from separate devices. Pick Pikachu, Gengar, Charizard, or Bidoof; all four have equal stats.
 
-Adjust the angle and power, account for the wind, and fire toward the rival raft. Wind changes after both players have fired, and nearby impacts can cause splash damage. Each player starts with 100 HP, unlimited standard Energy Orbs, and three stronger special shots. Reduce the rival's HP to zero to win. Easy AI allows more aiming error; Hard AI calculates shots using the current wind.
+Adjust the angle and power, account for the wind, and fire toward the rival raft. Wind changes after both players have taken a turn, and nearby impacts can cause splash damage. Pikachu uses Electro Ball, Gengar uses Shadow Ball, Charizard uses Flame Thrower, and Bidoof uses Rock Throw. Each player starts with 100 HP, unlimited standard attacks, and three stronger charged attacks. Reduce the rival's HP to zero to win. Easy AI allows more aiming error; Hard AI calculates shots using the current wind.
 
-The game runs locally in the browser with mouse, touch, and keyboard controls. Match state is held in memory and resets on refresh; it is not saved to browser storage. The game uses the existing Pokémon artwork, local fonts, and dark purple visual theme.
+All four characters breathe, step in place at the start of a turn, wind up and attack, taunt, and recoil when hit. The **Taunt** button works during your turn and has a five-second cooldown. Bidoof uses a generated twenty-frame sprite sheet; the other three animate their existing transparent artwork. Each attack has its own canvas effect. Reduced-motion settings use still poses and keep essential projectile movement. See [sprite assets and generation prompts](public/images/raft/README.md).
+
+The game uses mouse, touch, and keyboard controls, existing Pokémon artwork, local fonts, and the dark purple visual theme. Each turn allows two minutes to fire; an expired turn is skipped. Local match state resets on refresh. Online rooms use a separate WebSocket server that owns match state and timing, with a short reconnect window and a temporary session token in the browser tab.
+
+See [online multiplayer setup](docs/raft-multiplayer.md) for local server commands, hosting, and the GitHub Pages `NEXT_PUBLIC_RAFT_WS_URL` setting. Online play on the published site requires a deployed WebSocket server and a fresh Pages build with that URL. The repository includes a Render Blueprint and a portable Dockerfile; no hosting account is required for local two-player or AI games.
 
 - `app/play/raft/page.tsx`: route and page metadata.
 - `components/raft-battle.tsx`: setup, controls, turn handoffs, and match state.
 - `components/raft-arena.tsx`: canvas arena, artwork, and shot animation.
 - `lib/raft-battle.ts`: projectile physics, damage, turns, and AI difficulty.
+- `lib/raft-online.ts`: shared room messages and online timing constants.
+- `server/raft-server.mjs`: authoritative online rooms and WebSocket connections.
 - `app/play/raft/raft.css`: responsive layout and game styling.
 - `scripts/check-raft-battle.mjs`: physics, battle rules, and AI checks.
 
-Run `npm run test:raft` for the game logic checks and `npm run typecheck` for TypeScript. Artwork sources remain documented in `public/images/puzzle/README.md`.
+Run `npm run test:raft` for the game logic checks, `npm run test:raft:online` for online integration checks, and `npm run typecheck` for TypeScript. Install the server's dependencies with `npm ci --prefix server` before running online checks or `npm run multiplayer`. Artwork sources remain documented in `public/images/puzzle/README.md`.

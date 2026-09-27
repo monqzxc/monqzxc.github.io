@@ -2,8 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   MAX_HEALTH, SPECIAL_CHARGES, TARGETS, TARGET_RADIUS, WATER_Y, WORLD_WIDTH,
-  applyShot, chooseAiShot, createBattle, simulateShot,
+  applyShot, chooseAiShot, createBattle, simulateShot, skipTurn,
 } from "../lib/raft-battle.ts";
+import { TURN_DURATION_MS, formatTurnTime, remainingTurnSeconds } from "../lib/raft-online.ts";
 
 function seededRandom(seed) {
   return () => {
@@ -15,6 +16,37 @@ function seededRandom(seed) {
 const fresh = (overrides = {}) => ({ ...createBattle(() => 0.5), ...overrides });
 const miss = { angle: 45, power: 20, kind: "normal" };
 const close = (actual, expected, tolerance = 0.000001) => assert.ok(Math.abs(actual - expected) < tolerance, `${actual} differs from ${expected}`);
+
+test("timed-out turns pass without health or ammo loss, and advance shared wind each round", () => {
+  const state = fresh();
+  const before = structuredClone(state);
+  const second = skipTurn(state, () => 1);
+  assert.equal(second.turn, 1);
+  assert.equal(second.wind, state.wind);
+  assert.equal(second.round, state.round);
+  assert.deepEqual(second.health, state.health);
+  assert.deepEqual(second.specials, state.specials);
+  const nextRound = skipTurn(second, () => 1);
+  assert.equal(nextRound.turn, 0);
+  assert.equal(nextRound.round, state.round + 1);
+  assert.equal(nextRound.wind, 5);
+  assert.deepEqual(state, before);
+  const finished = fresh({ winner: 0 });
+  assert.equal(skipTurn(finished), finished);
+});
+
+test("turn countdown uses a two-minute wall-clock deadline rather than counting interval callbacks", () => {
+  assert.equal(TURN_DURATION_MS, 120000);
+  const start = 1000;
+  const deadline = start + TURN_DURATION_MS;
+  assert.equal(remainingTurnSeconds(deadline, start), 120);
+  assert.equal(formatTurnTime(120), "2:00");
+  assert.equal(remainingTurnSeconds(deadline, start + 90100), 30);
+  assert.equal(remainingTurnSeconds(deadline, deadline - 1), 1);
+  assert.equal(remainingTurnSeconds(deadline, deadline), 0);
+  assert.equal(remainingTurnSeconds(deadline, deadline + 500000), 0);
+  assert.equal(remainingTurnSeconds(null, start), 0);
+});
 
 test("new battles have independent equal teams and bounded, reproducible wind", () => {
   const left = createBattle(() => 0);

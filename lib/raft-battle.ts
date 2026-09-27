@@ -178,6 +178,18 @@ export function applyShot(state: BattleState, input: ShotInput, random: () => nu
   };
 }
 
+/** A missed deadline spends the turn, without firing or consuming ammunition. */
+export function skipTurn(state: BattleState, random: () => number = Math.random): BattleState {
+  if (state.winner !== null) return state;
+  const roundComplete = state.turn === 1;
+  return {
+    ...state,
+    turn: otherSide(state.turn),
+    round: state.round + (roundComplete ? 1 : 0),
+    wind: roundComplete ? nextWind(random) : state.wind,
+  };
+}
+
 /** AI always submits a legal shot to the same simulator used by the player. */
 export function chooseAiShot(state: BattleState, difficulty: Difficulty, random: () => number = Math.random): ShotInput {
   const side = state.turn;

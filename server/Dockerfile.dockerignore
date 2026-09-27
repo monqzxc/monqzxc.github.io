@@ -1,0 +1,11 @@
+**
+!package.json
+!lib/
+!lib/raft-battle.ts
+!lib/raft-online.ts
+!server/
+!server/package.json
+!server/package-lock.json
+!server/raft-server.mjs
+!server/Dockerfile
+!server/Dockerfile.dockerignore

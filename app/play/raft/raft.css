@@ -44,6 +44,14 @@
 .raft-status-dot.is-busy { background: var(--raft-gold); animation: raft-pulse 1s ease-in-out infinite alternate; }
 .raft-status strong { font-size: 12px; font-weight: 500; line-height: 1.6; }
 .raft-round { margin-left: auto; flex-shrink: 0; font: 10px var(--font-mono); color: var(--raft-muted); }
+.raft-turn-clock { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; white-space: nowrap; font: 13px var(--font-mono); font-variant-numeric: tabular-nums; color: var(--raft-purple); }
+.raft-turn-clock.is-urgent { color: var(--raft-gold); }
+.raft-turn-clock + .raft-round { margin-left: 0; }
+.raft-online-option { display: flex; width: 100%; align-items: center; gap: 8px; min-height: 44px; margin-top: 8px; border: 1px solid var(--raft-line); border-radius: 8px; color: var(--raft-purple); font-size: 12px; padding: 10px 12px; }
+.raft-online-option > svg:last-child { margin-left: auto; }
+.raft-online-option:hover { background: #c2a5f511; border-color: #c2a5f56b; }
+.raft-taunt-button { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-height: 44px; margin-top: 8px; color: var(--raft-muted); font-size: 12px; border: 1px solid var(--raft-line); border-radius: 8px; }
+.raft-taunt-button:hover:not(:disabled) { color: var(--raft-purple); background: #c2a5f511; }
 .raft-below-arena { display: flex; align-items: start; justify-content: space-between; gap: 18px; padding: 16px 0; }
 .raft-below-arena > p { display: flex; align-items: start; gap: 8px; color: var(--raft-muted); font-size: 12px; line-height: 1.7; margin: 5px 0 0; max-width: 53ch; }
 .raft-below-arena > p > svg { flex-shrink: 0; margin-top: 2px; color: var(--raft-purple); }
