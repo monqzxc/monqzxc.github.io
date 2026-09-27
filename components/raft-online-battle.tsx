@@ -6,9 +6,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import RaftArena from "@/components/raft-arena";
 import { useRaftOnline } from "@/hooks/use-raft-online";
 import { GAMES_HREF } from "@/lib/games";
-import { createBattle, simulateShot, type ShotInput, type Side } from "@/lib/raft-battle";
+import { createBattle, simulateShot, type Point, type ShotInput, type Side } from "@/lib/raft-battle";
 import { raftCrew } from "@/lib/raft-crew";
-import { formatTurnTime, remainingTurnSeconds, type RaftPokemon, type RoomEvent } from "@/lib/raft-online";
+import { formatTurnTime, remainingTurnSeconds, type OnlineShot, type RaftPokemon, type RoomEvent } from "@/lib/raft-online";
 
 const emptyBattle = createBattle(() => 0.5);
 const defaultAim: ShotInput = { angle: 45, power: 75, kind: "normal" };
@@ -24,6 +24,8 @@ export default function OnlineRaftBattle({ onBack, initialCode }: { onBack: () =
   const [copyFallback, setCopyFallback] = useState("");
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
+  const [impact, setImpact] = useState<{ point: Point; damage: number; color: string } | null>(null);
+  const lastShot = useRef<OnlineShot | null>(null);
   const copyInput = useRef<HTMLInputElement>(null);
   const angleInput = useRef<HTMLInputElement>(null);
   const lastEvent = useRef<string | null>(null);
@@ -41,7 +43,7 @@ export default function OnlineRaftBattle({ onBack, initialCode }: { onBack: () =
   const aim = myTurn && draft?.turnId === room?.turnId ? draft.input : authoritativeAim;
   const shot = room?.shot;
   const emote = room?.emote;
-  const canTaunt = canAim && (!emote || serverNow >= emote.startedAt + 5000);
+  const canTaunt = canAim && side !== null && serverNow >= (room?.tauntReadyAt[side] ?? 0);
   const label = (player: Side) => side === player ? "You" : "Your rival";
   const winner = battle.winner;
   const winnerText = winner === null ? "Good game." : winner === side ? "You take the lagoon!" : "Your rival takes the lagoon!";
@@ -70,8 +72,22 @@ export default function OnlineRaftBattle({ onBack, initialCode }: { onBack: () =
     if (copyFallback) { copyInput.current?.focus(); copyInput.current?.select(); }
   }, [copyFallback]);
   useEffect(() => {
+    if (shot) { lastShot.current = shot; setImpact(null); return; }
+    const previous = lastShot.current;
+    lastShot.current = null;
+    if (previous && room && room.turnId > previous.id) {
+      setImpact({ point: previous.result.impact, damage: previous.result.damage, color: "#f4d278" });
+    }
+  }, [shot, room?.turnId]);
+  useEffect(() => {
+    if (!impact) return;
+    const timer = window.setTimeout(() => setImpact(null), 1600);
+    return () => window.clearTimeout(timer);
+  }, [impact]);
+  useEffect(() => {
     if (!room?.lastEvent || side === null) return;
     const event = room.lastEvent;
+    if (event.kind === "shot" && room.shot) return;
     const key = `${room.code}:${event.id}`;
     if (key === lastEvent.current) return;
     lastEvent.current = key;
@@ -84,7 +100,7 @@ export default function OnlineRaftBattle({ onBack, initialCode }: { onBack: () =
       return `${name(entry.side)} missed. Watch the wind and adjust your aim.`;
     };
     setHistory(previous => event.kind === "start" || event.kind === "rematch" ? [eventText(event)] : [eventText(event), ...previous].slice(0, 3));
-  }, [room?.code, room?.lastEvent, side]);
+  }, [room?.code, room?.lastEvent, room?.shot, side]);
 
   function updateAim(change: Partial<ShotInput>) {
     if (!canAim || !room) return;
@@ -142,7 +158,7 @@ export default function OnlineRaftBattle({ onBack, initialCode }: { onBack: () =
       <div className="raft-layout"><section className="raft-game" aria-label="Battle arena">
         <div className="raft-scoreboard">{([0, 1] as const).map(player => <div className={`raft-player raft-player-${player} ${room?.phase === "playing" && battle.turn === player ? "is-active" : ""}`} key={player}><img src={`/images/puzzle/${players[player].id}.png`} alt="" width={52} height={52} /><div className="raft-player-info"><div className="raft-player-name"><strong>{room && !room.players[player] ? "Open raft" : players[player].name}</strong><span>{room ? room.players[player] ? `${label(player)}${!room.players[player]?.connected ? " · Offline" : ""}` : "Waiting for rival" : player === 0 ? "Your raft" : "Rival's raft"}</span></div><div className="raft-health" role="progressbar" aria-label={`${label(player)} health`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={battle.health[player]}><span style={{ width: `${battle.health[player]}%` }} /></div><span className="raft-health-value">{battle.health[player]} <span>/ 100 HP</span></span></div></div>)}<span className="raft-versus" aria-hidden="true">vs</span></div>
         <div className="raft-scene"><div className="raft-weather"><span><Waves size={14} /> Moonlit lagoon</span><span aria-label={`Wind strength ${Math.abs(battle.wind)}, blowing ${battle.wind < 0 ? "left" : "right"}`}><Wind size={15} />{battle.wind === 0 ? "No wind" : <>{battle.wind < 0 ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}{Math.abs(battle.wind)} wind</>}</span></div>
-          <RaftArena pokemon={[players[0].id, players[1].id]} health={battle.health} turn={battle.turn} preview={room?.phase === "playing" && !shot ? preview : []} flight={flight} impact={null} active={room?.phase === "playing"} emote={arenaEmote} />
+          <RaftArena pokemon={[players[0].id, players[1].id]} health={battle.health} turn={battle.turn} preview={room?.phase === "playing" && !shot ? preview : []} flight={flight} impact={impact} active={room?.phase === "playing"} emote={arenaEmote} />
           {room?.phase === "finished" && <div className="raft-scene-message"><Trophy size={25} /><strong>{winnerText}</strong><span>{winner === null ? "The battle has ended." : `${players[winner].name} is the last Pokémon afloat.`}</span></div>}
         </div>
         <div className="raft-status"><span className={`raft-status-dot ${busy || shot ? "is-busy" : ""}`} /><strong>{status}</strong>{room?.phase === "playing" ? <span className={`raft-online-timer ${remaining <= 20 && room.turnDeadline !== null ? "is-urgent" : ""}`} aria-label={room.turnDeadline === null ? "Turn clock paused during shot" : `Turn time remaining: ${formatTurnTime(remaining)}`} aria-live="off"><Clock3 size={14} />{room.turnDeadline === null ? "Shot in flight" : formatTurnTime(remaining)}</span> : <span className="raft-round">{room?.phase === "finished" ? `Round ${battle.round}` : "2 min / turn"}</span>}</div>
