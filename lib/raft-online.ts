@@ -50,6 +50,7 @@ export type RoomSnapshot = {
   serverNow: number;
   shot: OnlineShot | null;
   emote: { id: number; side: Side; startedAt: number; endsAt: number } | null;
+  tauntReadyAt: [number, number];
   lastEvent: RoomEvent | null;
   finishReason: "knockout" | "disconnect" | "left" | null;
 };

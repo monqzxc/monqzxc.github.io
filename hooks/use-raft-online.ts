@@ -134,6 +134,8 @@ export function useRaftOnline(initialCode?: string) {
         if (incoming.type === "welcome") {
           cancelTimers();
           attempts = 0;
+          firedTurn.current = null;
+          setFirePending(false);
           session = { code: incoming.code, token: incoming.token };
           rememberSession(session);
           currentSide.current = incoming.side;
@@ -148,6 +150,8 @@ export function useRaftOnline(initialCode?: string) {
         } else if (incoming.type === "state") {
           acceptSnapshot(incoming.snapshot);
         } else if (incoming.type === "error") {
+          firedTurn.current = null;
+          setFirePending(false);
           setError(incoming.message || "That action couldn't be completed. Please try again.");
           // A handshake rejection is final. Retrying the same expired token or full room cannot help.
           if (handshakeTimer !== null) {
@@ -175,11 +179,26 @@ export function useRaftOnline(initialCode?: string) {
         }
       };
       next.onerror = () => { /* The close event owns retries, so an error cannot start two sockets. */ };
-      next.onclose = () => {
+      next.onclose = event => {
         if (!active()) return;
         socket = null;
         cancelTimers();
         clearAim();
+        if (event.code === 1000 && event.reason === "Session resumed elsewhere") {
+          intentionalClose = true;
+          rememberSession(null, session?.code);
+          session = null;
+          intent = null;
+          currentSnapshot.current = null;
+          currentSide.current = null;
+          firedTurn.current = null;
+          setSnapshot(null);
+          setSide(null);
+          setFirePending(false);
+          setConnection("idle");
+          setError("This raft is now open in another tab. Continue playing there, or create a new room here.");
+          return;
+        }
         if (session && attempts < 6) {
           setConnection("reconnecting");
           setError("");
@@ -294,6 +313,9 @@ export function useRaftOnline(initialCode?: string) {
     choose: (pokemon: RaftPokemon) => transport.current?.send({ type: "choose", pokemon }),
     ready: () => transport.current?.send({ type: "ready" }),
     rematch: () => transport.current?.send({ type: "rematch" }),
+    taunt: () => {
+      if (canAct()) transport.current?.send({ type: "taunt", turnId: currentSnapshot.current!.turnId });
+    },
     reconnect: () => transport.current?.reconnect(),
     leave: () => transport.current?.leave(),
   };

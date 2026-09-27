@@ -80,6 +80,7 @@ export function createRaftServer(options = {}) {
       } : null),
       battle: room.battle, aims: room.aims, turnId: room.turnId,
       turnDeadline: room.turnDeadline, serverNow: Date.now(), shot: room.shot, emote: room.emote,
+      tauntReadyAt: room.lastTaunts.map((time) => Number.isFinite(time) ? time + 5000 : 0),
       lastEvent: room.lastEvent, finishReason: room.finishReason,
     };
   }
@@ -318,6 +319,7 @@ export function createRaftServer(options = {}) {
       room.shotTimer = null;
       if (room.phase !== "playing") return;
       room.battle = resolution.state;
+      room.aims = room.aims.map((aim, player) => room.battle.specials[player] === 0 ? { ...aim, kind: "normal" } : aim);
       room.shot = null;
       room.turnId++;
       room.updatedAt = Date.now();
