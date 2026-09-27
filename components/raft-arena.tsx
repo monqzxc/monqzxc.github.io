@@ -2,21 +2,24 @@
 
 import { useEffect, useRef } from "react";
 import type { Point, ShotResult } from "@/lib/raft-battle";
+import { RAFT_SPRITES, raftSpriteFrame, raftPortraitPose, type RaftPose, type RaftElement } from "@/lib/raft-sprites";
 
 type RaftArenaProps = {
   pokemon: [string, string];
   health: [number, number];
   turn: 0 | 1;
   preview: Point[];
-  flight: { shot: ShotResult; startedAt: number; duration: number } | null;
+  flight: { shot: ShotResult; startedAt: number; duration: number; shooter?: 0 | 1 } | null;
   impact: { point: Point; damage: number; color: string } | null;
   active: boolean;
+  emote?: { side: 0 | 1; startedAt: number } | null;
 };
 
 const WIDTH = 1000;
 const HEIGHT = 500;
 const TEAM_COLORS = ["#caafff", "#f5cf73"];
-const SPRITES = ["gengar", "pikachu", "charizard", "mew"];
+type SpriteImages = { sheet: HTMLImageElement; fallback: HTMLImageElement };
+type SpriteAnimation = { pose: RaftPose; elapsed: number };
 
 function ellipse(ctx: CanvasRenderingContext2D, x: number, y: number, rx: number, ry: number, fill: string) {
   ctx.fillStyle = fill;
@@ -128,7 +131,7 @@ function drawWaves(ctx: CanvasRenderingContext2D, time: number) {
   }
 }
 
-function drawRaft(ctx: CanvasRenderingContext2D, side: 0 | 1, sprite: HTMLImageElement | undefined, health: number, current: boolean, time: number) {
+function drawRaft(ctx: CanvasRenderingContext2D, side: 0 | 1, pokemon: string, images: SpriteImages | undefined, health: number, current: boolean, animation: SpriteAnimation, time: number, reducedMotion: boolean) {
   const x = side === 0 ? 150 : 850;
   const bob = Math.sin(time * 1.4 + side * 2) * 1.6;
   const color = TEAM_COLORS[side];
@@ -182,15 +185,38 @@ function drawRaft(ctx: CanvasRenderingContext2D, side: 0 | 1, sprite: HTMLImageE
 
   ellipse(ctx, 0, 367, 38, 5, "#422e364d");
   ctx.save();
-  if (health <= 0) {
-    ctx.globalAlpha = 0.48;
-    ctx.translate(0, 9);
-  }
-  if (sprite?.complete && sprite.naturalWidth > 0) {
+  const sheet = images?.sheet;
+  const fallback = images?.fallback;
+  if (sheet?.complete && sheet.naturalWidth > 0) {
+    if (health <= 0) {
+      ctx.globalAlpha = 0.62;
+      ctx.translate(0, 9);
+    }
+    const cellWidth = sheet.naturalWidth / 4;
+    const cellHeight = sheet.naturalHeight / 5;
+    const height = RAFT_SPRITES[pokemon]?.height ?? 150;
+    const width = height * cellWidth / cellHeight;
+    const { row, column } = raftSpriteFrame(animation.pose, animation.elapsed, reducedMotion);
+    const walking = animation.pose === "walking" && !reducedMotion ? Math.sin(animation.elapsed / 110) * 5 : 0;
+    const hit = animation.pose === "hit" && !reducedMotion && health > 0 ? Math.sin(animation.elapsed / 45) * Math.max(0, 1 - animation.elapsed / 650) * 4 : 0;
+    ctx.translate(walking + hit, 0);
+    // Every generated sheet faces right, so only the opposing raft is mirrored.
+    ctx.scale(side === 1 ? -1 : 1, 1);
+    ctx.drawImage(sheet, column * cellWidth, row * cellHeight, cellWidth, cellHeight, -width / 2, 367 - height * 0.85, width, height);
+  } else if (fallback?.complete && fallback.naturalWidth > 0) {
     ctx.save();
-    // The source portraits face left. Mirror the left team toward its rival.
-    ctx.scale(side === 0 ? -1 : 1, 1);
-    ctx.drawImage(sprite, -56, 257, 112, 112);
+    const pose = raftPortraitPose(animation.pose, animation.elapsed, reducedMotion, health <= 0);
+    const height = (RAFT_SPRITES[pokemon]?.height ?? 150) * 0.9;
+    const width = height * fallback.naturalWidth / fallback.naturalHeight;
+    const direction = side === 0 ? 1 : -1;
+    // Pivot the intact artwork at its feet, and direct every pose toward its rival.
+    // The supplied portraits face left; unlike sheets, mirror the left team.
+    ctx.translate(pose.x * direction, 369 + pose.y);
+    ctx.rotate(pose.rotation * direction);
+    ctx.scale(-direction * pose.scaleX, pose.scaleY);
+    ctx.globalAlpha = pose.opacity;
+    if (pose.saturation < 1) ctx.filter = `saturate(${pose.saturation})`;
+    ctx.drawImage(fallback, -width / 2, -height, width, height);
     ctx.restore();
   } else {
     ellipse(ctx, 0, 333, 30, 30, "#f6e9d7");
@@ -210,11 +236,13 @@ function drawRaft(ctx: CanvasRenderingContext2D, side: 0 | 1, sprite: HTMLImageE
   ctx.restore();
 
   if (current && health > 0) {
+    const spriteHeight = RAFT_SPRITES[pokemon]?.height ?? 150;
+    const markerY = sheet?.complete && sheet.naturalWidth > 0 ? 353 - spriteHeight * 0.85 : 355 - spriteHeight * 0.9;
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.moveTo(-7, 235);
-    ctx.lineTo(7, 235);
-    ctx.lineTo(0, 243);
+    ctx.moveTo(-7, markerY);
+    ctx.lineTo(7, markerY);
+    ctx.lineTo(0, markerY + 8);
     ctx.closePath();
     ctx.fill();
   }
@@ -235,7 +263,7 @@ function drawGuide(ctx: CanvasRenderingContext2D, points: Point[], color: string
   ctx.globalAlpha = 1;
 }
 
-function drawProjectile(ctx: CanvasRenderingContext2D, points: Point[], progress: number, color: string) {
+function drawProjectile(ctx: CanvasRenderingContext2D, points: Point[], progress: number, element: RaftElement, color: string, special: boolean, now: number, reducedMotion: boolean) {
   if (!points.length) return;
   const position = Math.max(0, Math.min(1, progress)) * (points.length - 1);
   const index = Math.floor(position);
@@ -244,9 +272,10 @@ function drawProjectile(ctx: CanvasRenderingContext2D, points: Point[], progress
   const mix = position - index;
   const point = { x: from.x + (to.x - from.x) * mix, y: from.y + (to.y - from.y) * mix };
 
+  ctx.save();
   ctx.strokeStyle = color;
-  ctx.globalAlpha = 0.35;
-  ctx.lineWidth = 2;
+  ctx.globalAlpha = 0.15;
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
   points.slice(0, index + 1).forEach((sample, i) => {
     if (i === 0) ctx.moveTo(sample.x, sample.y);
@@ -254,6 +283,24 @@ function drawProjectile(ctx: CanvasRenderingContext2D, points: Point[], progress
   });
   ctx.lineTo(point.x, point.y);
   ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  const size = special ? 1.3 : 1;
+  const start = Math.max(0, index - (element === "fire" ? 22 : 12));
+  const trail = points.slice(start, index + 1);
+  trail.push(point);
+  const tailLength = Math.max(1, trail.length - 1);
+  // Trails follow the actual simulated arc, preserving the same aiming rules.
+  for (let i = 1; i < trail.length; i++) {
+    const tail = i / tailLength;
+    ctx.globalAlpha = tail * (element === "fire" ? 0.65 : 0.36);
+    ctx.lineWidth = (element === "fire" ? 3 + tail * 14 : 2 + tail * 7) * size;
+    ctx.strokeStyle = element === "fire" ? (i % 3 === 0 ? "#ffd86a" : "#fa7035") : color;
+    ctx.beginPath();
+    ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
+    ctx.lineTo(trail[i].x, trail[i].y);
+    ctx.stroke();
+  }
   ctx.globalAlpha = 1;
 
   if (point.y < 12) {
@@ -266,14 +313,96 @@ function drawProjectile(ctx: CanvasRenderingContext2D, points: Point[], progress
     ctx.lineTo(x + 7, 19);
     ctx.closePath();
     ctx.fill();
-  } else {
-    ctx.save();
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 18;
-    ellipse(ctx, point.x, point.y, 7, 7, color);
-    ellipse(ctx, point.x - 1, point.y - 1, 3, 3, "#fff9eb");
     ctx.restore();
+    return;
   }
+
+  const previous = points[Math.max(0, index - 1)];
+  const angle = Math.atan2(point.y - previous.y, point.x - previous.x);
+  const motionTime = reducedMotion ? 0 : now / 1000;
+  ctx.translate(point.x, point.y);
+  ctx.scale(size, size);
+  if (element === "shadow") {
+    const sphere = ctx.createRadialGradient(-3, -3, 1, 0, 0, 14);
+    sphere.addColorStop(0, "#e8d4ff");
+    sphere.addColorStop(0.23, "#9655dc");
+    sphere.addColorStop(0.67, "#3b1c68");
+    sphere.addColorStop(1, "#8d50d800");
+    ctx.fillStyle = sphere;
+    ctx.beginPath();
+    ctx.arc(0, 0, 14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#c393ef";
+    ctx.lineWidth = 1.4;
+    ctx.rotate(motionTime * 3);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 16, 6, 0.6, 0, Math.PI * 1.45);
+    ctx.stroke();
+    ellipse(ctx, -11, 5, 2, 2, "#dbb4ff");
+    ellipse(ctx, 13, -7, 1.5, 1.5, "#ac7ee2");
+  } else if (element === "electric") {
+    ellipse(ctx, 0, 0, 10, 10, "#edb820");
+    ellipse(ctx, -1, -1, 7, 7, "#fff297");
+    ellipse(ctx, -2, -2, 3, 3, "#fffce9");
+    ctx.strokeStyle = "#fff1a5";
+    ctx.lineWidth = 2;
+    const flicker = Math.floor(motionTime * 10) % 2;
+    for (let arc = 0; arc < 4; arc++) {
+      ctx.save();
+      ctx.rotate(arc * Math.PI / 2 + flicker * 0.18);
+      ctx.beginPath();
+      ctx.moveTo(8, -3);
+      ctx.lineTo(15, -6);
+      ctx.lineTo(12, 1);
+      ctx.lineTo(19, 4);
+      ctx.stroke();
+      ctx.restore();
+    }
+  } else if (element === "fire") {
+    ctx.rotate(angle);
+    ctx.fillStyle = "#f67b35";
+    ctx.beginPath();
+    ctx.moveTo(14, 0);
+    ctx.quadraticCurveTo(5, -14, -14, -10);
+    ctx.lineTo(-27, -14);
+    ctx.lineTo(-20, -3);
+    ctx.lineTo(-35, 2);
+    ctx.lineTo(-18, 8);
+    ctx.quadraticCurveTo(3, 16, 14, 0);
+    ctx.fill();
+    ellipse(ctx, -1, 0, 11, 6, "#ffca59");
+    ellipse(ctx, 4, 0, 6, 3, "#fff0b0");
+  } else {
+    ctx.rotate(motionTime * 6);
+    ctx.fillStyle = "#ad8460";
+    ctx.strokeStyle = "#513d32";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-11, -4);
+    ctx.lineTo(-4, -11);
+    ctx.lineTo(6, -10);
+    ctx.lineTo(12, -2);
+    ctx.lineTo(8, 9);
+    ctx.lineTo(-3, 12);
+    ctx.lineTo(-12, 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#d6b391";
+    ctx.beginPath();
+    ctx.moveTo(-8, -3);
+    ctx.lineTo(-2, -8);
+    ctx.lineTo(5, -6);
+    ctx.lineTo(1, 1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(1, 1);
+    ctx.lineTo(7, 5);
+    ctx.lineTo(6, 8);
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 function drawImpact(ctx: CanvasRenderingContext2D, impact: NonNullable<RaftArenaProps["impact"]>) {
@@ -320,31 +449,87 @@ export default function RaftArena(props: RaftArenaProps) {
 
     const background = document.createElement("canvas");
     const backgroundCtx = background.getContext("2d");
-    const sprites = new Map<string, HTMLImageElement>();
+    const sprites = new Map<string, SpriteImages>();
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let reducedMotion = motionQuery.matches;
     let frame: number | null = null;
     let disposed = false;
+    let onScreen = true;
+    let previousHealth: [number, number] = [...sceneRef.current.health];
+    let previousPokemon: [string, string] = [...sceneRef.current.pokemon];
+    let previousTurn = sceneRef.current.turn;
+    let previouslyActive = false;
+    let previousImpact: RaftArenaProps["impact"] = null;
+    const hitStarted: [number, number] = [-Infinity, -Infinity];
+    const walkStarted: [number, number] = [-Infinity, -Infinity];
+
+    const shooterFor = (flight: NonNullable<RaftArenaProps["flight"]>): 0 | 1 =>
+      flight.shooter ?? ((flight.shot.points[0]?.x ?? 175) < WIDTH / 2 ? 0 : 1);
+
+    const updateAnimations = (scene: RaftArenaProps, now: number) => {
+      for (const side of [0, 1] as const) {
+        if (scene.health[side] < previousHealth[side]) hitStarted[side] = now;
+        if (scene.health[side] > previousHealth[side] || scene.pokemon[side] !== previousPokemon[side]) {
+          hitStarted[side] = -Infinity;
+          walkStarted[side] = -Infinity;
+        }
+      }
+      if (scene.impact && scene.impact !== previousImpact && scene.impact.damage > 0) {
+        const target = scene.impact.point.x < WIDTH / 2 ? 0 : 1;
+        hitStarted[target] = now;
+      }
+      if (scene.active && !previouslyActive) {
+        walkStarted[0] = now;
+        walkStarted[1] = now;
+      } else if (scene.active && scene.turn !== previousTurn) {
+        walkStarted[scene.turn] = now;
+      }
+      previousHealth = [...scene.health];
+      previousPokemon = [...scene.pokemon];
+      previousTurn = scene.turn;
+      previouslyActive = scene.active;
+      previousImpact = scene.impact;
+    };
+
+    const animationFor = (scene: RaftArenaProps, side: 0 | 1, now: number): SpriteAnimation => {
+      if (scene.health[side] <= 0 || now - hitStarted[side] < 650) {
+        return { pose: "hit", elapsed: Math.min(1000, now - hitStarted[side]) };
+      }
+      if (scene.flight && shooterFor(scene.flight) === side && now - scene.flight.startedAt < 650) {
+        return { pose: "attacking", elapsed: now - scene.flight.startedAt };
+      }
+      if (scene.emote?.side === side && now - scene.emote.startedAt < 1200) {
+        return { pose: "taunting", elapsed: now - scene.emote.startedAt };
+      }
+      if (now - walkStarted[side] < 900) return { pose: "walking", elapsed: now - walkStarted[side] };
+      return { pose: "breathing", elapsed: now + side * 280 };
+    };
 
     const draw = (now: number) => {
       frame = null;
-      if (disposed || document.hidden) return;
+      if (disposed || document.hidden || !onScreen) return;
       const scene = sceneRef.current;
+      updateAnimations(scene, now);
       const time = reducedMotion ? 0 : now / 1000;
       ctx.setTransform(canvas.width / WIDTH, 0, 0, canvas.height / HEIGHT, 0, 0);
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
       if (backgroundCtx) ctx.drawImage(background, 0, 0, WIDTH, HEIGHT);
       else drawBackground(ctx);
       drawWaves(ctx, time);
-      drawRaft(ctx, 0, sprites.get(scene.pokemon[0]), scene.health[0], scene.active && scene.turn === 0, time);
-      drawRaft(ctx, 1, sprites.get(scene.pokemon[1]), scene.health[1], scene.active && scene.turn === 1, time);
+      drawRaft(ctx, 0, scene.pokemon[0], sprites.get(scene.pokemon[0]), scene.health[0], scene.active && scene.turn === 0, animationFor(scene, 0, now), time, reducedMotion);
+      drawRaft(ctx, 1, scene.pokemon[1], sprites.get(scene.pokemon[1]), scene.health[1], scene.active && scene.turn === 1, animationFor(scene, 1, now), time, reducedMotion);
       if (scene.active && !scene.flight) drawGuide(ctx, scene.preview, TEAM_COLORS[scene.turn]);
       if (scene.flight) {
-        const progress = (now - scene.flight.startedAt) / Math.max(1, scene.flight.duration);
-        drawProjectile(ctx, scene.flight.shot.points, progress, TEAM_COLORS[scene.turn]);
+        const windup = reducedMotion ? 0 : Math.min(160, scene.flight.duration * 0.2);
+        const progress = (now - scene.flight.startedAt - windup) / Math.max(1, scene.flight.duration - windup);
+        const shooter = shooterFor(scene.flight);
+        const pokemon = RAFT_SPRITES[scene.pokemon[shooter]];
+        drawProjectile(ctx, scene.flight.shot.points, progress, pokemon?.element ?? "shadow", pokemon?.color ?? TEAM_COLORS[shooter], scene.flight.shot.kind === "special", now, reducedMotion);
       }
       if (scene.impact) drawImpact(ctx, scene.impact);
-      if (!reducedMotion || (scene.flight && now < scene.flight.startedAt + scene.flight.duration)) {
+      const actionUntil = Math.max(hitStarted[0] + 650, hitStarted[1] + 650, walkStarted[0] + 900, walkStarted[1] + 900,
+        scene.emote ? scene.emote.startedAt + 1200 : 0, scene.flight ? scene.flight.startedAt + Math.max(650, scene.flight.duration) : 0);
+      if (!reducedMotion || now < actionUntil) {
         frame = window.requestAnimationFrame(draw);
       }
     };
@@ -370,12 +555,17 @@ export default function RaftArena(props: RaftArenaProps) {
       requestDraw();
     };
 
-    for (const name of SPRITES) {
-      const sprite = new Image();
-      sprite.onload = requestDraw;
-      sprite.onerror = requestDraw;
-      sprite.src = `/images/puzzle/${name}.png`;
-      sprites.set(name, sprite);
+    for (const name of new Set([...Object.keys(RAFT_SPRITES), ...sceneRef.current.pokemon])) {
+      const sheet = new Image();
+      const fallback = new Image();
+      for (const sprite of [sheet, fallback]) {
+        sprite.onload = requestDraw;
+        sprite.onerror = requestDraw;
+      }
+      const source = RAFT_SPRITES[name];
+      if (source?.sheet) sheet.src = source.sheet;
+      fallback.src = source?.fallback ?? `/images/puzzle/${name}.png`;
+      sprites.set(name, { sheet, fallback });
     }
 
     const onMotionChange = () => {
@@ -384,6 +574,11 @@ export default function RaftArena(props: RaftArenaProps) {
     };
     const observer = new ResizeObserver(resize);
     observer.observe(canvas);
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      if (onScreen) requestDraw();
+    });
+    visibilityObserver.observe(canvas);
     motionQuery.addEventListener("change", onMotionChange);
     document.addEventListener("visibilitychange", requestDraw);
     resize();
@@ -392,12 +587,15 @@ export default function RaftArena(props: RaftArenaProps) {
       disposed = true;
       if (frame !== null) window.cancelAnimationFrame(frame);
       observer.disconnect();
+      visibilityObserver.disconnect();
       motionQuery.removeEventListener("change", onMotionChange);
       document.removeEventListener("visibilitychange", requestDraw);
       redrawRef.current = null;
-      for (const sprite of sprites.values()) {
-        sprite.onload = null;
-        sprite.onerror = null;
+      for (const images of sprites.values()) {
+        for (const sprite of [images.sheet, images.fallback]) {
+          sprite.onload = null;
+          sprite.onerror = null;
+        }
       }
     };
   }, []);

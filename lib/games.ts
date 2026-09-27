@@ -15,10 +15,10 @@ export const games: readonly Game[] = [
     slug: "raft",
     name: "Poké Raft",
     description:
-      "Aim, catch the wind, and battle across the water. Challenge Easy or Hard AI, or take turns with a friend.",
+      "Aim, catch the wind, and beat the two-minute clock. Challenge a friend online or on one device, or battle Easy or Hard AI.",
     players: "1–2 players",
     category: "Artillery",
-    artwork: ["/images/puzzle/charizard.png", "/images/puzzle/mew.png"],
+    artwork: ["/images/puzzle/charizard.png", "/images/puzzle/bidoof.png"],
   },
   {
     slug: "puzzle",
