@@ -27,6 +27,7 @@ type Runtime = {
 };
 
 const HOST_ID_PREFIX = "poke-raft-v2-";
+const MAX_JOIN_ATTEMPTS = 3;
 function hostPeerId(code: string) { return `${HOST_ID_PREFIX}${code}`; }
 function randomRoomCode() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -89,10 +90,12 @@ export function useRaftOnline(initialCode?: string) {
   }, [clearAim]);
 
   const destroyPeer = useCallback(() => {
-    connectionRef.current?.close();
+    const conn = connectionRef.current;
+    const peer = peerRef.current;
     connectionRef.current = null;
-    peerRef.current?.destroy();
     peerRef.current = null;
+    conn?.close();
+    peer?.destroy();
   }, []);
 
   useEffect(() => {
@@ -121,6 +124,14 @@ export function useRaftOnline(initialCode?: string) {
   }, [clearAim, initialCode]);
 
   useEffect(() => {
+    let joinIntent: { code: string; pokemon: RaftPokemon } | null = null;
+    let hostIntent: RaftPokemon | null = null;
+    let joinAttempts = 0;
+    let joinTimer: ReturnType<typeof setTimeout> | null = null;
+    let signalingTimer: ReturnType<typeof setTimeout> | null = null;
+    let signalingAttempts = 0;
+    const clearJoinTimer = () => { if (joinTimer) clearTimeout(joinTimer); joinTimer = null; };
+    const clearSignalingTimer = () => { if (signalingTimer) clearTimeout(signalingTimer); signalingTimer = null; };
     const publish = (next: RoomSnapshot) => {
       const runtime = runtimeRef.current;
       if (!runtime) return;
@@ -247,7 +258,7 @@ export function useRaftOnline(initialCode?: string) {
       runtime.guest = conn; connectionRef.current = conn;
       conn.on("data", data => {
         const message = data as PeerMessage;
-        if (runtimeRef.current !== runtime) return;
+        if (runtimeRef.current !== runtime || runtime.guest !== conn) return;
         if (message?.type === "hello") {
           const existing = runtime.snapshot.players[1];
           runtime.snapshot = { ...runtime.snapshot, players: [runtime.snapshot.players[0], existing ? { ...existing, pokemon: message.pokemon, connected: true } : player(message.pokemon, true)] };
@@ -259,52 +270,126 @@ export function useRaftOnline(initialCode?: string) {
     };
     const attachGuestConnection = (conn: DataConnection, code: string, pokemon: RaftPokemon) => {
       connectionRef.current = conn;
-      conn.on("open", () => { if (!disposedRef.current) conn.send({ type: "hello", pokemon } satisfies PeerMessage); });
+      conn.on("open", () => { if (!disposedRef.current && connectionRef.current === conn) conn.send({ type: "hello", pokemon } satisfies PeerMessage); });
       conn.on("data", data => {
-        if (disposedRef.current) return;
+        if (disposedRef.current || connectionRef.current !== conn) return;
         const message = data as PeerMessage;
-        if (message?.type === "snapshot") { acceptSnapshot(message.snapshot, 1); setConnection("connected"); setError(""); setRoomUrl(code); }
-        else if (message?.type === "leave") { destroyPeer(); currentSnapshot.current = null; setSnapshot(null); setSide(null); setConnection("idle"); setError("The host closed this room. Create or join a new room to play again."); setRoomUrl(); }
+        if (message?.type === "snapshot") { joinAttempts = 0; clearJoinTimer(); acceptSnapshot(message.snapshot, 1); setConnection("connected"); setError(""); setRoomUrl(code); }
+        else if (message?.type === "leave") { joinIntent = null; clearJoinTimer(); clearSignalingTimer(); destroyPeer(); currentSnapshot.current = null; setSnapshot(null); setSide(null); setConnection("idle"); setError("The host closed this room. Create or join a new room to play again."); setRoomUrl(); }
       });
       conn.on("close", () => { if (connectionRef.current !== conn || disposedRef.current) return; connectionRef.current = null; setConnection("disconnected"); setError("Your rival connection ended. Try reconnecting while the room is still open."); });
-      conn.on("error", () => setError("PeerJS could not establish the direct connection. Check both browsers' network access and try again."));
+      conn.on("error", () => { if (connectionRef.current !== conn || disposedRef.current) return; connectionRef.current = null; conn.close(); setConnection("disconnected"); setError("PeerJS could not establish the direct connection. Check both browsers' network access and try again."); });
+    };
+    const connectGuest = (peer: Peer) => {
+      if (peerRef.current !== peer || !joinIntent || disposedRef.current || peer.disconnected || peer.destroyed) return;
+      if (connectionRef.current?.open) return;
+      const stale = connectionRef.current;
+      connectionRef.current = null;
+      stale?.close();
+      joinAttempts += 1;
+      const conn = peer.connect(hostPeerId(joinIntent.code), { reliable: true, serialization: "json" });
+      if (conn) attachGuestConnection(conn, joinIntent.code, joinIntent.pokemon);
+    };
+    const scheduleSignalingReconnect = (peer: Peer, immediate = false) => {
+      if (peerRef.current !== peer || peer.destroyed || !peer.disconnected || signalingTimer) return;
+      if (hostRef.current || !connectionRef.current?.open) setConnection("reconnecting");
+      signalingTimer = setTimeout(() => {
+        signalingTimer = null;
+        if (peerRef.current !== peer || disposedRef.current || peer.destroyed || !peer.disconnected) return;
+        try { peer.reconnect(); }
+        catch { setConnection("disconnected"); setError("PeerJS signaling is unavailable. Try reconnecting while the room is still open."); }
+      }, immediate ? 0 : Math.min(8000, 700 * 2 ** signalingAttempts++));
     };
     const installPeerError = (peer: Peer) => {
+      let fatalError = false;
+      peer.on("open", () => { if (disposedRef.current || peerRef.current !== peer) return; fatalError = false; clearSignalingTimer(); signalingAttempts = 0; });
       peer.on("error", error => {
-        if (disposedRef.current) return;
-        setConnection("disconnected"); setError(error.message || "PeerJS could not connect the two browsers.");
-        if (peerRef.current === peer && !runtimeRef.current) { peerRef.current = null; try { peer.destroy(); } catch { /* already closed */ } }
+        if (disposedRef.current || peerRef.current !== peer) return;
+        if (error.type === "network") return; // PeerJS emits "disconnected" next; keep this ID for reconnect().
+        if (error.type === "peer-unavailable" && joinIntent && !hostRef.current) {
+          if (connectionRef.current?.open) return;
+          const stale = connectionRef.current;
+          connectionRef.current = null;
+          stale?.close();
+          if (joinAttempts < MAX_JOIN_ATTEMPTS) {
+            setConnection("reconnecting");
+            setError("The room is not available yet. Trying again…");
+            clearJoinTimer();
+            joinTimer = setTimeout(() => { joinTimer = null; connectGuest(peer); }, 1200 * joinAttempts);
+          } else {
+            setConnection("disconnected");
+            setError(`Could not reach room ${joinIntent.code}. Keep the host tab open and check its current room code.`);
+            peerRef.current = null;
+            peer.destroy();
+          }
+          return;
+        }
+        fatalError = true;
+        setConnection("disconnected");
+        setError(error.message || "PeerJS could not connect the two browsers.");
+        if (!runtimeRef.current) {
+          const stale = connectionRef.current;
+          connectionRef.current = null;
+          peerRef.current = null;
+          stale?.close();
+          peer.destroy();
+        }
       });
-      peer.on("disconnected", () => { if (!disposedRef.current && !connectionRef.current) setError("The PeerJS signaling service disconnected. Try again."); });
+      peer.on("disconnected", () => {
+        if (disposedRef.current || peerRef.current !== peer || fatalError) return;
+        if (!hostRef.current && !connectionRef.current?.open) {
+          clearJoinTimer();
+          const stale = connectionRef.current;
+          connectionRef.current = null;
+          stale?.close();
+          joinAttempts = 0;
+        }
+        if (hostRef.current || !connectionRef.current?.open) setError("The PeerJS signaling service disconnected. Reconnecting…");
+        scheduleSignalingReconnect(peer);
+      });
     };
     const startCreate = (pokemon: RaftPokemon) => {
       if (peerRef.current || disposedRef.current) return;
+      joinIntent = null; hostIntent = pokemon; clearJoinTimer(); clearSignalingTimer();
       const code = randomRoomCode(); setConnection("connecting"); setError(""); hostRef.current = true; sideRef.current = 0;
       const peer = new Peer(hostPeerId(code), peerOptions()); peerRef.current = peer; installPeerError(peer);
+      peer.on("connection", conn => { if (peerRef.current === peer && !disposedRef.current) attachHostConnection(conn); else conn.close(); });
       peer.on("open", () => {
+        if (peerRef.current !== peer || disposedRef.current) return;
+        if (runtimeRef.current) { setConnection("connected"); setError(""); return; }
         const initial: RoomSnapshot = { code, phase: "waiting", players: [player(pokemon, true), null], battle: createBattle(), aims: [{ angle: 45, power: 75, kind: "normal" }, { angle: 45, power: 75, kind: "normal" }], turnId: 0, turnDeadline: null, serverNow: Date.now(), shot: null, emote: null, tauntReadyAt: [0, 0], lastEvent: null, finishReason: null };
         runtimeRef.current = { code, snapshot: initial, guest: null, turnTimer: null, shotTimer: null, emoteTimer: null, graceTimer: null, eventId: 0 };
-        peer.on("connection", attachHostConnection); acceptSnapshot(initial, 0); setConnection("connected"); setRoomUrl(code);
+        acceptSnapshot(initial, 0); setConnection("connected"); setRoomUrl(code);
       });
     };
     const startJoin = (code: string, pokemon: RaftPokemon) => {
       if (peerRef.current || disposedRef.current || !/^[A-Z]{6}$/.test(code)) return;
+      joinIntent = { code, pokemon }; joinAttempts = 0; clearJoinTimer(); clearSignalingTimer();
       setConnection("connecting"); setError(""); hostRef.current = false; sideRef.current = 1;
       const peer = new Peer(peerOptions()); peerRef.current = peer; installPeerError(peer);
-      peer.on("open", () => attachGuestConnection(peer.connect(hostPeerId(code), { reliable: true, serialization: "json" }), code, pokemon));
+      peer.on("open", () => { if (peerRef.current !== peer || disposedRef.current) return; clearJoinTimer(); if (connectionRef.current?.open) setError(""); else connectGuest(peer); });
     };
     const send = (action: Action) => { if (hostRef.current) { handleAction(action, 0); return true; } return sendToPeer(action); };
     const leave = () => {
       const runtime = runtimeRef.current;
       if (hostRef.current && runtime?.guest?.open) runtime.guest.send({ type: "leave" } satisfies PeerMessage); else if (connectionRef.current?.open) connectionRef.current.send({ type: "leave" } satisfies PeerMessage);
-      destroyPeer(); if (runtime) clearRuntimeTimers(runtime); runtimeRef.current = null; hostRef.current = false; sideRef.current = null; currentSnapshot.current = null;
+      joinIntent = null; hostIntent = null; clearJoinTimer(); clearSignalingTimer(); if (runtime) clearRuntimeTimers(runtime); runtimeRef.current = null; destroyPeer(); hostRef.current = false; sideRef.current = null; currentSnapshot.current = null;
       setSnapshot(null); setSide(null); setConnection("idle"); setError(""); setFirePending(false); setRoomUrl();
     };
     transportRef.current = { send, startCreate, startJoin, reconnect: () => {
-      const code = currentSnapshot.current?.code || initialCodeRef.current; const selected = currentSnapshot.current?.players[1]?.pokemon || "pikachu";
-      destroyPeer(); if (code && sideRef.current === 1) startJoin(code, selected); else setError("The host raft must stay open for a peer-to-peer rematch.");
+      if (hostRef.current) {
+        const peer = peerRef.current;
+        if (peer?.disconnected && !peer.destroyed) scheduleSignalingReconnect(peer, true);
+        else if (!peer && !runtimeRef.current && hostIntent) startCreate(hostIntent);
+        else if (!peer?.open) setError("This room is no longer available. Leave and create a new room.");
+        return;
+      }
+      const code = joinIntent?.code || currentSnapshot.current?.code || initialCodeRef.current;
+      const selected = joinIntent?.pokemon || currentSnapshot.current?.players[1]?.pokemon || "pikachu";
+      if (!code) { setError("Enter a room code to join."); return; }
+      clearJoinTimer(); clearSignalingTimer(); destroyPeer(); startJoin(code, selected);
     }, leave };
-    return () => { transportRef.current = null; };
+    return () => { clearJoinTimer(); clearSignalingTimer(); transportRef.current = null; };
   }, [acceptSnapshot, destroyPeer, initialCode]);
 
   const canAct = useCallback(() => {
