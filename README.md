@@ -136,17 +136,17 @@ Adjust the angle and power, account for the wind, and fire toward the rival raft
 
 All four characters breathe, step in place at the start of a turn, wind up and attack, taunt, and recoil when hit. The **Taunt** button works during your turn and has a five-second cooldown. Bidoof uses a generated twenty-frame sprite sheet; the other three animate their existing transparent artwork. Each attack has its own canvas effect. Reduced-motion settings use still poses and keep essential projectile movement. See [sprite assets and generation prompts](public/images/raft/README.md).
 
-The game uses mouse, touch, and keyboard controls, existing Pokémon artwork, local fonts, and the dark purple visual theme. Each turn allows two minutes to fire; an expired turn is skipped. Local match state resets on refresh. Online rooms use a separate WebSocket server that owns match state and timing, with a short reconnect window and a temporary session token in the browser tab.
+The game uses mouse, touch, and keyboard controls, existing Pokémon artwork, local fonts, and the dark purple visual theme. Each turn allows two minutes to fire; an expired turn is skipped. Local match state resets on refresh. Online rooms use PeerJS for a direct browser-to-browser connection, with the room host owning match state and a short reconnect window. No WebSocket backend or environment variable is required.
 
-See [online multiplayer setup](docs/raft-multiplayer.md) for local server commands, hosting, and the GitHub Pages `NEXT_PUBLIC_RAFT_WS_URL` setting. Online play on the published site requires a deployed WebSocket server and a fresh Pages build with that URL. The repository includes a Render Blueprint and a portable Dockerfile; no hosting account is required for local two-player or AI games.
+See [online multiplayer setup](docs/raft-multiplayer.md) for the PeerJS flow and local checks. Keep the host tab open while a match is in progress; closing it ends that room.
 
 - `app/play/raft/page.tsx`: route and page metadata.
 - `components/raft-battle.tsx`: setup, controls, turn handoffs, and match state.
 - `components/raft-arena.tsx`: canvas arena, artwork, and shot animation.
 - `lib/raft-battle.ts`: projectile physics, damage, turns, and AI difficulty.
 - `lib/raft-online.ts`: shared room messages and online timing constants.
-- `server/raft-server.mjs`: authoritative online rooms and WebSocket connections.
+- `hooks/use-raft-online.ts`: PeerJS room transport and host-authoritative online state.
 - `app/play/raft/raft.css`: responsive layout and game styling.
 - `scripts/check-raft-battle.mjs`: physics, battle rules, and AI checks.
 
-Run `npm run test:raft` for the game logic checks, `npm run test:raft:online` for online integration checks, and `npm run typecheck` for TypeScript. Install the server's dependencies with `npm ci --prefix server` before running online checks or `npm run multiplayer`. Artwork sources remain documented in `public/images/puzzle/README.md`.
+Run `npm run test:raft` for the game logic checks and `npm run typecheck` for TypeScript. Artwork sources remain documented in `public/images/puzzle/README.md`.

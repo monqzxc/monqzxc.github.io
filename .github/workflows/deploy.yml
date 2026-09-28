@@ -41,8 +41,6 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build static site
-        env:
-          NEXT_PUBLIC_RAFT_WS_URL: ${{ vars.NEXT_PUBLIC_RAFT_WS_URL }}
         run: pnpm build
 
       - name: Upload Pages artifact

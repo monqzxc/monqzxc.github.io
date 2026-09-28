@@ -1,21 +1,3 @@
-# Optional WebSocket host. The portfolio continues to deploy to GitHub Pages.
-# Run one instance: active rooms are stored in this process's memory.
-services:
-  - type: web
-    name: poke-raft
-    runtime: node
-    plan: free
-    buildCommand: npm ci --omit=dev --prefix server
-    startCommand: node --experimental-strip-types server/raft-server.mjs
-    healthCheckPath: /health
-    # Deploy server changes manually so unrelated portfolio pushes do not end games.
-    autoDeployTrigger: "off"
-    envVars:
-      - key: NODE_VERSION
-        value: 24.21.0
-      - key: NODE_ENV
-        value: production
-      - key: HOST
-        value: 0.0.0.0
-      - key: RAFT_ALLOWED_ORIGINS
-        value: https://monqzxc.github.io
+# PeerJS provides the signaling service for Poké Raft online play.
+# No Render service or WebSocket backend is required for the static frontend.
+# The old server implementation remains under server/ for reference only.
