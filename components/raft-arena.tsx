@@ -196,11 +196,11 @@ function drawRaft(ctx: CanvasRenderingContext2D, side: 0 | 1, pokemon: string, i
     const cellHeight = sheet.naturalHeight / 5;
     const height = RAFT_SPRITES[pokemon]?.height ?? 150;
     const width = height * cellWidth / cellHeight;
-    const { row, column } = raftSpriteFrame(animation.pose, animation.elapsed, reducedMotion);
+    const { row, column } = raftSpriteFrame(animation.pose, animation.elapsed, reducedMotion, pokemon);
     const walking = animation.pose === "walking" && !reducedMotion ? Math.sin(animation.elapsed / 110) * 5 : 0;
     const hit = animation.pose === "hit" && !reducedMotion && health > 0 ? Math.sin(animation.elapsed / 45) * Math.max(0, 1 - animation.elapsed / 650) * 4 : 0;
     ctx.translate(walking + hit, 0);
-    // Every generated sheet faces right, so only the opposing raft is mirrored.
+    // Sprite sheets face right, so only the opposing raft is mirrored.
     ctx.scale(side === 1 ? -1 : 1, 1);
     ctx.drawImage(sheet, column * cellWidth, row * cellHeight, cellWidth, cellHeight, -width / 2, 367 - height * 0.85, width, height);
   } else if (fallback?.complete && fallback.naturalWidth > 0) {
