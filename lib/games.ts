@@ -12,6 +12,14 @@ export const GAMES_HREF = "/play/";
 // Register every new game here to include it in the homepage and games hub.
 export const games: readonly Game[] = [
   {
+    slug: "laser-grid-lock",
+    name: "Laser Grid Lock",
+    description: "Shift mirrors, bend the laser, and guide Deoxys into a black hole. Find your way through an endless sequence of space puzzles.",
+    players: "1 player",
+    category: "Laser puzzle",
+    artwork: ["/images/laser/deoxys.png", "/images/puzzle/mew.png"],
+  },
+  {
     slug: "raft",
     name: "Poké Raft",
     description:

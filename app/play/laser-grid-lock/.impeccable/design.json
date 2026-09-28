@@ -1,0 +1,12 @@
+{
+  "name": "Laser Grid Lock",
+  "scope": "/play/laser-grid-lock/",
+  "mode": "experience",
+  "source": "app/play/laser-grid-lock/laser-grid-lock.css",
+  "colors": { "background": "#0f172a", "console": "#111d32", "board": "#0a1222", "text": "#edf6ff", "muted": "#a6b8cf", "laser": "#6fffe3", "portal": "#ff577b" },
+  "typography": { "display": "Laser Manrope", "measurements": "var(--font-mono)" },
+  "radius": { "console": "16px", "board": "5px" },
+  "motion": { "travelMs": 2600, "departureDelayMs": 450, "nextLevelMs": 4000, "reducedMotion": "Snap to portal; disable transitions" },
+  "focus": { "color": "#6fffe3", "width": "2px", "offset": "4px" },
+  "verification": "Source reviewed and engine tested; browser rendering unavailable."
+}
