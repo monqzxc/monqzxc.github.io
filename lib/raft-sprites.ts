@@ -16,13 +16,19 @@ export const RAFT_SPRITES: Record<string, { sheet?: string; fallback: string; he
   bidoof: { sheet: "/images/raft/bidoof-sheet.png", fallback: "/images/puzzle/bidoof.png", height: 142, element: "rock", color: "#cfad82" },
 };
 
-// The supplied Pikachu sheet places its poses across rows rather than in pose-only rows.
-const PIKACHU_FRAMES: Record<RaftPose, readonly (readonly [number, number])[]> = {
-  breathing: [[0, 1], [0, 2], [4, 0], [4, 3]],
-  walking: [[1, 0], [1, 1], [1, 2], [1, 3]],
-  attacking: [[2, 0], [2, 1], [2, 2], [2, 3]],
-  taunting: [[4, 1], [4, 2], [3, 2], [3, 3]],
-  hit: [[3, 0], [3, 1], [3, 0], [3, 1]],
+// The supplied sheets mix expressions across some rows and have effects at cell edges.
+const SPRITE_FRAME_OVERRIDES: Record<string, Partial<Record<RaftPose, readonly (readonly [number, number])[]>>> = {
+  gengar: {
+    attacking: [[2, 0], [2, 1], [2, 2], [2, 2]],
+    taunting: [[3, 1], [3, 2], [4, 1], [3, 2]],
+    hit: [[3, 0], [3, 3], [4, 3], [4, 2]],
+  },
+  pikachu: {
+    breathing: [[2, 0], [0, 2], [4, 0], [4, 3]],
+    attacking: [[2, 0], [2, 1], [2, 2], [2, 2]],
+    taunting: [[4, 1], [4, 2], [3, 2], [4, 2]],
+    hit: [[3, 0], [3, 1], [3, 0], [3, 1]],
+  },
 };
 
 export function raftSpriteFrame(pose: RaftPose, elapsed: number, reducedMotion: boolean, pokemon?: string): { row: number; column: number } {
@@ -31,8 +37,9 @@ export function raftSpriteFrame(pose: RaftPose, elapsed: number, reducedMotion: 
   // Keep the action readable without recurring spatial motion.
   const column = reducedMotion ? (pose === "breathing" || pose === "walking" ? 0 : pose === "hit" ? 3 : 2)
     : animation.loop ? frame % 4 : Math.min(3, frame);
-  if (pokemon === "pikachu") {
-    const [row, mappedColumn] = PIKACHU_FRAMES[pose][column];
+  const mappedFrame = SPRITE_FRAME_OVERRIDES[pokemon ?? ""]?.[pose]?.[column];
+  if (mappedFrame) {
+    const [row, mappedColumn] = mappedFrame;
     return { row, column: mappedColumn };
   }
   return { row: animation.row, column };
