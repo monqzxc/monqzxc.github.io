@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-29T00:15:06.141041+00:00",
+  "generatedAt": "2026-09-29T00:24:13.416462+00:00",
   "title": "Design System: Laser Grid Lock",
   "extensions": {
     "scope": "/play/laser-grid-lock/",
@@ -69,6 +69,16 @@
         "name": "active-prism",
         "value": "0 0 14px #ffca6655",
         "purpose": "Indicate an illuminated amber core."
+      },
+      {
+        "name": "pokemon-artwork",
+        "value": "drop-shadow(0 3px 3px #0009)",
+        "purpose": "Separate contained Pok?mon artwork from the board."
+      },
+      {
+        "name": "sealed-portal",
+        "value": "0 0 14px #5ddaa966",
+        "purpose": "Signal Rayquaza shield state with the portal lock icon."
       }
     ],
     "campaign": {
@@ -86,19 +96,66 @@
         "difficulty selector",
         "mission",
         "objectives",
-        "expandable field guide"
+        "expandable field guide",
+        "named encounter portraits",
+        "Rayquaza phase panel"
       ],
       "entityIndicators": [
         "steel lock",
-        "lavender deflector shield and direction arrow",
-        "cyan Split-Jaw icon",
-        "pink Eater icon and charge count",
+        "Solrock artwork with lavender direction badge",
+        "Minior artwork with named Prism splitter encounter label",
+        "Lunatone artwork with pink charge badge",
+        "Rayquaza artwork, shield panel, four phase marks, sealed portal lock, and dashed locked-row highlight",
         "amber prism gem",
         "numbered sequence nodes",
         "dashed patrol and portal rail"
-      ]
+      ],
+      "pokemonProfiles": {
+        "Solrock": {
+          "role": "Solar deflector",
+          "image": "/images/laser/solrock.png"
+        },
+        "Lunatone": {
+          "role": "Lunar absorber",
+          "image": "/images/laser/lunatone.png"
+        },
+        "Minior": {
+          "role": "Prism splitter",
+          "image": "/images/laser/minior.png"
+        },
+        "Rayquaza": {
+          "role": "Delta Stream guardian",
+          "image": "/images/puzzle/rayquaza.png"
+        }
+      },
+      "rayquaza": {
+        "firstLevel": 15,
+        "challengeButton": "Challenge Rayquaza opens level 15 from non-boss levels.",
+        "shieldedPhases": 3,
+        "openingPhase": 4,
+        "lockedRowsByPhase": [
+          2,
+          3,
+          4,
+          null
+        ],
+        "columnsRemainUsable": true,
+        "phaseOffset": "Level-dependent; current panel and countdown are authoritative.",
+        "undoRestoresPhase": true,
+        "beamInteraction": "Absorbs beam",
+        "openingRequirements": "Both colors, amber core, ordered nodes, and moving portal complete together."
+      }
     },
-    "verification": "Source-only documentation review; no browser rendering, contrast, touch, animation, or gameplay QA claimed by this pass."
+    "verification": "Source-only documentation review; no browser rendering, contrast, touch, animation, or gameplay QA claimed by this pass.",
+    "pokemonArtwork": {
+      "entitySize": "17% of board",
+      "rayquazaSize": "19% of board",
+      "fit": "contain",
+      "surface": "transparent; no frame",
+      "bossPortrait": "60px desktop; 48px at 660px and below",
+      "guidePortrait": "28px",
+      "accessibleIdentity": "Decorative empty-alt artwork accompanies visible names and the textual board description."
+    }
   },
   "components": [
     {
@@ -126,19 +183,21 @@
   ],
   "narrative": {
     "northStar": "Neon cyberpunk slate game console",
-    "overview": "This document applies only to `/play/laser-grid-lock/`. The user-pinned direction combines a deep slate console, cyan laser, red black hole, and pixel-rendered Deoxys sprite. A compact HUD and framed square puzzle give the game a legible instrument-panel character.\n\nThis is a source-derived record of `laser-grid-lock.css`, `components/laser-grid-lock.tsx`, and `lib/laser-campaign.ts`, scoped to this game. The authorized expansion covers all five tiers: Beginner, Intermediate, Advanced, Expert, and Master. This documentation pass uses source-only QA; browser appearance, contrast, touch ergonomics, and animation quality remain unverified here.",
+    "overview": "This document applies only to `/play/laser-grid-lock/`. The user-pinned direction combines a deep slate console, cyan laser, red black hole, and pixel-rendered Deoxys sprite. A compact HUD and framed square puzzle give the game a legible instrument-panel character.\n\nThis is a source-derived record of `laser-grid-lock.css`, `components/laser-grid-lock.tsx`, and `lib/laser-campaign.ts`, scoped to this game. The authorized expansion covers all five tiers: Beginner, Intermediate, Advanced, Expert, and Master, with Solrock, Lunatone, Minior, and Rayquaza encounters. This documentation pass uses source-only QA; browser appearance, contrast, touch ergonomics, and animation quality remain unverified here.",
     "keyCharacteristics": [
       "Cyan light against layered slate surfaces.",
       "A square 5 by 5 board with controls outside all four edges.",
       "Bold sans-serif headings, small utility labels, and tabular monospace counters.",
       "Pixel sprite travel and a glowing portal communicate a solved route.",
-      "Amber branches, lavender deflectors, and distinct steel, Eater, prism, and sequence markers explain the expanded circuit.",
+      "Recognizable Pok?mon artwork identifies Solrock, Lunatone, Minior, and Rayquaza; direction and charge badges retain mechanical clarity.",
+      "Amber branches, steel, prism, and sequence markers explain the expanded circuit.",
+      "A green storm panel, sealed portal, row highlight, and four-phase indicator expose Rayquaza's threat and opening.",
       "Difficulty selection, mission text, objectives, and an expandable field guide remain available on mobile."
     ],
     "rules": [
       {
         "name": "The Signal Color Rule",
-        "body": "Preserve cyan for the original beam and connection feedback, red for the unsolved portal, amber for the second branch and matching core, and lavender for deflectors. Reinforce entity meaning with icons, direction, and counts.",
+        "body": "Preserve cyan for the original beam and connection feedback, red for the unsolved portal, amber for the second branch and matching core, and lavender for deflectors. Reinforce entity meaning with named artwork, direction, and counts. The portal's storm-green sealed state is an explicit exception to its resting red signal.",
         "section": "colors"
       }
     ],
@@ -146,6 +205,8 @@
       "Do preserve the square board, external arrow banks, visible HUD, and current entity positions.",
       "Do keep all five tiers selectable and mission, objectives, and field guide available on mobile.",
       "Do expose rail timing, prism angle/color requirements, deflector direction, and Eater charge with text or counts.",
+      "Do preserve Pok?mon artwork identities with visible direction/charge badges and named encounter labels.",
+      "Do communicate Rayquaza's sealed portal, locked row, countdown, and fourth-phase opening in text as well as color.",
       "Do keep the sprite crisp and reserve luminous effects for game signals.",
       "Do retain textual control labels, focus outlines, live status, and reduced-motion handling."
     ],
