@@ -1,12 +1,158 @@
 {
-  "name": "Laser Grid Lock",
-  "scope": "/play/laser-grid-lock/",
-  "mode": "experience",
-  "source": "app/play/laser-grid-lock/laser-grid-lock.css",
-  "colors": { "background": "#0f172a", "console": "#111d32", "board": "#0a1222", "text": "#edf6ff", "muted": "#a6b8cf", "laser": "#6fffe3", "portal": "#ff577b" },
-  "typography": { "display": "Laser Manrope", "measurements": "var(--font-mono)" },
-  "radius": { "console": "16px", "board": "5px" },
-  "motion": { "travelMs": 2600, "departureDelayMs": 450, "nextLevelMs": 4000, "reducedMotion": "Snap to portal; disable transitions" },
-  "focus": { "color": "#6fffe3", "width": "2px", "offset": "4px" },
-  "verification": "Source reviewed and engine tested; browser rendering unavailable."
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-29T00:15:06.141041+00:00",
+  "title": "Design System: Laser Grid Lock",
+  "extensions": {
+    "scope": "/play/laser-grid-lock/",
+    "sources": [
+      "app/play/laser-grid-lock/laser-grid-lock.css",
+      "components/laser-grid-lock.tsx",
+      "lib/laser-campaign.ts"
+    ],
+    "motion": [
+      {
+        "name": "departure-delay",
+        "value": "450ms",
+        "purpose": "Pause before sprite departure."
+      },
+      {
+        "name": "sprite-travel",
+        "value": "2600ms",
+        "purpose": "Travel along solved portal path."
+      },
+      {
+        "name": "next-level",
+        "value": "4000ms",
+        "purpose": "Advance after the solve sequence."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "1550ms",
+        "purpose": "Snap to portal at 450ms; advance at 1550ms; disable CSS transitions and animations."
+      }
+    ],
+    "focus": {
+      "color": "#6fffe3",
+      "width": "2px",
+      "offset": "4px"
+    },
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "1500px"
+      },
+      {
+        "name": "compact",
+        "value": "850px"
+      },
+      {
+        "name": "mobile",
+        "value": "660px"
+      },
+      {
+        "name": "narrow",
+        "value": "380px"
+      }
+    ],
+    "shadows": [
+      {
+        "name": "mirror",
+        "value": "0 3px 8px #0008",
+        "purpose": "Separate mirror bars from the board."
+      },
+      {
+        "name": "portal",
+        "value": "0 0 19px #ff396a75",
+        "purpose": "Identify the unsolved destination."
+      },
+      {
+        "name": "active-prism",
+        "value": "0 0 14px #ffca6655",
+        "purpose": "Indicate an illuminated amber core."
+      }
+    ],
+    "campaign": {
+      "tiers": [
+        "Beginner",
+        "Intermediate",
+        "Advanced",
+        "Expert",
+        "Master"
+      ],
+      "masterPortalShiftInterval": 2,
+      "prismPortalAngles": 2,
+      "masterLevel14PrismAngles": 3,
+      "mobileVisible": [
+        "difficulty selector",
+        "mission",
+        "objectives",
+        "expandable field guide"
+      ],
+      "entityIndicators": [
+        "steel lock",
+        "lavender deflector shield and direction arrow",
+        "cyan Split-Jaw icon",
+        "pink Eater icon and charge count",
+        "amber prism gem",
+        "numbered sequence nodes",
+        "dashed patrol and portal rail"
+      ]
+    },
+    "verification": "Source-only documentation review; no browser rendering, contrast, touch, animation, or gameplay QA claimed by this pass."
+  },
+  "components": [
+    {
+      "name": "Shift control",
+      "kind": "button",
+      "refersTo": "shift-button",
+      "description": "External directional control with cyan hover and focus feedback.",
+      "html": "<button class=\"shift\" aria-label=\"Shift row 1 right\">?</button>",
+      "css": ".shift{width:36px;height:36px;border:0;border-radius:5px;background:transparent;color:#8aa7c8;font:18px sans-serif;cursor:pointer;transition:background .15s,color .15s}.shift:hover{background:#233e50;color:#6fffe3}.shift:focus-visible{outline:2px solid #6fffe3;outline-offset:4px}"
+    },
+    {
+      "name": "Difficulty selector",
+      "kind": "input",
+      "description": "Native selector makes all five tiers directly available.",
+      "html": "<label class=\"tier\">Difficulty <select><option>Tier 1 ? Beginner</option><option>Tier 2 ? Intermediate</option><option>Tier 3 ? Advanced</option><option>Tier 4 ? Expert</option><option>Tier 5 ? Master</option></select></label>",
+      "css": ".tier{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#a6b8cf;font:12px sans-serif}.tier select{max-width:75%;border:1px solid #3d506b;border-radius:6px;background:#0f172a;color:#edf6ff;padding:9px 28px 9px 10px;font:inherit;color-scheme:dark}.tier select:focus-visible{outline:2px solid #6fffe3;outline-offset:4px}"
+    },
+    {
+      "name": "Circuit requirements",
+      "kind": "custom",
+      "description": "Wrapping counts communicate simultaneous target requirements.",
+      "html": "<div class=\"objectives\"><span class=\"active\">Amber core: 1/1 lit</span><span>Portal: 1/2 angles ? 1/2 colors</span><span>Rail moves in 2 shifts</span></div>",
+      "css": ".objectives{display:flex;flex-wrap:wrap;gap:8px 16px;color:#b9c9df;font:10px/1.7 sans-serif;font-variant-numeric:tabular-nums}.objectives .active{color:#6fffe3}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Neon cyberpunk slate game console",
+    "overview": "This document applies only to `/play/laser-grid-lock/`. The user-pinned direction combines a deep slate console, cyan laser, red black hole, and pixel-rendered Deoxys sprite. A compact HUD and framed square puzzle give the game a legible instrument-panel character.\n\nThis is a source-derived record of `laser-grid-lock.css`, `components/laser-grid-lock.tsx`, and `lib/laser-campaign.ts`, scoped to this game. The authorized expansion covers all five tiers: Beginner, Intermediate, Advanced, Expert, and Master. This documentation pass uses source-only QA; browser appearance, contrast, touch ergonomics, and animation quality remain unverified here.",
+    "keyCharacteristics": [
+      "Cyan light against layered slate surfaces.",
+      "A square 5 by 5 board with controls outside all four edges.",
+      "Bold sans-serif headings, small utility labels, and tabular monospace counters.",
+      "Pixel sprite travel and a glowing portal communicate a solved route.",
+      "Amber branches, lavender deflectors, and distinct steel, Eater, prism, and sequence markers explain the expanded circuit.",
+      "Difficulty selection, mission text, objectives, and an expandable field guide remain available on mobile."
+    ],
+    "rules": [
+      {
+        "name": "The Signal Color Rule",
+        "body": "Preserve cyan for the original beam and connection feedback, red for the unsolved portal, amber for the second branch and matching core, and lavender for deflectors. Reinforce entity meaning with icons, direction, and counts.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "Do preserve the square board, external arrow banks, visible HUD, and current entity positions.",
+      "Do keep all five tiers selectable and mission, objectives, and field guide available on mobile.",
+      "Do expose rail timing, prism angle/color requirements, deflector direction, and Eater charge with text or counts.",
+      "Do keep the sprite crisp and reserve luminous effects for game signals.",
+      "Do retain textual control labels, focus outlines, live status, and reduced-motion handling."
+    ],
+    "donts": [
+      "Don't apply this route's palette or typography to the global portfolio by inference.",
+      "Don't replace the pinned cyan laser, red portal, or Deoxys identity with unrelated decoration.",
+      "Don't treat this source record as proof of rendered, accessibility, or gameplay QA."
+    ]
+  }
 }

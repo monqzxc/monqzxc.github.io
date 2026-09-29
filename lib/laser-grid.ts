@@ -3,12 +3,13 @@ export type Shift = { axis: "row" | "column"; index: number; direction: 1 | -1 }
 export type Point = { x: number; y: number };
 export const SIZE = 5;
 
-export function shiftTiles(board: Tile[], { axis, index, direction }: Shift): Tile[] {
+export function shiftTiles(board: Tile[], { axis, index, direction }: Shift, immovable: readonly number[] = []): Tile[] {
   const next = [...board];
-  for (let i = 0; i < SIZE; i++) {
-    const to = (i + direction + SIZE) % SIZE;
-    const source = axis === "row" ? index * SIZE + i : i * SIZE + index;
-    const target = axis === "row" ? index * SIZE + to : to * SIZE + index;
+  const movable = Array.from({ length: SIZE }, (_, i) => axis === "row" ? index * SIZE + i : i * SIZE + index)
+    .filter(cell => !immovable.includes(cell));
+  for (let i = 0; i < movable.length; i++) {
+    const source = movable[i];
+    const target = movable[(i + direction + movable.length) % movable.length];
     next[target] = board[source];
   }
   return next;

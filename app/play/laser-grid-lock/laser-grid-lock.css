@@ -12,3 +12,40 @@
 @media(max-width:660px){.laser-topbar{min-height:65px;padding:0 20px}.laser-topbar .laser-solo{display:none}.laser-main{padding:29px 14px 30px}.laser-heading{margin:0 6px 23px}.laser-heading h1{font-size:36px}.laser-heading p{font-size:13px}.laser-layout{display:flex;flex-direction:column;gap:15px}.laser-brief{display:none}.laser-console{width:100%;max-width:530px;padding:0 12px}.laser-hud{padding:17px 4px;gap:32px}.laser-hud button span{display:block}.laser-hud strong{font-size:25px}.laser-sector{padding:14px 4px 7px}.laser-board-frame{grid-template-columns:32px minmax(0,1fr) 32px;grid-template-rows:38px auto 38px;gap:3px}.laser-shift{min-height:32px}.laser-status{font-size:11px;min-height:52px}.laser-console-footer{padding-inline:3px}.laser-console-footer>span{font-size:10px;gap:6px}.laser-mobile-tip{display:flex;align-items:center;gap:8px;font-size:10px;line-height:1.6;color:#a6b8cf}.laser-footer{padding:20px;flex-direction:column;gap:6px}.laser-tile-coordinate{font-size:7px;top:3px;left:4px}}
 @media(max-width:380px){.laser-hud{gap:18px}.laser-hud button span{display:none}.laser-console-footer>span{gap:4px;font-size:9px}.laser-mobile-tip{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.laser-page *{transition:none!important;animation:none!important}}
+
+/* Campaign controls and readable board entities. */
+.laser-tier-picker{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;font-size:12px;color:#a6b8cf}
+.laser-tier-picker select{max-width:75%;border:1px solid #3d506b;border-radius:6px;background:#0f172a;color:#edf6ff;padding:9px 28px 9px 10px;font:inherit;cursor:pointer;color-scheme:dark}
+.laser-tier-picker select:disabled{opacity:.55;cursor:default}
+.laser-tier-picker select:focus-visible,.laser-field-guide summary:focus-visible{outline:2px solid #6fffe3;outline-offset:4px}
+.laser-mission{font-size:12px;line-height:1.65;color:#b9c9df;margin:0 0 13px}
+.laser-objectives{display:flex;flex-wrap:wrap;gap:8px 16px;padding-bottom:12px;color:#b9c9df;font-size:10px;line-height:1.7;font-variant-numeric:tabular-nums}
+.laser-objectives>span{display:inline-flex;align-items:center;gap:5px}
+.laser-objectives .is-active{color:#6fffe3}
+.laser-steel{position:absolute;inset:9%;z-index:4;background:#344259;border:2px solid #7d8da6;box-shadow:inset 0 -5px 0 #243248;display:grid;place-items:center;border-radius:4px;color:#d6e4ff}
+.laser-steel svg{width:45%;height:45%}
+.laser-entity,.laser-prism{position:absolute;width:13%;height:13%;transform:translate(-50%,-50%);z-index:4;display:grid;place-items:center;border-radius:8px;background:#152a3f;border:1px solid currentColor;pointer-events:none}
+.laser-entity>svg,.laser-prism>svg{width:65%;height:65%}
+.laser-entity-deflector{color:#c7acff;background:#292242}
+.laser-entity-deflector>svg:first-child{width:88%;height:88%}
+.laser-entity-deflector .laser-deflector-arrow{position:absolute;width:48%;height:48%;color:#fff}
+.laser-entity-split_jaw{color:#6fffe3;background:#123f3b}
+.laser-entity-beam_eater{color:#ffa6b7;background:#4b2132}
+.laser-entity-beam_eater>svg{width:50%;height:50%;align-self:start;margin-top:6%}
+.laser-entity-beam_eater small{position:absolute;bottom:2%;font:clamp(8px,1vw,11px) var(--font-mono);font-weight:700}
+.laser-prism{color:#ffce76;background:#4b361d;border-radius:50%}
+.laser-prism.is-active{background:#6a4a1b;color:#ffe5b0;box-shadow:0 0 14px #ffca6655}
+.laser-sequence-node{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;width:42%;height:42%;display:grid;place-items:center;background:#102c44;border:1px solid #98dbff;border-radius:50%;font:700 clamp(10px,1.3vw,15px) var(--font-mono);color:#ceeeff}
+.laser-beam .laser-rail{stroke:#fca5bf;stroke-width:3;stroke-dasharray:5 6;opacity:.7}
+.laser-beam .laser-patrol{stroke:#c7acff;stroke-width:2;stroke-dasharray:3 6;opacity:.7}
+.beam-amber .laser-beam-core{stroke:#ffcf72}.beam-amber .laser-beam-glow{stroke:#ffb52e}
+.laser-black-hole b{position:absolute;z-index:1;font:700 clamp(9px,1vw,12px) var(--font-mono);color:#ffcad5}
+.laser-console-footer .laser-amber-line{background:#ffcf72;margin-left:7px}
+.laser-status.has-emp{color:#ffb2c2}.laser-status.has-emp .laser-status-dot{background:#ff668a}
+.laser-field-guide{font-size:11px;line-height:1.7;color:#b9c9df;border-top:1px solid #304158;padding:11px 0}
+.laser-field-guide summary{cursor:pointer;color:#d6e4ff;padding:4px 0;min-height:30px}
+.laser-field-guide ul{list-style:none;margin:13px 0;padding:0;display:grid;gap:12px}
+.laser-field-guide li{display:flex;align-items:flex-start;gap:10px}
+.laser-field-guide li svg{width:16px;height:16px;flex:0 0 16px;margin-top:2px;color:#99d7df}
+.laser-field-guide p{margin:14px 0 4px}
+@media(max-width:660px){.laser-mission{font-size:11px;margin-inline:4px}.laser-objectives{margin-inline:4px;gap:6px 12px}.laser-tier-picker{padding:13px 4px 0}.laser-entity,.laser-prism{border-radius:5px}.laser-prism{border-radius:50%}.laser-field-guide{margin-inline:4px}.laser-layout{align-items:center}}
