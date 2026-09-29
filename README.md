@@ -103,6 +103,12 @@ The editor does not send CV input to a server or save it to browser storage. A d
 
 After changing Mon's data, regenerate his static download with `npm run generate:cv` before building. This uses the same PDF renderer as visitor exports. No API key, account, database, or third-party document service is needed. Site sharing controls determine who can access the hosted builder.
 
+## Laser Grid Lock
+
+Play `/play/laser-grid-lock/` to guide Deoxys through five tiers of laser puzzles: mirrors, fixed steel terrain, patrolling deflectors, splitting monsters, Beam Eaters, multi-angle prism targets, and ordered nodes. Master portals move every two player shifts. Use the difficulty selector to practice any tier; Undo restores the full previous turn.
+
+See [the game rules and tier progression](docs/laser-grid-lock.md). Run `npm run test:laser` for terrain, monsters, EMP, branch tracing, targets, and generated-level solution checks.
+
 ## Games hub
 
 Open `/play/`, or follow **Games** from the homepage, to find every game together. The homepage's grouped games section and the hub both use the shared catalog in `lib/games.ts`.

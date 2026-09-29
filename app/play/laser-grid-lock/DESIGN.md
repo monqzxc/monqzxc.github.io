@@ -14,6 +14,12 @@ colors:
   mirror-silver: "#d6e4ff"
   beam-core: "#90ffe8"
   beam-glow: "#2afaca"
+  amber-core: "#ffcf72"
+  amber-glow: "#ffb52e"
+  deflector-lavender: "#c7acff"
+  steel-surface: "#344259"
+  eater-pink: "#ffa6b7"
+  prism-amber: "#ffce76"
 typography:
   display:
     fontFamily: "Laser Manrope, sans-serif"
@@ -77,7 +83,7 @@ components:
 
 This document applies only to `/play/laser-grid-lock/`. The user-pinned direction combines a deep slate console, cyan laser, red black hole, and pixel-rendered Deoxys sprite. A compact HUD and framed square puzzle give the game a legible instrument-panel character.
 
-This is a source-derived record of `laser-grid-lock.css` and `components/laser-grid-lock.tsx`, not a portfolio-wide design system. No PRODUCT.md or rendered browser QA was available for this documentation pass. Values describe the implementation; browser appearance, contrast, touch ergonomics, and animation quality remain unverified here.
+This is a source-derived record of `laser-grid-lock.css`, `components/laser-grid-lock.tsx`, and `lib/laser-campaign.ts`, scoped to this game. The authorized expansion covers all five tiers: Beginner, Intermediate, Advanced, Expert, and Master. This documentation pass uses source-only QA; browser appearance, contrast, touch ergonomics, and animation quality remain unverified here.
 
 **Key Characteristics:**
 
@@ -85,6 +91,8 @@ This is a source-derived record of `laser-grid-lock.css` and `components/laser-g
 - A square 5 by 5 board with controls outside all four edges.
 - Bold sans-serif headings, small utility labels, and tabular monospace counters.
 - Pixel sprite travel and a glowing portal communicate a solved route.
+- Amber branches, lavender deflectors, and distinct steel, Eater, prism, and sequence markers explain the expanded circuit.
+- Difficulty selection, mission text, objectives, and an expandable field guide remain available on mobile.
 
 ## Colors
 
@@ -94,13 +102,13 @@ Laser cyan marks the title accent, level counter, status dot, focus outlines, an
 
 ### Secondary
 
-Portal red identifies the destination and its legend marker. The portal changes to mint/cyan on success. Mirror silver separates reflective surfaces from both the beam and the board.
+Portal red identifies the destination and its legend marker. The portal changes to mint/cyan on success. Mirror silver separates reflective surfaces from both the beam and the board. Amber distinguishes the second beam branch and its matching core. Lavender identifies the deflector and its dashed patrol path; pink identifies the Beam Eater and EMP feedback. Steel uses a gray-blue surface with a lock icon. Prism gems, direction arrows, charge counts, and numbered nodes supplement color with shape and text.
 
 ### Neutral
 
 Slate page, console, and board surfaces establish three tonal layers. Bright text carries headings; muted text carries instructions and metadata. Fine blue-slate borders separate the grid, HUD, and console edges.
 
-**The Signal Color Rule.** Preserve cyan for the light and connection feedback, and red for the unsolved portal, so the puzzle remains readable at a glance.
+**The Signal Color Rule.** Preserve cyan for the original beam and connection feedback, red for the unsolved portal, amber for the second branch and matching core, and lavender for deflectors. Reinforce entity meaning with icons, direction, and counts.
 
 ## Typography
 
@@ -112,9 +120,9 @@ The display role is the page title; the headline role belongs to the desktop bri
 
 The top and bottom bars have a 1240px maximum width. Main content has a 1100px maximum width and 46px top padding. Desktop uses a briefing column of at least 220px and a game column capped at 590px. The board stays square; its five equal rows and columns sit inside a three-by-three frame, with four external arrow banks. Desktop arrow tracks are 36px.
 
-At 1500px and above, main vertical padding becomes 64px and the column gap becomes 85px. At 850px and below, the briefing becomes 210px wide, the gap becomes 26px, console padding becomes 16px, and the reset text hides. At 660px and below, the briefing hides, the console stacks beneath the title, and a short mobile instruction appears. The console is full width up to 530px with 12px horizontal padding; reset text returns. Mobile arrow tracks are 32px at the sides and 38px above/below, with 3px gaps and a 32px minimum control height.
+At 1500px and above, main vertical padding becomes 64px and the column gap becomes 85px. At 850px and below, the briefing becomes 210px wide, the gap becomes 26px, console padding becomes 16px, and the reset text hides. At 660px and below, the desktop briefing hides and the console stacks beneath the title. The difficulty selector, mission, objective counters, and expandable board guide remain inside the console and available at this width. The console is full width up to 530px with 12px horizontal padding; reset text returns. Mobile arrow tracks are 32px at the sides and 38px above/below, with 3px gaps and a 32px minimum control height.
 
-At 380px and below, HUD spacing contracts to 18px, reset becomes icon-only again, and legend/mobile instructions become 9px. The mobile instruction explains wrapping, mirror deflection toward the destination, and fixed endpoints.
+At 380px and below, HUD spacing contracts to 18px, reset becomes icon-only again, and the legend becomes 9px. Mission text becomes 11px at mobile widths, objectives wrap, and the field guide opens in normal document flow. Do not rely on the hidden desktop briefing for gameplay rules.
 
 ## Elevation & Depth
 
@@ -128,15 +136,23 @@ The console has the broadest rounded corners. The board and arrow buttons use ti
 
 ### Puzzle console and HUD
 
-The HUD groups Level, Moves, and Time with reset aligned to the right. Dividers separate the HUD, board status, and legend. Reset uses a thin outline, transparent resting background, and a lighter slate hover fill. Undo is a text action with an icon and becomes dimmed when unavailable.
+The HUD groups Level, Moves, and Time with reset aligned to the right. A labeled native difficulty select opens the first level of any of the five tiers and is disabled during the solve sequence. Sector metadata includes Turn; mission text explains the current mechanics. Wrapping objective counters show target angles, beam colors, sequence progress, and the moving portal countdown. Completed requirements turn cyan. Dividers separate the HUD, board status, and legend. Reset uses a thin outline, transparent resting background, and a lighter slate hover fill. Undo is a text action with an icon and becomes dimmed when unavailable.
 
 ### External shift controls
 
-Twenty arrow buttons shift rows or columns with wrapping behavior. Controls name axis, index, and direction for assistive technology. Hover adds a slate-teal fill and cyan icon; active adds a brighter fill. Solved state disables shift controls at 0.3 opacity. Keyboard focus receives a 2px cyan outline with 4px offset. Small-screen target dimensions are implementation facts, not a claim of touch-target compliance.
+Twenty arrow buttons shift rows or columns; free tiles wrap around anchored steel cells. Controls name axis, index, and direction for assistive technology. Hover adds a slate-teal fill and cyan icon; active adds a brighter fill. Solved state disables shift controls at 0.3 opacity. Keyboard focus receives a 2px cyan outline with 4px offset. Small-screen target dimensions are implementation facts, not a claim of touch-target compliance.
 
-### Board, beam, and fixed endpoints
+### Board, branches, and moving entities
 
-The Deoxys origin is row 1, column 1; the black-hole destination is row 5, column 5. Endpoints remain fixed while mirror tiles shift. Mirrors beneath endpoints are dimmed. The board exposes a textual description of mirror locations; the SVG beam and decorative portal are hidden from assistive technology. The sprite uses pixelated image rendering and the local `/images/laser/deoxys.png` asset.
+Deoxys starts at row 1, column 1. The portal begins at the lower-right in early tiers; Master portals move along their dashed rail every two shifts. The countdown and current portal position must agree. Mirrors covered by the origin, steel, monsters, or targets are dimmed. The board exposes mirror and entity positions, turn, deflector direction, Eater charge, sequence nodes, and prism cores in its accessible description. Decorative beam and entity artwork is hidden from assistive technology. The sprite uses pixelated rendering and `/images/laser/deoxys.png`.
+
+Steel is an inset block with a lock icon and absorbs light. The lavender shield carries a white direction arrow; its deflector moves one patrol step and rotates clockwise after each shift. Split-Jaw uses a cyan split icon and sends cyan counterclockwise and amber clockwise, perpendicular to the incoming beam. The Eater uses a pink absorption icon plus an explicit charge count out of four. Its fourth consecutive shift hit causes EMP; missing a hit clears charge. EMP restores the column-only board baseline while patrols and rail time continue. Undo restores the complete previous turn.
+
+Amber prism cores are circular gem markers and brighten when active. Prism portals require both colors from two incoming angles, except Master level 14, which requires three angles. Hits must coexist in one turn. Numbered nodes require ordered traversal on one branch with a mirror between successive nodes. All targets and any sequence must be complete together; a completed circuit takes priority over EMP.
+
+### Board guide
+
+A native details/summary disclosure below the status explains steel, deflectors, Split-Jaw, Eaters, prisms, nodes, rails, and turn order. It remains available on mobile. The footer legend names Cyan, Amber, and Portal. Move count includes shifts and Undo actions; Turn rewinds with Undo. Preserve these visible explanations alongside the compact board symbols.
 
 ### Status and solve sequence
 
@@ -148,7 +164,9 @@ A compact top bar links back to Playground and identifies the arcade. The bottom
 
 ## Do's and Don'ts
 
-- **Do** preserve the square board, external arrow banks, fixed endpoints, and visible HUD.
+- **Do** preserve the square board, external arrow banks, visible HUD, and current entity positions.
+- **Do** keep all five tiers selectable and mission, objectives, and field guide available on mobile.
+- **Do** expose rail timing, prism angle/color requirements, deflector direction, and Eater charge with text or counts.
 - **Do** keep the sprite crisp and reserve luminous effects for game signals.
 - **Do** retain textual control labels, focus outlines, live status, and reduced-motion handling.
 - **Don't** apply this route's palette or typography to the global portfolio by inference.
