@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createLevel, shiftTiles, traceLaser, pointAlongPath } from '../lib/laser-grid.ts';
 import { createCampaignLevel, initialState, advanceCampaign, traceCampaign, monsterAt, monsterFacing, targetAt, rayquazaStatus, MONSTER_PROFILES } from '../lib/laser-campaign.ts';
+import { readLaserProgress, saveLaserProgress } from '../lib/laser-progress.ts';
 
 test('all generated levels start unsolved and have a reversible solution', () => {
   for (let level = 1; level <= 250; level++) {
@@ -220,4 +221,21 @@ test('Delta Stream rejects the locked row without advancing any state; columns r
   state = advanceCampaign(level, state, { axis: 'row', index: 1, direction: 1 });
   assert.equal(rayquazaStatus(level, state.turn).lockedRow, 1);
   assert.deepEqual(before, initialState(level), 'undo snapshot and storm phase are unchanged');
+});
+
+test('campaign checkpoint starts new players at one and rejects invalid or obsolete saves', () => {
+  for (const raw of [null, '', 'broken', 'null', '[]', '3', '{"version":2,"level":4}', '{"version":1,"level":"4"}', '{"version":1,"level":-2}', '{"version":1,"level":0}', '{"version":1,"level":3.5}', '{"version":1,"level":1e100}']) {
+    assert.equal(readLaserProgress(raw), 1);
+  }
+  assert.equal(readLaserProgress('{"version":1,"level":15}'), 15);
+});
+test('clearing a level unlocks exactly the next level and cannot overwrite farther progress', () => {
+  let saved = null;
+  for (let cleared = 1; cleared <= 15; cleared++) {
+    saved = saveLaserProgress(saved, cleared);
+    assert.equal(readLaserProgress(saved), cleared + 1);
+  }
+  assert.equal(readLaserProgress(saveLaserProgress(saved, 2)), 16, 'older tab cannot regress saved progress');
+  assert.throws(() => saveLaserProgress(null, -1), RangeError);
+  assert.throws(() => saveLaserProgress(null, 2.5), RangeError);
 });

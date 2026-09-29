@@ -7,7 +7,8 @@
     "sources": [
       "app/play/laser-grid-lock/laser-grid-lock.css",
       "components/laser-grid-lock.tsx",
-      "lib/laser-campaign.ts"
+      "lib/laser-campaign.ts",
+      "lib/laser-progress.ts"
     ],
     "motion": [
       {
@@ -82,6 +83,15 @@
       }
     ],
     "campaign": {
+      "progression": {
+        "mode": "sequential wins only",
+        "tierSelection": false,
+        "bossShortcut": false,
+        "checkpointKey": "mon-laser-campaign-progress-v1",
+        "saveTiming": "Immediately on win, before portal travel",
+        "restore": "Start of the current unlocked level",
+        "storageFailure": "Visible notice; current visit remains playable"
+      },
       "tiers": [
         "Beginner",
         "Intermediate",
@@ -93,7 +103,7 @@
       "prismPortalAngles": 2,
       "masterLevel14PrismAngles": 3,
       "mobileVisible": [
-        "difficulty selector",
+        "read-only campaign progression and save notice",
         "mission",
         "objectives",
         "expandable field guide",
@@ -130,7 +140,7 @@
       },
       "rayquaza": {
         "firstLevel": 15,
-        "challengeButton": "Challenge Rayquaza opens level 15 from non-boss levels.",
+        "unlock": "Clear levels 1 through 14; no boss shortcut.",
         "shieldedPhases": 3,
         "openingPhase": 4,
         "lockedRowsByPhase": [
@@ -167,11 +177,11 @@
       "css": ".shift{width:36px;height:36px;border:0;border-radius:5px;background:transparent;color:#8aa7c8;font:18px sans-serif;cursor:pointer;transition:background .15s,color .15s}.shift:hover{background:#233e50;color:#6fffe3}.shift:focus-visible{outline:2px solid #6fffe3;outline-offset:4px}"
     },
     {
-      "name": "Difficulty selector",
-      "kind": "input",
-      "description": "Native selector makes all five tiers directly available.",
-      "html": "<label class=\"tier\">Difficulty <select><option>Tier 1 ? Beginner</option><option>Tier 2 ? Intermediate</option><option>Tier 3 ? Advanced</option><option>Tier 4 ? Expert</option><option>Tier 5 ? Master</option></select></label>",
-      "css": ".tier{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#a6b8cf;font:12px sans-serif}.tier select{max-width:75%;border:1px solid #3d506b;border-radius:6px;background:#0f172a;color:#edf6ff;padding:9px 28px 9px 10px;font:inherit;color-scheme:dark}.tier select:focus-visible{outline:2px solid #6fffe3;outline-offset:4px}"
+      "name": "Campaign progression",
+      "kind": "custom",
+      "description": "Read-only five-step track; levels advance after wins and checkpoints save locally.",
+      "html": "<div class=\"campaign\"><strong>Beginner</strong><p>Clear level 3 to unlock Intermediate</p><ol aria-label=\"Difficulty progression\"><li aria-current=\"step\">1</li><li>2</li><li>3</li><li>4</li><li>5</li></ol></div>",
+      "css": ".campaign{color:#b9c9df;font:12px sans-serif}.campaign strong{color:#6fffe3}.campaign ol{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;list-style:none;padding:0}.campaign li{text-align:center;padding:7px 2px;border-bottom:2px solid #41506a}.campaign [aria-current]{border-color:#6fffe3;background:#173830;color:#e2fff6}"
     },
     {
       "name": "Circuit requirements",
@@ -192,7 +202,7 @@
       "Recognizable Pok?mon artwork identifies Solrock, Lunatone, Minior, and Rayquaza; direction and charge badges retain mechanical clarity.",
       "Amber branches, steel, prism, and sequence markers explain the expanded circuit.",
       "A green storm panel, sealed portal, row highlight, and four-phase indicator expose Rayquaza's threat and opening.",
-      "Difficulty selection, mission text, objectives, and an expandable field guide remain available on mobile."
+      "Read-only campaign progression, mission text, objectives, and an expandable field guide remain available on mobile."
     ],
     "rules": [
       {
@@ -203,7 +213,7 @@
     ],
     "dos": [
       "Do preserve the square board, external arrow banks, visible HUD, and current entity positions.",
-      "Do keep all five tiers selectable and mission, objectives, and field guide available on mobile.",
+      "Do unlock tiers through completed levels; keep progression, mission, objectives, and field guide visible on mobile.",
       "Do expose rail timing, prism angle/color requirements, deflector direction, and Eater charge with text or counts.",
       "Do preserve Pok?mon artwork identities with visible direction/charge badges and named encounter labels.",
       "Do communicate Rayquaza's sealed portal, locked row, countdown, and fourth-phase opening in text as well as color.",

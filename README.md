@@ -105,11 +105,11 @@ After changing Mon's data, regenerate his static download with `npm run generate
 
 ## Laser Grid Lock
 
-Play `/play/laser-grid-lock/` to guide Deoxys through five tiers of laser puzzles: mirrors, fixed steel terrain, patrolling deflectors, splitting monsters, Beam Eaters, multi-angle prism targets, and ordered nodes. Master portals move every two player shifts. Use the difficulty selector to practice any tier; Undo restores the full previous turn.
+Play `/play/laser-grid-lock/` to guide Deoxys through five tiers of laser puzzles: mirrors, fixed steel terrain, patrolling deflectors, splitting monsters, Beam Eaters, multi-angle prism targets, and ordered nodes. Master portals move every two player shifts. Clear each level to advance and unlock the next tier; Undo restores the full previous turn. Progress saves locally after each win, and refreshing restarts the current unlocked level.
 
 See [the game rules and tier progression](docs/laser-grid-lock.md). Run `npm run test:laser` for terrain, monsters, EMP, branch tracing, targets, and generated-level solution checks.
 
-Solrock redirects light, Lunatone absorbs it, and Minior splits it. From level 15, Rayquaza's Delta Stream seals the portal and locks a rotating row for three phases before a one-turn opening. Choose **Challenge Rayquaza** to jump into the boss encounter.
+Solrock redirects light, Lunatone absorbs it, and Minior splits it. Clear levels 1–14 to reach Rayquaza. From level 15, its Delta Stream seals the portal and locks a rotating row for three phases before a one-turn opening.
 
 ## Games hub
 

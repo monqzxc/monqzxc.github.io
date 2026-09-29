@@ -10,7 +10,11 @@ Play at `/play/laser-grid-lock/`. Deoxys follows a completed beam path into the 
 | Expert | 10–12 | Minior: splitter; Lunatone: absorber; prism and sequential targets |
 | Master | 13 onward | Combined mechanics; moving portal; Rayquaza boss from level 15 |
 
-The difficulty selector jumps to the first level of a tier. Further Master levels use new deterministic scrambles. Every generated puzzle is validated by replaying its solution through the full turn simulation, including monster movement and EMP.
+The campaign begins at level 1 and advances only after a successful circuit. There is no tier selector or boss shortcut. Clear levels 1–3 for Intermediate, 4–6 for Advanced, 7–9 for Expert, and 10–12 for Master. Rayquaza appears after clearing level 14. The read-only progression display marks cleared, current, and locked tiers.
+
+Scramble depth grows with level, up to nine shifts; new mechanics add difficulty at tier boundaries. Further Master levels use new deterministic scrambles. Every generated puzzle is validated by replaying its solution through the full turn simulation, including monster movement, storm restrictions, and EMP. Scramble depth is not a claim about the shortest possible solution.
+
+The versioned `mon-laser-campaign-progress-v1` localStorage checkpoint saves the next unlocked level immediately on a win, before Deoxys's travel animation. Refreshing or returning resumes at the start of that level; partial board, timer, and move state are not saved. Malformed or incompatible checkpoints start at level 1. Blocked browser storage leaves the campaign playable for the current visit with a visible notice. Existing farther progress is preserved when saving from an earlier level in another tab. Clearing browser data removes local progress. Reset retries the current level without changing its unlock.
 
 ## Pokémon encounters
 
@@ -19,7 +23,7 @@ The difficulty selector jumps to the first level of a tier. Further Master level
 - **Minior — Prism Splitter:** turns incoming light into perpendicular cyan and amber branches. Both branches can be required to light the circuit simultaneously.
 - **Rayquaza — Delta Stream Guardian:** appears at level 15 and beyond. Its three shielded phases seal the portal and lock rows 2, 3, then 4 in turn. The fourth phase drops the shield and releases every row for one turn. Complete the full circuit on arrival at that opening. Column shifts remain legal throughout; a locked-row attempt changes nothing and consumes no turn. Any beam hitting Rayquaza's body is absorbed, even during the opening.
 
-The boss panel shows the current phase, locked row, and shifts until the opening. The portal carries a lock while sealed, and a dashed band marks the wind-locked row. Initial storm phase varies with the puzzle; the four-phase cycle is deterministic. **Challenge Rayquaza** jumps directly to level 15. Undo restores the storm phase along with all other state. These abilities are custom rules for this fan game.
+The boss panel shows the current phase, locked row, and shifts until the opening. The portal carries a lock while sealed, and a dashed band marks the wind-locked row. Initial storm phase varies with the puzzle; the four-phase cycle is deterministic. Rayquaza is reached through normal campaign advancement. Undo restores the storm phase along with all other state. These abilities are custom rules for this fan game.
 
 ## Turn rules
 
@@ -38,6 +42,7 @@ Undo restores a complete snapshot: board, patrol phase, portal rail phase, charg
 
 - `lib/laser-grid.ts`: shared wrapping and path interpolation; original basic puzzles.
 - `lib/laser-campaign.ts`: tier layouts, branch tracing, full turn transitions, validated generation.
+- `lib/laser-progress.ts`: versioned checkpoint validation and non-regressing unlock saves.
 - `components/laser-grid-lock.tsx`: interactive game, HUD, entities, guide, solve animation.
 - `scripts/check-laser-grid.mjs`: terrain, patrols, EMP, prisms, sequence, rail, cycle and solvability tests.
 
