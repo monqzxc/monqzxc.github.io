@@ -109,6 +109,8 @@ Play `/play/laser-grid-lock/` to guide Deoxys through five tiers of laser puzzle
 
 See [the game rules and tier progression](docs/laser-grid-lock.md). Run `npm run test:laser` for terrain, monsters, EMP, branch tracing, targets, and generated-level solution checks.
 
+Solrock redirects light, Lunatone absorbs it, and Minior splits it. From level 15, Rayquaza's Delta Stream seals the portal and locks a rotating row for three phases before a one-turn opening. Choose **Challenge Rayquaza** to jump into the boss encounter.
+
 ## Games hub
 
 Open `/play/`, or follow **Games** from the homepage, to find every game together. The homepage's grouped games section and the hub both use the shared catalog in `lib/games.ts`.

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createLevel, shiftTiles, traceLaser, pointAlongPath } from '../lib/laser-grid.ts';
-import { createCampaignLevel, initialState, advanceCampaign, traceCampaign, monsterAt, monsterFacing, targetAt } from '../lib/laser-campaign.ts';
+import { createCampaignLevel, initialState, advanceCampaign, traceCampaign, monsterAt, monsterFacing, targetAt, rayquazaStatus, MONSTER_PROFILES } from '../lib/laser-campaign.ts';
 
 test('all generated levels start unsolved and have a reversible solution', () => {
   for (let level = 1; level <= 250; level++) {
@@ -180,6 +180,44 @@ test('all five tiers and 250 campaign levels have replay-verified dynamic soluti
     assert.equal(traceCampaign(level, state).won, false, `initial level ${n}`);
     for (const move of level.solution) state = advanceCampaign(level, state, move);
     assert.equal(traceCampaign(level, state).won, true, `solved level ${n}`);
+    if (n >= 15) assert.equal(rayquazaStatus(level, state.turn).exposed, true, `boss opening ${n}`);
     assert.deepEqual(createCampaignLevel(n), level, `deterministic level ${n}`);
   }
+});
+
+test('Pokémon identities map to the expected puzzle abilities', () => {
+  assert.equal(MONSTER_PROFILES.DEFLECTOR.name, 'Solrock');
+  assert.equal(MONSTER_PROFILES.BEAM_EATER.name, 'Lunatone');
+  assert.equal(MONSTER_PROFILES.SPLIT_JAW.name, 'Minior');
+  assert.equal(MONSTER_PROFILES.RAYQUAZA.name, 'Rayquaza');
+  assert.equal(createCampaignLevel(14).monsters.some(m => m.kind === 'RAYQUAZA'), false);
+  assert.equal(createCampaignLevel(15).monsters.some(m => m.kind === 'RAYQUAZA'), true);
+});
+test('Rayquaza seals an otherwise complete circuit for three phases and opens on the fourth', () => {
+  const level = fixture({ monsters: [{ id: 'rayquaza', kind: 'RAYQUAZA', route: [6], offset: 0, facing: 0, cycleOffset: 0 }] });
+  level.board[4] = '\\';
+  for (let turn = 0; turn < 8; turn++) {
+    const beam = traceCampaign(level, { ...initialState(level), turn });
+    assert.equal(beam.won, turn % 4 === 3, `turn ${turn}`);
+    assert.equal(beam.targets[0].active, turn % 4 === 3);
+    assert.equal(rayquazaStatus(level, turn).shiftsUntilExposed, 3 - turn % 4);
+  }
+  const exposed = { ...initialState(level), turn: 3 };
+  const bodyBlocking = { ...level, monsters: [{ ...level.monsters[0], route: [4] }] };
+  assert.equal(traceCampaign(bodyBlocking, exposed).won, false, 'Rayquaza itself always absorbs beams');
+});
+test('Delta Stream rejects the locked row without advancing any state; columns remain legal', () => {
+  const level = fixture({ monsters: [{ id: 'rayquaza', kind: 'RAYQUAZA', route: [6], offset: 0, facing: 0, cycleOffset: 0 }] });
+  const before = initialState(level);
+  assert.equal(rayquazaStatus(level, 0).lockedRow, 1);
+  assert.equal(advanceCampaign(level, before, { axis: 'row', index: 1, direction: 1 }), before);
+  let state = advanceCampaign(level, before, { axis: 'column', index: 1, direction: 1 });
+  assert.equal(state.turn, 1); assert.equal(rayquazaStatus(level, state.turn).lockedRow, 2);
+  state = advanceCampaign(level, state, { axis: 'row', index: 0, direction: 1 });
+  assert.equal(rayquazaStatus(level, state.turn).lockedRow, 3);
+  state = advanceCampaign(level, state, { axis: 'column', index: 1, direction: 1 });
+  assert.equal(rayquazaStatus(level, state.turn).lockedRow, null);
+  state = advanceCampaign(level, state, { axis: 'row', index: 1, direction: 1 });
+  assert.equal(rayquazaStatus(level, state.turn).lockedRow, 1);
+  assert.deepEqual(before, initialState(level), 'undo snapshot and storm phase are unchanged');
 });
