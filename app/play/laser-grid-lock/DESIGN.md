@@ -109,7 +109,7 @@ This is a source-derived record of `laser-grid-lock.css`, `components/laser-grid
 - Recognizable Pok?mon artwork identifies Solrock, Lunatone, Minior, and Rayquaza; direction and charge badges retain mechanical clarity.
 - Amber branches, steel, prism, and sequence markers explain the expanded circuit.
 - A green storm panel, sealed portal, row highlight, and four-phase indicator expose Rayquaza's threat and opening.
-- Difficulty selection, mission text, objectives, and an expandable field guide remain available on mobile.
+- Read-only campaign progression, mission text, objectives, and an expandable field guide remain available on mobile.
 
 ## Colors
 
@@ -137,7 +137,7 @@ The display role is the page title; the headline role belongs to the desktop bri
 
 The top and bottom bars have a 1240px maximum width. Main content has a 1100px maximum width and 46px top padding. Desktop uses a briefing column of at least 220px and a game column capped at 590px. The board stays square; its five equal rows and columns sit inside a three-by-three frame, with four external arrow banks. Desktop arrow tracks are 36px.
 
-At 1500px and above, main vertical padding becomes 64px and the column gap becomes 85px. At 850px and below, the briefing becomes 210px wide, the gap becomes 26px, console padding becomes 16px, and the reset text hides. At 660px and below, the desktop briefing hides and the console stacks beneath the title. The difficulty selector, mission, objective counters, and expandable board guide remain inside the console and available at this width. The console is full width up to 530px with 12px horizontal padding; reset text returns. Mobile arrow tracks are 32px at the sides and 38px above/below, with 3px gaps and a 32px minimum control height.
+At 1500px and above, main vertical padding becomes 64px and the column gap becomes 85px. At 850px and below, the briefing becomes 210px wide, the gap becomes 26px, console padding becomes 16px, and the reset text hides. Progression step captions hide at this width; the full current tier and next unlock remain in text above the five steps. At 660px and below, the desktop briefing hides and the console stacks beneath the title. Campaign progression, mission, objective counters, and expandable board guide remain visible. The console is full width up to 530px with 12px horizontal padding; reset text returns. Mobile arrow tracks are 32px at the sides and 38px above/below, with 3px gaps and a 32px minimum control height.
 
 At 380px and below, HUD spacing contracts to 18px, reset becomes icon-only again, and the legend becomes 9px. Mission text becomes 11px at mobile widths, objectives wrap, and the field guide opens in normal document flow. At 660px and below, the boss panel uses 10px padding and a 48px portrait instead of 60px; its heading becomes 12px, and encounter portraits become 22px. Do not rely on the hidden desktop briefing for gameplay rules.
 
@@ -153,7 +153,7 @@ The console has the broadest rounded corners. The board and arrow buttons use ti
 
 ### Puzzle console and HUD
 
-The HUD groups Level, Moves, and Time with reset aligned to the right. A labeled native difficulty select opens the first level of any of the five tiers and is disabled during the solve sequence. Sector metadata includes Turn; mission text explains the current mechanics. Wrapping objective counters show target angles, beam colors, sequence progress, and the moving portal countdown. Completed requirements turn cyan. Dividers separate the HUD, board status, and legend. Reset uses a thin outline, transparent resting background, and a lighter slate hover fill. Undo is a text action with an icon and becomes dimmed when unavailable.
+The HUD groups Level, Moves, and Time with reset aligned to the right. A read-only five-step campaign track replaces difficulty selection. It marks cleared tiers with mint borders, the current tier with cyan and a dark-green fill, and future tiers with lock icons. The full current tier and next unlock are shown above it; a local progress-save notice appears below. Only a completed circuit advances a level; there are no tier or boss shortcuts. Checkpoints save on victory before travel, while Reset retries the current level and is disabled during victory travel and checkpoint loading. Sector metadata includes Turn; mission text explains the current mechanics. Wrapping objective counters show target angles, beam colors, sequence progress, and the moving portal countdown. Completed requirements turn cyan. Dividers separate the HUD, board status, and legend. Reset uses a thin outline, transparent resting background, and a lighter slate hover fill. Undo is a text action with an icon and becomes dimmed when unavailable.
 
 ### External shift controls
 
@@ -169,7 +169,7 @@ Amber prism cores are circular gem markers and brighten when active. Prism porta
 
 ### Rayquaza encounter
 
-Rayquaza, the Delta Stream guardian, uses `/images/puzzle/rayquaza.png` on the board, in the boss panel, and in the guide. It absorbs beams that hit it. Level 15 and later include the boss; the **Challenge Rayquaza** text button with a portrait opens level 15 from a non-boss level and is disabled during the solve sequence.
+Rayquaza, the Delta Stream guardian, uses `/images/puzzle/rayquaza.png` on the board, in the boss panel, and in the guide. It absorbs beams that hit it. Level 15 and later include the boss; players reach it by clearing earlier campaign levels.
 
 The green boss panel combines a portrait, **Rayquaza ? Delta Stream** heading, current shield/row text, countdown, and four phase marks. The first three phases seal the portal and lock rows 2, 3, and 4 respectively; the fourth opens the portal and releases every row. Columns stay usable. The phase offset varies by level, so the displayed phase is authoritative rather than assuming the first turn begins at phase one. The sealed portal gains a green signal and lock icon; a dashed green band highlights the locked row. The opening panel changes to a yellow-green border and text. Complete both beam colors, amber core, and ordered nodes with the moving portal during this opening. Undo restores the phase.
 
@@ -190,7 +190,7 @@ A compact top bar links back to Playground and identifies the arcade. The bottom
 ## Do's and Don'ts
 
 - **Do** preserve the square board, external arrow banks, visible HUD, and current entity positions.
-- **Do** keep all five tiers selectable and mission, objectives, and field guide available on mobile.
+- **Do** unlock tiers through completed levels; keep progression, mission, objectives, and field guide visible on mobile.
 - **Do** expose rail timing, prism angle/color requirements, deflector direction, and Eater charge with text or counts.
 - **Do** preserve Pok?mon artwork identities with visible direction/charge badges and named encounter labels.
 - **Do** communicate Rayquaza's sealed portal, locked row, countdown, and fourth-phase opening in text as well as color.

@@ -14,10 +14,7 @@
 @media(prefers-reduced-motion:reduce){.laser-page *{transition:none!important;animation:none!important}}
 
 /* Campaign controls and readable board entities. */
-.laser-tier-picker{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;font-size:12px;color:#a6b8cf}
-.laser-tier-picker select{max-width:75%;border:1px solid #3d506b;border-radius:6px;background:#0f172a;color:#edf6ff;padding:9px 28px 9px 10px;font:inherit;cursor:pointer;color-scheme:dark}
-.laser-tier-picker select:disabled{opacity:.55;cursor:default}
-.laser-tier-picker select:focus-visible,.laser-field-guide summary:focus-visible{outline:2px solid #6fffe3;outline-offset:4px}
+.laser-field-guide summary:focus-visible{outline:2px solid #6fffe3;outline-offset:4px}
 .laser-mission{font-size:12px;line-height:1.65;color:#b9c9df;margin:0 0 13px}
 .laser-objectives{display:flex;flex-wrap:wrap;gap:8px 16px;padding-bottom:12px;color:#b9c9df;font-size:10px;line-height:1.7;font-variant-numeric:tabular-nums}
 .laser-objectives>span{display:inline-flex;align-items:center;gap:5px}
@@ -48,7 +45,7 @@
 .laser-field-guide li{display:flex;align-items:flex-start;gap:10px}
 .laser-field-guide li svg{width:16px;height:16px;flex:0 0 16px;margin-top:2px;color:#99d7df}
 .laser-field-guide p{margin:14px 0 4px}
-@media(max-width:660px){.laser-mission{font-size:11px;margin-inline:4px}.laser-objectives{margin-inline:4px;gap:6px 12px}.laser-tier-picker{padding:13px 4px 0}.laser-entity,.laser-prism{border-radius:5px}.laser-prism{border-radius:50%}.laser-field-guide{margin-inline:4px}.laser-layout{align-items:center}}
+@media(max-width:660px){.laser-mission{font-size:11px;margin-inline:4px}.laser-objectives{margin-inline:4px;gap:6px 12px}.laser-entity,.laser-prism{border-radius:5px}.laser-prism{border-radius:50%}.laser-field-guide{margin-inline:4px}.laser-layout{align-items:center}}
 
 /* Pokémon encounters: artwork carries identity, badges carry the current rules. */
 .laser-entity{width:17%;height:17%;border:0;border-radius:0;background:transparent}
@@ -59,10 +56,6 @@
 .laser-encounters{display:flex;flex-wrap:wrap;gap:6px 15px;margin:0 0 12px;font-size:10px;color:#d6e4ff}
 .laser-encounters>span{display:flex;align-items:center;gap:5px}
 .laser-encounters img{object-fit:contain}
-.laser-boss-challenge{display:flex;align-items:center;gap:8px;margin:8px 0 0 auto;padding:4px 0;border:0;background:none;color:#baf4c8;font-size:11px}
-.laser-boss-challenge:hover:not(:disabled){color:#e1ffe9;text-decoration:underline;text-underline-offset:4px}
-.laser-boss-challenge:disabled{opacity:.4}
-.laser-boss-challenge img{object-fit:contain}
 .laser-boss-panel{display:flex;align-items:center;gap:12px;padding:12px;margin:0 0 14px;background:#173b32;border:1px solid #65ac86;border-radius:8px;color:#d5f7df}
 .laser-boss-panel>img{width:60px;height:60px;object-fit:contain;flex:0 0 60px}
 .laser-boss-panel>div{min-width:0;flex:1}
@@ -80,3 +73,17 @@
 .laser-black-hole>svg{position:absolute;width:42%;height:42%;color:#b1ffcf}
 .laser-field-guide li>img{width:28px;height:28px;flex:0 0 28px;object-fit:contain}
 @media(max-width:660px){.laser-boss-panel{gap:8px;padding:10px;margin-inline:3px}.laser-boss-panel>img{width:48px;height:48px;flex-basis:48px}.laser-boss-panel strong{font-size:12px}.laser-encounters{gap:4px 10px;margin-inline:4px}.laser-encounters img{width:22px;height:22px}.laser-entity-beam_eater small{font-size:9px;padding:1px 3px}}
+
+.laser-progression{padding:16px 0 0}
+.laser-progression>div{display:flex;flex-wrap:wrap;gap:5px 12px;align-items:baseline;justify-content:space-between}
+.laser-progression strong{font-size:13px;color:#6fffe3}
+.laser-progression>div>span{font-size:10px;color:#b9c9df;line-height:1.6}
+.laser-progression ol{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;list-style:none;padding:0;margin:13px 0 8px}
+.laser-progression li{display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 2px;border-bottom:2px solid #41506a;color:#a6b8cf;font-size:10px;min-width:0}
+.laser-progression li>span{display:flex;align-items:center;font-family:var(--font-mono)}
+.laser-progression small{font-size:9px}
+.laser-progression .is-current{border-color:#6fffe3;color:#e2fff6;background:#173830}
+.laser-progression .is-cleared{border-color:#5fa792;color:#9fe1c6}
+.laser-progression>p{margin:0;color:#a6b8cf;font-size:10px;line-height:1.6}
+.laser-hud button:disabled{opacity:.4}
+@media(max-width:850px){.laser-progression small{display:none}.laser-progression li{min-height:28px}}

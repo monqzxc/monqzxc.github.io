@@ -224,7 +224,7 @@ export function createCampaignLevel(number: number): CampaignLevel {
   let seed = number * 7919;
   const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
   for (let attempt = 0; attempt < 150; attempt++) {
-    const length = number === 1 ? 1 : attempt === 149 ? 1 : Math.min(2 + number % 3 + Math.floor(number / 6), 9);
+    const length = number === 1 ? 1 : attempt === 149 ? 1 : Math.min(1 + Math.floor((number + 1) / 2), 9);
     const level = layout(number, length);
     const scramble: Shift[] = [];
     for (let i = 0; i < length; i++) {

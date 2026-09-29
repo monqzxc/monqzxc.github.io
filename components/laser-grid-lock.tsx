@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, RotateCcw, Undo2, Orbit, LockKeyhole, Gem } from "lucide-react";
 import { pointAlongPath, type Point, type Shift } from "@/lib/laser-grid";
 import { advanceCampaign, createCampaignLevel, initialState, monsterAt, monsterFacing, targetAt, traceCampaign, rayquazaStatus, MONSTER_PROFILES, TIERS, type CampaignState } from "@/lib/laser-campaign";
+import { LASER_PROGRESS_KEY, readLaserProgress, saveLaserProgress } from "@/lib/laser-progress";
 
 const indices = [0, 1, 2, 3, 4];
 const facingNames = ["right", "down", "left", "up"];
@@ -21,6 +22,9 @@ export default function LaserGridLock() {
   const [seconds, setSeconds] = useState(0);
   const [started, setStarted] = useState(false);
   const [travel, setTravel] = useState(0);
+  const [ready, setReady] = useState(false);
+  const [progressMessage, setProgressMessage] = useState("Loading campaign progress…");
+  const [lastCleared, setLastCleared] = useState<number | null>(null);
   const startTime = useRef(0);
   const locked = useRef(false);
   const beam = useMemo(() => traceCampaign(campaign, state), [campaign, state]);
@@ -36,6 +40,17 @@ export default function LaserGridLock() {
   }, []);
 
   useEffect(() => {
+    try {
+      const savedLevel = readLaserProgress(localStorage.getItem(LASER_PROGRESS_KEY));
+      if (savedLevel > 1) loadLevel(savedLevel);
+      setProgressMessage(savedLevel > 1 ? "Progress restored. Reload restarts your current level." : "Clear levels to advance. Progress saves in this browser.");
+    } catch {
+      setProgressMessage("Browser storage is unavailable. Progress lasts for this visit.");
+    }
+    setReady(true);
+  }, [loadLevel]);
+
+  useEffect(() => {
     if (!started || beam.won) return;
     const timer = window.setInterval(() => setSeconds(Math.floor((Date.now() - startTime.current) / 1000)), 250);
     return () => window.clearInterval(timer);
@@ -43,6 +58,13 @@ export default function LaserGridLock() {
 
   useEffect(() => {
     if (!beam.won) return;
+    // Save at the win, before the travel animation, so a refresh cannot lose it.
+    try {
+      localStorage.setItem(LASER_PROGRESS_KEY, saveLaserProgress(localStorage.getItem(LASER_PROGRESS_KEY), campaign.number));
+      setProgressMessage("Progress saved. Reload restarts your current unlocked level.");
+    } catch {
+      setProgressMessage("Couldn't save progress. You can keep playing in this tab.");
+    }
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const duration = reduced ? 150 : 2600;
     const start = performance.now();
@@ -51,14 +73,14 @@ export default function LaserGridLock() {
       const elapsed = now - start;
       setTravel(reduced ? (elapsed >= 450 ? 1 : 0) : Math.min(1, Math.max(0, (elapsed - 450) / duration)));
       if (elapsed < duration + 1400) frame = requestAnimationFrame(animate);
-      else loadLevel(campaign.number + 1);
+      else { setLastCleared(campaign.number); loadLevel(campaign.number + 1); }
     };
     frame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(frame);
   }, [beam.won, campaign.number, loadLevel]);
 
   function shift(move: Shift) {
-    if (locked.current) return;
+    if (!ready || locked.current) return;
     const next = advanceCampaign(campaign, state, move);
     if (next === state) return;
     if (!started) { startTime.current = Date.now(); setStarted(true); }
@@ -77,7 +99,7 @@ export default function LaserGridLock() {
     const Icon = axis === "row" ? (direction === 1 ? ArrowRight : ArrowLeft) : (direction === 1 ? ArrowDown : ArrowUp);
     const label = axis === "row" ? (direction === 1 ? "right" : "left") : (direction === 1 ? "down" : "up");
     const windLocked = axis === "row" && boss?.lockedRow === index;
-    return <button key={index} className={`laser-shift${windLocked ? " is-wind-locked" : ""}`} aria-label={`Shift ${axis} ${index + 1} ${label}${windLocked ? ", locked by Rayquaza" : ""}`} disabled={beam.won || windLocked} onClick={() => shift({ axis, index, direction })}>{windLocked ? <LockKeyhole size={16} aria-hidden="true" /> : <Icon size={18} aria-hidden="true" />}</button>;
+    return <button key={index} className={`laser-shift${windLocked ? " is-wind-locked" : ""}`} aria-label={`Shift ${axis} ${index + 1} ${label}${windLocked ? ", locked by Rayquaza" : ""}`} disabled={!ready || beam.won || windLocked} onClick={() => shift({ axis, index, direction })}>{windLocked ? <LockKeyhole size={16} aria-hidden="true" /> : <Icon size={18} aria-hidden="true" />}</button>;
   };
   const boardDescription = [
     `5 by 5 board. Deoxys at row 1, column 1. Portal at ${coordinates(portalCell)}. Turn ${state.turn}.`,
@@ -91,6 +113,7 @@ export default function LaserGridLock() {
   const status = beam.won ? (travel >= 1 ? "Portal entered. Next sector incoming…" : "Circuit complete! Deoxys is heading home…")
     : state.emp ? "EMP! Row shifts reset; column shifts kept. Patrols continue. Undo restores the previous turn."
     : campaign.number === 1 && moves === 0 ? "First flight: shift the top row right to connect."
+    : lastCleared === campaign.number - 1 && !started ? `Level ${lastCleared} cleared. Level ${campaign.number}: ${TIERS[campaign.tier - 1]}${campaign.number === 15 ? " — Rayquaza awaits!" : "."}`
     : beam.eaters.length ? `Lunatone charging: ${Math.max(...Object.values(state.charges), 0)}/4. Redirect the beam before EMP.`
     : beam.loop ? "Beam looping. Shift a mirror to break the cycle."
     : "Shift, watch the patrols, and complete the circuit.";
@@ -109,9 +132,8 @@ export default function LaserGridLock() {
           <p className="laser-fixed"><Orbit size={17} /> Undo restores the entire previous turn.</p>
         </aside>
         <section className={`laser-console${beam.won ? " is-solved" : ""}`} aria-label="Laser puzzle">
-          <div className="laser-hud"><div><span>Level</span><strong>{String(campaign.number).padStart(2, "0")}</strong></div><div><span>Moves</span><strong>{String(moves).padStart(2, "0")}</strong></div><div><span>Time</span><strong>{time}</strong></div><button onClick={() => loadLevel(campaign.number)} aria-label="Reset current level"><RotateCcw size={16} /><span>Reset</span></button></div>
-          <div className="laser-tier-picker"><label htmlFor="laser-tier">Difficulty</label><select id="laser-tier" value={campaign.tier} disabled={beam.won} onChange={event => loadLevel((Number(event.target.value) - 1) * 3 + 1)}>{TIERS.map((name, i) => <option key={name} value={i + 1}>Tier {i + 1} · {name}</option>)}</select></div>
-          {!boss && <button className="laser-boss-challenge" disabled={beam.won} onClick={() => loadLevel(15)}><img src={MONSTER_PROFILES.RAYQUAZA.image} alt="" width={30} height={30} />Challenge Rayquaza<ArrowRight size={14} aria-hidden="true" /></button>}
+          <div className="laser-hud"><div><span>Level</span><strong>{String(campaign.number).padStart(2, "0")}</strong></div><div><span>Moves</span><strong>{String(moves).padStart(2, "0")}</strong></div><div><span>Time</span><strong>{time}</strong></div><button disabled={!ready || beam.won} onClick={() => loadLevel(campaign.number)} aria-label="Reset current level"><RotateCcw size={16} /><span>Reset</span></button></div>
+          <div className="laser-progression"><div><strong>{TIERS[campaign.tier - 1]}</strong><span>{campaign.tier < 5 ? `Clear level ${campaign.tier * 3} to unlock ${TIERS[campaign.tier]}` : campaign.number < 15 ? "Rayquaza awaits at level 15" : "Master campaign · Rayquaza's domain"}</span></div><ol aria-label="Difficulty progression">{TIERS.map((name, i) => <li key={name} aria-current={campaign.tier === i + 1 ? "step" : undefined} className={i + 1 < campaign.tier ? "is-cleared" : i + 1 === campaign.tier ? "is-current" : "is-locked"} title={`${name} · ${i + 1 < campaign.tier ? "cleared" : i + 1 === campaign.tier ? "current" : "locked"}`}><span>{i + 1 > campaign.tier ? <LockKeyhole size={11} aria-hidden="true" /> : i + 1}</span><small>{name}</small></li>)}</ol><p>{progressMessage}</p></div>
           <div className="laser-sector"><span>{campaign.name}</span><span>Turn {state.turn} · 5 × 5</span></div>
           <p className="laser-mission">{campaign.briefing}</p>
           {boss && <div className={`laser-boss-panel${boss.exposed ? " is-exposed" : ""}`} role="status"><img src={MONSTER_PROFILES.RAYQUAZA.image} alt="" width={64} height={64} /><div><strong>Rayquaza · Delta Stream</strong><p>{boss.exposed ? "Shield down this turn. Next shift seals the portal." : `Portal sealed · row ${boss.lockedRow! + 1} locked. Shield drops in ${boss.shiftsUntilExposed} shift${boss.shiftsUntilExposed === 1 ? "" : "s"}.`}</p><span className="laser-boss-cycle" aria-label={`Storm phase ${boss.phase + 1} of 4`}>{indices.slice(0, 4).map(i => <i key={i} className={`${i === boss.phase ? "is-current " : ""}${i === 3 ? "is-opening" : ""}`} />)}</span></div></div>}
