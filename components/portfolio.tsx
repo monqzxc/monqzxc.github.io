@@ -16,6 +16,7 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import styles from "./portfolio.module.css";
 
 const milestones = [
+  { year: "2018", icon: Trophy, title: "ASEAN Skills Competition Bangkok 2018", text: "Awarded a Medallion for Excellence, recognizing scores that meet the standard of excellence, independent of podium placings.", type: "MEDALLION FOR EXCELLENCE" },
   { year: "2019", icon: Trophy, title: "WorldSkills Kazan", text: "Represented Team Philippines in Web Technologies at the 45th WorldSkills Competition in Kazan, Russia.", type: "THE GLOBAL STAGE" },
   { year: "2020", icon: Building2, title: "Building for the public sector", text: "Joined TESDA, working on the systems behind human resources and everyday agency operations.", type: "TESDA · PHILIPPINES" },
   { year: "2022", icon: Code2, title: "A more connected stack", text: "Brought Laravel, Vue, and Inertia together to build reactive interfaces on a reliable backend.", type: "STACK MODERNIZATION" },
