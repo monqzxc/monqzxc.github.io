@@ -14,9 +14,9 @@
 
 <div class="wrap">
   <header class="intro">
-    <div class="eyebrow">Portfolio · AI career guidance</div>
+    <div class="eyebrow">Portfolio · AI-driven recommendations</div>
     <h1>TESDA-TRACK</h1>
-    <p class="lede">Learners describe a career goal in English, Filipino or Taglish. A locally hosted embedding model matches it to TESDA qualifications, ranks nearby training with an explained score, and builds a personal pathway report.</p>
+    <p class="lede">An AI-driven recommender for TESDA training and assessment centers. Learners describe a career goal in English, Filipino or Taglish; a locally hosted embedding model matches it to qualifications, then ranks nearby training providers and assessment centers with an explained score.</p>
     <div class="stack"><span>FastAPI</span><span>PostgreSQL + pgvector</span><span>PostGIS</span><span>Fine-tuned multilingual-e5</span><span>React 19</span><span>Docker</span></div>
   </header>
   <div id="walkthrough"></div>
@@ -50,8 +50,9 @@ window.WALKTHROUGH = {
     <div class="box"><h3>Blend</h3><dl class="kv"><dt>Semantic match</dt><dd>50%</dd><dt>Keyword evidence</dt><dd>50%</dd><dt>Confidence band</dt><dd class="mono">3.0–5.0</dd></dl></div>
     <div class="box"><h3>Out-of-scope goals</h3><p class="muted" style="margin:0;font-size:13px">Goals with no TVET equivalent, like “astronaut”, get no match rather than a wrong one.</p></div>
    </div>`},
-  {t:"Rank nearby training", d:"A weighted score you can inspect", url:"training?qualification=CGE-NCII",
-   html:`<div class="sh"><div><h2>Training programs near you</h2><p>Caregiving (Elderly) NC II · sorted by overall score</p></div><span class="pill acc">Audited</span></div>
+  {t:"Recommend centers", d:"Training and assessment, with an explained score", url:"training-and-assessment?qualification=CGE-NCII",
+   html:`<div class="sh"><div><h2>Recommended centers near you</h2><p>Caregiving (Elderly) NC II · sorted by overall score</p></div><span class="pill acc">Audited</span></div>
+   <div class="tabs"><span class="on">Training</span><span>Assessment</span></div>
    <div class="jobs">
     <div class="job sel"><div><b>Sample Skills Training Center</b><div class="meta"><span>Calamba · 12 km</span><span>Starts Jan 10</span><span>Weekend batch</span></div>
      <div class="score"><span>Meaning · 50</span><span class="bar"><i style="width:94%"></i></span><span class="mono">47</span></div>
@@ -61,6 +62,7 @@ window.WALKTHROUGH = {
      <div class="score"><span>Preference · 5</span><span class="bar"><i style="width:100%"></i></span><span class="mono">5</span></div>
     </div><span class="big mono" style="font-size:30px">92</span></div>
     <div class="job"><div><b>Example Polytechnic Institute</b><div class="meta"><span>Sta. Rosa · 28 km</span><span>Starts Feb 3</span><span>Weekday batch</span></div></div><span class="big mono" style="font-size:30px">78</span></div>
+    <div class="job"><div><b>Sample Assessment Center</b><div class="meta"><span>Assessment · Cabuyao · 15 km</span><span>Next schedule Jul 14</span><span>8 seats open</span></div></div><span class="pill ok">Nearest</span></div>
    </div>`},
   {t:"Check readiness", d:"Units to learn and next steps", url:"find-my-pathway/report",
    html:`<div class="done-banner"><span class="stamp">62% ready</span><div><b>Pathway: train, then get assessed</b><span>Personalized report from the match, readiness check and rankings</span></div></div>
