@@ -1,6 +1,6 @@
 # CV Studio validation
 
-- The generated Anthony Cabigayan CV fits one A4 page. Rendered with Poppler and visually inspected; text extraction includes all supplied employment, education, eligibility, courses, and awards used in the CV.
+- The generated Anthony Cabigayan CV fits two A4 pages, including the six portfolio projects and Google/Coursera certifications. Rendered with Poppler and visually inspected; text extraction includes all supplied employment, education, eligibility, courses, and awards used in the CV.
 - The browser SVG preview uses the same measured text and page operations as the PDF.
 - A five-page sample preserves all eight roles, wraps long words, and keeps text within page bounds. Accented Latin names are supported; missing glyphs produce a visible error instead of being silently lost.
 - Browser checks covered start-blank confirmation, required-field validation, profile edits, live preview, adding/removing roles, section tabs, and the mobile Preview action.
