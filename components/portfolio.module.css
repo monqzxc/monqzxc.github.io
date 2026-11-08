@@ -61,6 +61,30 @@
   .party { justify-items: start; }
 }
 
+.personalHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 64px 0 24px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+  pointer-events: auto;
+}
+
+.personalHeading h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -.035em;
+}
+
+.personalHeading p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 15px;
+}
+
 .certifications {
   pointer-events: auto;
   margin-top: 48px;
@@ -144,6 +168,7 @@
 
 @media (max-width: 760px) {
   .certifications { margin-top: 36px; }
-  .certHeading { flex-direction: column; gap: 6px; }
+  .certHeading, .personalHeading { flex-direction: column; gap: 6px; }
+  .personalHeading { margin-top: 48px; }
   .certGrid { grid-template-columns: 1fr; }
 }
