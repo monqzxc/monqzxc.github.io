@@ -1,6 +1,6 @@
 import { personalProjects, projects } from "./projects.ts";
 
-export type CvEntry = { title: string; organization: string; period: string; details: string };
+export type CvEntry = { title: string; organization: string; period: string; details: string; url?: string };
 export type CvData = {
   name: string; role: string; email: string; phone: string; location: string; website: string;
   summary: string; skills: string; eligibility: string; interests: string;
@@ -31,9 +31,9 @@ export const monCv: CvData = {
     { title: "2-year Computer Programming", organization: "St. Nicolas College of Business and Technology", period: "June 2014 - April 2016", details: "" },
   ],
   certifications: [
-    { title: "AI for Brainstorming and Planning", organization: "Google · Coursera", period: "", details: "" },
-    { title: "AI Fundamentals", organization: "Google · Coursera", period: "", details: "" },
-    { title: "AI for App Building", organization: "Google · Coursera", period: "", details: "" },
+    { title: "AI for Brainstorming and Planning", organization: "Google · Coursera", period: "", details: "", url: "https://www.credly.com/badges/532d2afd-c52d-4d2d-b1e6-65ea3b84f17a/public_url" },
+    { title: "AI Fundamentals", organization: "Google · Coursera", period: "", details: "", url: "https://www.credly.com/badges/5a8a5a26-4b14-4862-bc84-cef03e076c53/public_url" },
+    { title: "AI for App Building", organization: "Google · Coursera", period: "", details: "", url: "https://www.credly.com/badges/7d7e3443-3fb6-45be-b898-c6b859b4c9c1/public_url" },
     { title: "Foundations: Data, Data, Everywhere", organization: "Google · Coursera", period: "", details: "" },
   ],
   training: [
@@ -44,7 +44,7 @@ export const monCv: CvData = {
     { title: "Technical Essentials on AWS", organization: "Trainocate", period: "January 20, 2025 · 8 hours", details: "" },
   ],
   awards: [
-    { title: "WorldSkills Kazan", organization: "Team Philippines · Web Technologies", period: "2019", details: "" },
+    { title: "WorldSkills Kazan", organization: "Team Philippines · IT Software Solutions for Business", period: "2019", details: "", url: "https://www.credly.com/badges/07a81712-0ffb-459b-934c-f68c680caa93/public_url" },
     { title: "Medallion for Excellence · ITSSB", organization: "WorldSkills ASEAN Bangkok", period: "2018", details: "" },
     { title: "Silver Medal · ITSSB", organization: "Zonal Skills Competition", period: "2017", details: "" },
     { title: "Gold Medals · ITSSB", organization: "Regional and Provincial Skills Competitions", period: "2017", details: "" },
