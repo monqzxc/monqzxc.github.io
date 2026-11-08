@@ -1,4 +1,4 @@
-import { projects } from "./projects.ts";
+import { personalProjects, projects } from "./projects.ts";
 
 export type CvEntry = { title: string; organization: string; period: string; details: string };
 export type CvData = {
@@ -22,7 +22,10 @@ export const monCv: CvData = {
     { title: "Freelance work", organization: "Independent", period: "April 2022 - October 2022", details: "" },
     { title: "IT Support Staff", organization: "TESDA Region IV-A", period: "January 2020 - March 2022", details: "" },
   ],
-  projects: projects.map(project => ({ title: project.title, organization: project.tags.join(" · "), period: "", details: project.summary })),
+  projects: [
+    ...projects.map(project => ({ title: project.title, organization: project.tags.join(" · "), period: "", details: project.summary })),
+    ...personalProjects.map(project => ({ title: `${project.title} (personal project)`, organization: project.tags.join(" · "), period: "", details: project.summary })),
+  ],
   education: [
     { title: "BS in Computer Science", organization: "St. Nicolas College of Business and Technology", period: "June 2016 - March 2019", details: "" },
     { title: "2-year Computer Programming", organization: "St. Nicolas College of Business and Technology", period: "June 2014 - April 2016", details: "" },

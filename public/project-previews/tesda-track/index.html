@@ -1,0 +1,84 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../embed.js"></script></head><body>
+<title>TESDA-TRACK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="walkthrough.css">
+<link rel="stylesheet" href="../embed.css">
+<style>
+.goal{border:1.5px solid var(--accent);border-radius:10px;padding:14px 16px;font-size:16px;background:var(--ground)}
+.goal small{display:block;margin-top:6px;color:var(--muted);font-size:12.5px}
+.score{display:grid;grid-template-columns:110px minmax(0,1fr) 34px;gap:10px;align-items:center;font-size:12.5px;margin-top:7px}
+.score .bar{height:6px}
+.chip{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);border-radius:4px;padding:2px 7px;color:var(--muted);background:var(--surface)}
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">Portfolio · AI career guidance</div>
+    <h1>TESDA-TRACK</h1>
+    <p class="lede">Learners describe a career goal in English, Filipino or Taglish. A locally hosted embedding model matches it to TESDA qualifications, ranks nearby training with an explained score, and builds a personal pathway report.</p>
+    <div class="stack"><span>FastAPI</span><span>PostgreSQL + pgvector</span><span>PostGIS</span><span>Fine-tuned multilingual-e5</span><span>React 19</span><span>Docker</span></div>
+  </header>
+  <div id="walkthrough"></div>
+  <p class="foot">Screens are simplified recreations. All names, scores, places and figures are sample data.</p>
+</div>
+
+<script>
+// Each step: t = title, d = one-line description, url = fake address bar, html = the mock screen.
+window.WALKTHROUGH = {
+  name: "TESDA-TRACK",
+  host: "tesda-track.example",
+  steps:[
+  {t:"Describe a goal", d:"In English, Filipino or Taglish", url:"find-my-pathway",
+   html:`<div class="sh"><div><h2>Find my pathway</h2><p>Tell us the work you want to do. Your own words are fine.</p></div><span class="pill acc">Guest</span></div>
+   <div class="goal">Gusto kong mag-alaga ng matatanda, possibly abroad.<small>“I want to take care of elderly people, possibly abroad.”</small></div>
+   <div class="grid3" style="margin-top:14px">
+    <div class="field"><label>Region</label><div>Region IV-A · CALABARZON</div></div>
+    <div class="field"><label>Prefers</label><div>Weekend classes</div></div>
+    <div class="field"><label>Already knows</label><div>Basic first aid</div></div>
+   </div>
+   <div class="box" style="margin-top:14px"><h3>How your goal is read</h3><p class="muted" style="margin:0;font-size:13px">Matching runs on our own server with a local model. Your goal text is never stored. Audits keep only a hash of it.</p></div>`},
+  {t:"Match qualifications", d:"Meaning and keywords, with evidence", url:"find-my-pathway/matches",
+   html:`<div class="sh"><div><h2>Best-matching qualifications</h2><p>319 qualifications compared · confidence shown as a z-score</p></div><span class="pill ok">3 strong matches</span></div>
+   <div class="tbl-wrap"><table>
+    <tr><th>Qualification</th><th class="r">z-score</th><th>Evidence</th></tr>
+    <tr><td><b>Caregiving (Elderly) NC II</b></td><td class="r mono">5.4</td><td><span class="chip">meaning</span> <span class="chip">“alaga”</span></td></tr>
+    <tr><td>Health Care Services NC II</td><td class="r mono">4.6</td><td><span class="chip">meaning</span></td></tr>
+    <tr><td>Caregiving (Newborn to Pre-Schooler) NC II</td><td class="r mono">4.1</td><td><span class="chip">meaning</span> <span class="chip">“alaga”</span></td></tr>
+   </table></div>
+   <div class="grid2" style="margin-top:12px">
+    <div class="box"><h3>Blend</h3><dl class="kv"><dt>Semantic match</dt><dd>50%</dd><dt>Keyword evidence</dt><dd>50%</dd><dt>Confidence band</dt><dd class="mono">3.0–5.0</dd></dl></div>
+    <div class="box"><h3>Out-of-scope goals</h3><p class="muted" style="margin:0;font-size:13px">Goals with no TVET equivalent, like “astronaut”, get no match rather than a wrong one.</p></div>
+   </div>`},
+  {t:"Rank nearby training", d:"A weighted score you can inspect", url:"training?qualification=CGE-NCII",
+   html:`<div class="sh"><div><h2>Training programs near you</h2><p>Caregiving (Elderly) NC II · sorted by overall score</p></div><span class="pill acc">Audited</span></div>
+   <div class="jobs">
+    <div class="job sel"><div><b>Sample Skills Training Center</b><div class="meta"><span>Calamba · 12 km</span><span>Starts Jan 10</span><span>Weekend batch</span></div>
+     <div class="score"><span>Meaning · 50</span><span class="bar"><i style="width:94%"></i></span><span class="mono">47</span></div>
+     <div class="score"><span>Distance · 20</span><span class="bar"><i style="width:85%"></i></span><span class="mono">17</span></div>
+     <div class="score"><span>Assessment · 15</span><span class="bar"><i style="width:100%"></i></span><span class="mono">15</span></div>
+     <div class="score"><span>Start date · 10</span><span class="bar"><i style="width:80%"></i></span><span class="mono">8</span></div>
+     <div class="score"><span>Preference · 5</span><span class="bar"><i style="width:100%"></i></span><span class="mono">5</span></div>
+    </div><span class="big mono" style="font-size:30px">92</span></div>
+    <div class="job"><div><b>Example Polytechnic Institute</b><div class="meta"><span>Sta. Rosa · 28 km</span><span>Starts Feb 3</span><span>Weekday batch</span></div></div><span class="big mono" style="font-size:30px">78</span></div>
+   </div>`},
+  {t:"Check readiness", d:"Units to learn and next steps", url:"find-my-pathway/report",
+   html:`<div class="done-banner"><span class="stamp">62% ready</span><div><b>Pathway: train, then get assessed</b><span>Personalized report from the match, readiness check and rankings</span></div></div>
+   <div class="grid2">
+    <div class="box"><h3>Units of competency</h3><ul class="check">
+     <li><span class="tick">✓</span><span>Provide care and support to elderly clients</span><span class="muted">knows</span></li>
+     <li><span class="tick pend">!</span><span>Maintain a safe home environment</span><span class="muted">practice</span></li>
+     <li><span class="tick pend">!</span><span>Assist with daily living activities</span><span class="muted">must learn</span></li>
+    </ul></div>
+    <div class="box"><h3>Next steps</h3><ul class="timeline">
+     <li><span>Enroll in the weekend batch</span><time>Jan 10</time></li>
+     <li><span>Complete the training program</span><time>Jun</time></li>
+     <li><span>Apply for national assessment</span><time>Center 15 km</time></li>
+    </ul></div>
+   </div>`}
+  ]
+};
+</script>
+<script src="walkthrough.js"></script>
+
+</body></html>
