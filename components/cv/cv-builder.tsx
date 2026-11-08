@@ -23,6 +23,7 @@ function Entries({ group, form, singular }: { group: Group; form: UseFormReturn<
       <div className="cv-field"><Label htmlFor={`${group}-${field.id}-title`}>{group === "experience" ? "Job title" : group === "education" ? "Degree or qualification" : group === "projects" ? "Project name" : group === "certifications" ? "Certificate" : "Title"}</Label><Input id={`${group}-${field.id}-title`} maxLength={160} {...form.register(`${group}.${index}.title`)} /></div>
       <div className="cv-field"><Label htmlFor={`${group}-${field.id}-org`}>{group === "experience" ? "Employer" : group === "education" ? "School or university" : group === "projects" ? "Tech stack or client" : group === "certifications" ? "Issuer" : "Organization"}</Label><Input id={`${group}-${field.id}-org`} maxLength={200} {...form.register(`${group}.${index}.organization`)} /></div>
       <div className="cv-field"><Label htmlFor={`${group}-${field.id}-period`}>{group === "training" ? "Date and duration" : "Dates"}{(group === "projects" || group === "certifications") && <span className="cv-optional">optional</span>}</Label><Input id={`${group}-${field.id}-period`} placeholder={group === "experience" ? "January 2023 - Present" : "2024"} maxLength={100} {...form.register(`${group}.${index}.period`)} /></div>
+      {(group === "certifications" || group === "awards") && <div className="cv-field"><Label htmlFor={`${group}-${field.id}-url`}>Credential link <span className="cv-optional">optional</span></Label><Input id={`${group}-${field.id}-url`} type="url" inputMode="url" placeholder="https://www.credly.com/badges/…" maxLength={300} {...form.register(`${group}.${index}.url`)} /></div>}
       <div className="cv-field"><Label htmlFor={`${group}-${field.id}-details`}>Highlights <span className="cv-optional">optional</span></Label><Textarea id={`${group}-${field.id}-details`} rows={3} maxLength={4000} placeholder="One achievement or detail per line" {...form.register(`${group}.${index}.details`)} /></div>
     </fieldset>)}
     <Button type="button" variant="outline" className="cv-add" disabled={fields.length >= 20} onClick={() => append(blankEntry())}><Plus />Add {singular.toLowerCase()}</Button>
@@ -32,7 +33,11 @@ function Entries({ group, form, singular }: { group: Group; form: UseFormReturn<
 function PaperPreview({ pages }: { pages: CvPage[] }) {
   return <div className="cv-papers">{pages.map((page, index) => <svg key={index} className="cv-paper" viewBox="0 0 595.28 841.89" role="img" aria-label={`CV preview, page ${index + 1} of ${pages.length}`}>
     <title>CV preview, page {index + 1} of {pages.length}</title><rect width="595.28" height="841.89" fill="white" />
-    {page.map((op, i) => op.kind === "line" ? <line key={i} x1={op.x} y1={op.y} x2={op.x2} y2={op.y2} stroke={op.color} strokeWidth={op.width} /> : <text key={i} x={op.x} y={op.y} fill={op.color} fontSize={op.size} fontFamily="CV Sans, sans-serif" fontWeight={op.bold ? 600 : 400} letterSpacing={op.spacing}>{op.text}</text>)}
+    {page.map((op, i) => {
+      if (op.kind === "line") return <line key={i} x1={op.x} y1={op.y} x2={op.x2} y2={op.y2} stroke={op.color} strokeWidth={op.width} />;
+      const label = <text x={op.x} y={op.y} fill={op.color} fontSize={op.size} fontFamily="CV Sans, sans-serif" fontWeight={op.bold ? 600 : 400} letterSpacing={op.spacing}>{op.text}</text>;
+      return op.url ? <a key={i} href={op.url} target="_blank" rel="noopener noreferrer">{label}</a> : <g key={i}>{label}</g>;
+    })}
   </svg>)}</div>;
 }
 export default function CvBuilder() {
