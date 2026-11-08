@@ -114,10 +114,12 @@ export async function createCvDocument(data: CvData, suppliedFonts?: [string, st
   if (contact.length) { left.heading("Contact"); contact.forEach(value => left.paragraph(value, 9.2, false, "#49434f", 5)); left.space(14); }
   left.entries("Education", data.education);
   if (data.skills.trim()) { left.heading("Skills"); left.paragraph(data.skills, 9.4, false, "#49434f", 18); }
+  left.entries("Certifications", data.certifications ?? [], true);
   left.entries("Recognition", data.awards, true);
   if (data.interests.trim()) { left.heading("Interests"); left.paragraph(data.interests, 9.2); }
   if (data.summary.trim()) { right.heading("Profile"); right.paragraph(data.summary, 9.6, false, "#49434f", 17); }
   right.entries("Experience", data.experience);
+  right.entries("Projects", data.projects ?? []);
   if (data.eligibility.trim()) { right.heading("Eligibility"); right.paragraph(data.eligibility, 9.2, false, "#49434f", 14); }
   right.entries("Professional development", data.training, true);
   pages.forEach((ops, index) => {

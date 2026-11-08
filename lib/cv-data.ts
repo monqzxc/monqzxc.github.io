@@ -1,18 +1,20 @@
+import { projects } from "./projects.ts";
+
 export type CvEntry = { title: string; organization: string; period: string; details: string };
 export type CvData = {
   name: string; role: string; email: string; phone: string; location: string; website: string;
   summary: string; skills: string; eligibility: string; interests: string;
-  experience: CvEntry[]; education: CvEntry[]; training: CvEntry[]; awards: CvEntry[];
+  experience: CvEntry[]; projects: CvEntry[]; education: CvEntry[]; certifications: CvEntry[]; training: CvEntry[]; awards: CvEntry[];
 };
 export const blankEntry = (): CvEntry => ({ title: "", organization: "", period: "", details: "" });
 export const blankCv = (): CvData => ({
   name: "", role: "", email: "", phone: "", location: "", website: "", summary: "", skills: "", eligibility: "", interests: "",
-  experience: [blankEntry()], education: [blankEntry()], training: [], awards: [],
+  experience: [blankEntry()], projects: [], education: [blankEntry()], certifications: [], training: [], awards: [],
 });
 export const monCv: CvData = {
   name: "Anthony Cabigayan", role: "Software Engineer", email: "suppmon27@gmail.com", phone: "", location: "Manila, Philippines", website: "github.com/monqzxc",
   summary: "Software engineer focused on dependable enterprise systems and clear digital workflows. Builds Laravel and Vue applications for public-sector performance management, recruitment, personnel records, and document automation.",
-  skills: "PHP / Laravel\nVue.js / Inertia.js\nJavaScript / React / Next.js\nMySQL\nDocker / Git\nPDF generation / Workflow design",
+  skills: "PHP / Laravel\nVue.js / Inertia.js\nJavaScript / React / Next.js\nMySQL\nDocker / Git\nPDF generation / Workflow design\nAI-assisted app building\nAI for brainstorming and planning\nData analysis fundamentals",
   eligibility: "Career Service Professional\nMarch 13, 2022 · Muntinlupa\nRating: 82.5%",
   interests: "Traveling, running, watching anime, gaming, and reading.",
   experience: [
@@ -20,9 +22,16 @@ export const monCv: CvData = {
     { title: "Freelance work", organization: "Independent", period: "April 2022 - October 2022", details: "" },
     { title: "IT Support Staff", organization: "TESDA Region IV-A", period: "January 2020 - March 2022", details: "" },
   ],
+  projects: projects.map(project => ({ title: project.title, organization: project.tags.join(" · "), period: "", details: project.summary })),
   education: [
     { title: "BS in Computer Science", organization: "St. Nicolas College of Business and Technology", period: "June 2016 - March 2019", details: "" },
     { title: "2-year Computer Programming", organization: "St. Nicolas College of Business and Technology", period: "June 2014 - April 2016", details: "" },
+  ],
+  certifications: [
+    { title: "AI for Brainstorming and Planning", organization: "Google · Coursera", period: "", details: "" },
+    { title: "AI Fundamentals", organization: "Google · Coursera", period: "", details: "" },
+    { title: "AI for App Building", organization: "Google · Coursera", period: "", details: "" },
+    { title: "Foundations: Data, Data, Everywhere", organization: "Google · Coursera", period: "", details: "" },
   ],
   training: [
     { title: "Responsible and Ethical Use of Generative AI", organization: "DICT Region 5", period: "October 13, 2025 · 2 hours", details: "" },

@@ -12,17 +12,17 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { blankCv, blankEntry, monCv, type CvData } from "@/lib/cv-data";
 import type { CvPage } from "@/lib/cv-pdf";
 
-type Group = "experience" | "education" | "training" | "awards";
+type Group = "experience" | "projects" | "education" | "certifications" | "training" | "awards";
 function Entries({ group, form, singular }: { group: Group; form: UseFormReturn<CvData>; singular: string }) {
   const { fields, append, remove } = useFieldArray({ control: form.control, name: group });
   return <div className="cv-entries">
-    {fields.length === 0 && <p className="cv-empty">No {group === "awards" ? "recognition" : group} added. Empty sections stay off your CV.</p>}
+    {fields.length === 0 && <p className="cv-empty">No {group === "awards" ? "recognition" : group === "training" ? "courses" : group} added. Empty sections stay off your CV.</p>}
     {fields.map((field, index) => <fieldset className="cv-entry" key={field.id}>
       <legend>{singular} {index + 1}</legend>
       <Button type="button" variant="ghost" size="icon" className="cv-remove" aria-label={`Remove ${singular.toLowerCase()} ${index + 1}`} onClick={() => remove(index)}><Trash2 /></Button>
-      <div className="cv-field"><Label htmlFor={`${group}-${field.id}-title`}>{group === "experience" ? "Job title" : group === "education" ? "Degree or qualification" : "Title"}</Label><Input id={`${group}-${field.id}-title`} maxLength={160} {...form.register(`${group}.${index}.title`)} /></div>
-      <div className="cv-field"><Label htmlFor={`${group}-${field.id}-org`}>{group === "experience" ? "Employer" : group === "education" ? "School or university" : "Organization"}</Label><Input id={`${group}-${field.id}-org`} maxLength={200} {...form.register(`${group}.${index}.organization`)} /></div>
-      <div className="cv-field"><Label htmlFor={`${group}-${field.id}-period`}>{group === "training" ? "Date and duration" : "Dates"}</Label><Input id={`${group}-${field.id}-period`} placeholder={group === "experience" ? "January 2023 - Present" : "2024"} maxLength={100} {...form.register(`${group}.${index}.period`)} /></div>
+      <div className="cv-field"><Label htmlFor={`${group}-${field.id}-title`}>{group === "experience" ? "Job title" : group === "education" ? "Degree or qualification" : group === "projects" ? "Project name" : group === "certifications" ? "Certificate" : "Title"}</Label><Input id={`${group}-${field.id}-title`} maxLength={160} {...form.register(`${group}.${index}.title`)} /></div>
+      <div className="cv-field"><Label htmlFor={`${group}-${field.id}-org`}>{group === "experience" ? "Employer" : group === "education" ? "School or university" : group === "projects" ? "Tech stack or client" : group === "certifications" ? "Issuer" : "Organization"}</Label><Input id={`${group}-${field.id}-org`} maxLength={200} {...form.register(`${group}.${index}.organization`)} /></div>
+      <div className="cv-field"><Label htmlFor={`${group}-${field.id}-period`}>{group === "training" ? "Date and duration" : "Dates"}{(group === "projects" || group === "certifications") && <span className="cv-optional">optional</span>}</Label><Input id={`${group}-${field.id}-period`} placeholder={group === "experience" ? "January 2023 - Present" : "2024"} maxLength={100} {...form.register(`${group}.${index}.period`)} /></div>
       <div className="cv-field"><Label htmlFor={`${group}-${field.id}-details`}>Highlights <span className="cv-optional">optional</span></Label><Textarea id={`${group}-${field.id}-details`} rows={3} maxLength={4000} placeholder="One achievement or detail per line" {...form.register(`${group}.${index}.details`)} /></div>
     </fieldset>)}
     <Button type="button" variant="outline" className="cv-add" disabled={fields.length >= 20} onClick={() => append(blankEntry())}><Plus />Add {singular.toLowerCase()}</Button>
@@ -104,7 +104,7 @@ export default function CvBuilder() {
         <div className="cv-layout">
           <section id="cv-editor" className="cv-editor" aria-label="CV editor">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="cv-tabs" aria-label="CV sections"><TabsTrigger value="profile">Profile</TabsTrigger><TabsTrigger value="experience">Experience</TabsTrigger><TabsTrigger value="education">Education</TabsTrigger><TabsTrigger value="extras">Extras</TabsTrigger></TabsList>
+              <TabsList className="cv-tabs" aria-label="CV sections"><TabsTrigger value="profile">Profile</TabsTrigger><TabsTrigger value="experience">Experience</TabsTrigger><TabsTrigger value="projects">Projects</TabsTrigger><TabsTrigger value="education">Education</TabsTrigger><TabsTrigger value="extras">Extras</TabsTrigger></TabsList>
               <TabsContent value="profile" className="cv-panel"><div className="cv-panel-heading"><h2>Make an introduction.</h2><p>Your name and title are required. Everything else is up to you.</p></div>
                 {simple("name", "Full name", "Your full name", true)}{simple("role", "Professional title", "Software Engineer", true)}
                 <div className="cv-field-row">{simple("email", "Email", "you@example.com")}{simple("phone", "Phone", "+63 …")}</div>
@@ -113,10 +113,12 @@ export default function CvBuilder() {
                 <div className="cv-field"><Label htmlFor={`${id}-skills`}>Skills <span className="cv-optional">optional</span></Label><Textarea id={`${id}-skills`} rows={4} maxLength={2000} placeholder="One skill or group per line" {...register("skills")} /></div>
               </TabsContent>
               <TabsContent value="experience" className="cv-panel"><div className="cv-panel-heading"><h2>Show your experience.</h2><p>Start with your most recent role. Include freelance work, too.</p></div><Entries group="experience" form={form} singular="Role" /></TabsContent>
+              <TabsContent value="projects" className="cv-panel"><div className="cv-panel-heading"><h2>Show what you built.</h2><p>Add the projects that best represent your work.</p></div><Entries group="projects" form={form} singular="Project" /></TabsContent>
               <TabsContent value="education" className="cv-panel"><div className="cv-panel-heading"><h2>Build on your foundations.</h2><p>Add your qualifications, starting with the most recent.</p></div><Entries group="education" form={form} singular="Qualification" /></TabsContent>
               <TabsContent value="extras" className="cv-panel"><div className="cv-panel-heading"><h2>The rest of your story.</h2><p>Include the credentials and interests that matter to you.</p></div>
                 <div className="cv-field"><Label htmlFor={`${id}-eligibility`}>Eligibility or certifications</Label><Textarea id={`${id}-eligibility`} rows={3} maxLength={2000} {...register("eligibility")} /></div>
                 <div className="cv-field"><Label htmlFor={`${id}-interests`}>Interests</Label><Textarea id={`${id}-interests`} rows={2} maxLength={1000} {...register("interests")} /></div>
+                <h3 className="cv-subheading">Certifications</h3><Entries group="certifications" form={form} singular="Certificate" />
                 <h3 className="cv-subheading">Recognition</h3><Entries group="awards" form={form} singular="Recognition" />
                 <h3 className="cv-subheading">Professional development</h3><Entries group="training" form={form} singular="Course" />
               </TabsContent>
