@@ -95,7 +95,7 @@ Open `/cv` for a client-only CV editor with an A4 preview and PDF export. Visito
 
 The editor does not send CV input to a server or save it to browser storage. A draft stays in the current tab until refresh or navigation; export before leaving. The download is a selectable-text PDF with embedded, locally served DM Sans fonts.
 
-- `lib/cv-data.ts`: Anthony's confirmed employment, freelance period, education, certifications, eligibility, training, and awards. CV projects are derived from `lib/projects.ts`, and certifications also appear on the homepage's Journey section.
+- `lib/cv-data.ts`: Anthony's confirmed employment, freelance period, education, certifications, eligibility, training, and awards. CV projects are derived from `lib/projects.ts`, and certifications also appear on the homepage's Journey section. An entry's optional `url` (e.g. a Credly badge) becomes a clickable "Verify on Credly" link in the PDF and on the site.
 - `lib/cv-pdf.ts`: shared layout for the SVG preview and PDF, including wrapping and pagination.
 - `components/cv/cv-builder.tsx`: visitor form, validation, section tabs, and download actions.
 - `app/cv/cv.css`: CV Studio's responsive dark glass interface.
