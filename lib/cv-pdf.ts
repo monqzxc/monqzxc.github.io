@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import type { CvData, CvEntry } from "./cv-data";
 
-export type TextOp = { kind: "text"; text: string; x: number; y: number; size: number; bold: boolean; color: string; spacing: number };
+export type TextOp = { kind: "text"; text: string; x: number; y: number; size: number; bold: boolean; color: string; spacing: number; url?: string };
 export type LineOp = { kind: "line"; x: number; y: number; x2: number; y2: number; color: string; width: number };
 export type CvPage = (TextOp | LineOp)[];
 const W = 595.28, H = 841.89, BOTTOM = 784;
@@ -101,6 +101,12 @@ export async function createCvDocument(data: CvData, suppliedFonts?: [string, st
         ensure(Math.min(estimated, 120));
         paragraph(title, 9.4, true, "#2f2c35", 2);
         paragraph(label === "Professional development" ? [entry.organization, entry.period].filter(Boolean).join(" | ") : entry.organization, 9.1, false, "#49434f", 1);
+        const url = entry.url?.trim();
+        if (url && /^https?:\/\//i.test(url)) {
+          ensure(13);
+          pages[page].push({ kind: "text", text: /credly\.com/i.test(url) ? "Verify on Credly" : "Verify credential", x, y, size: 8.4, bold: false, color: "#5b45a8", spacing: 0, url });
+          y += 13;
+        }
         if (!compact) paragraph(entry.period, 8.8, false, "#706a75", 4);
         if (entry.details) entry.details.split("\n").filter(row => row.trim()).forEach(row => paragraph(`• ${row.replace(/^[•\-]\s*/, "")}`, 9.2, false, "#49434f", 2));
         y += compact ? 3 : 9;
@@ -127,7 +133,10 @@ export async function createCvDocument(data: CvData, suppliedFonts?: [string, st
     if (index) doc.addPage();
     ops.forEach(op => {
       if (op.kind === "line") { doc.setDrawColor(op.color); doc.setLineWidth(op.width); doc.line(op.x, op.y, op.x2, op.y2); }
-      else { doc.setFont("CV", op.bold ? "bold" : "normal"); doc.setFontSize(op.size); doc.setTextColor(op.color); doc.setCharSpace(op.spacing); doc.text(op.text, op.x, op.y); }
+      else {
+        doc.setFont("CV", op.bold ? "bold" : "normal"); doc.setFontSize(op.size); doc.setTextColor(op.color); doc.setCharSpace(op.spacing);
+        if (op.url) doc.textWithLink(op.text, op.x, op.y, { url: op.url }); else doc.text(op.text, op.x, op.y);
+      }
     });
   });
   doc.setProperties({ title: `${data.name.trim() || "My"} - CV`, subject: data.role, author: data.name, creator: "Mon CV Studio" });
