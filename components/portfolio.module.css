@@ -60,3 +60,90 @@
   .navContact { margin-left: 0; }
   .party { justify-items: start; }
 }
+
+.certifications {
+  pointer-events: auto;
+  margin-top: 48px;
+}
+
+.certHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.certHeading h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -.035em;
+}
+
+.certHeading p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 15px;
+}
+
+.certGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.certCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--card) 70%, transparent);
+  backdrop-filter: blur(14px);
+}
+
+.certIcon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+}
+
+.certIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.certCard h4 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -.02em;
+}
+
+.certCard p {
+  margin: 0;
+  color: color-mix(in srgb, var(--accent) 75%, white);
+  font: 12px/1.5 var(--font-mono);
+  letter-spacing: .04em;
+}
+
+@media (max-width: 1100px) {
+  .certGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .certifications { margin-top: 36px; }
+  .certHeading { flex-direction: column; gap: 6px; }
+  .certGrid { grid-template-columns: 1fr; }
+}

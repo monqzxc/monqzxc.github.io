@@ -91,15 +91,15 @@ The Vue build flags are configured in `next.config.ts`. The scripts use Webpack 
 
 ## CV Studio
 
-Open `/cv` for a client-only CV editor with an A4 preview and PDF export. Visitors can edit Mon's example or choose **Start my CV** for a blank form. Add or remove employment, education, training, and recognition entries. Blank sections are omitted, longer entries flow to additional pages, and unsupported font characters produce a clear message rather than disappearing.
+Open `/cv` for a client-only CV editor with an A4 preview and PDF export. Visitors can edit Mon's example or choose **Start my CV** for a blank form. Add or remove employment, project, education, certification, training, and recognition entries. Blank sections are omitted, longer entries flow to additional pages, and unsupported font characters produce a clear message rather than disappearing.
 
 The editor does not send CV input to a server or save it to browser storage. A draft stays in the current tab until refresh or navigation; export before leaving. The download is a selectable-text PDF with embedded, locally served DM Sans fonts.
 
-- `lib/cv-data.ts`: Anthony's confirmed employment, freelance period, education, eligibility, training, and awards.
+- `lib/cv-data.ts`: Anthony's confirmed employment, freelance period, education, certifications, eligibility, training, and awards. CV projects are derived from `lib/projects.ts`, and certifications also appear on the homepage's Journey section.
 - `lib/cv-pdf.ts`: shared layout for the SVG preview and PDF, including wrapping and pagination.
 - `components/cv/cv-builder.tsx`: visitor form, validation, section tabs, and download actions.
 - `app/cv/cv.css`: CV Studio's responsive dark glass interface.
-- `public/cv/Anthony-Cabigayan-CV.pdf`: finished one-page CV linked from the hero and editor.
+- `public/cv/Anthony-Cabigayan-CV.pdf`: finished two-page CV linked from the hero and editor.
 
 After changing Mon's data, regenerate his static download with `npm run generate:cv` before building. This uses the same PDF renderer as visitor exports. No API key, account, database, or third-party document service is needed. Site sharing controls determine who can access the hosted builder.
 
