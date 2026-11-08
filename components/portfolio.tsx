@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, ArrowUpRight, Menu, X, Trophy, Code2, Building2, Layers } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Menu, X, Trophy, Code2, Building2, Layers, BadgeCheck } from "lucide-react";
 import ProjectCard from "@/components/project-card";
 import GamesTeaser from "@/components/games-teaser";
 import FloatingMenu from "@/components/floating-menu";
@@ -8,6 +8,7 @@ import ContactModal from "@/components/contact-modal";
 import SocialLinks from "@/components/social-links";
 import { portfolioSections } from "@/lib/navigation";
 import { projects } from "@/lib/projects";
+import { monCv } from "@/lib/cv-data";
 import VueCraft from "@/components/vue-craft";
 import Hero from "@/components/hero";
 import { PokemonHabitat, ThemeSelector } from "@/components/pokemon-theme";
@@ -33,10 +34,12 @@ export default function Portfolio() {
   const links=portfolioSections.map(({id,label})=>[id,label]);
   return <div className="portfolio-page"><a className="skip-link" href="#main">Skip to content</a><header className="site-header"><nav className="shell nav" aria-label="Main navigation"><a className="wordmark" href="#about" aria-label="Mon — back to top"><strong>mon<span>.</span></strong><span className="brand-caption">ANTHONY CABIGAYAN<br/>SOFTWARE ENGINEER</span></a><button className="menu-toggle" ref={menuButton} aria-label={menuOpen?"Close menu":"Open menu"} aria-expanded={menuOpen} aria-controls="site-navigation" onClick={()=>setMenuOpen(!menuOpen)}>{menuOpen?<X size={22}/>:<Menu size={22}/>}</button><div id="site-navigation" className={`nav-links ${menuOpen?"open":""}`}>{links.map(([id,label])=><a className={active===id?"active":""} key={id} href={`#${id}`} onClick={()=>setMenuOpen(false)} aria-current={active===id?"location":undefined}>{label}</a>)}<a href="/cv" onClick={()=>setMenuOpen(false)}>CV Studio</a><button className={`nav-contact ${styles.navContact}`} type="button" aria-haspopup="dialog" onClick={event=>{(menuOpen?menuButton.current:event.currentTarget)?.focus({preventScroll:true});setMenuOpen(false);setContactOpen(true);}}>Let’s talk <ArrowUpRight size={16}/></button></div><ThemeSelector/></nav></header><PokemonHabitat/>
   <main id="main" ref={revealRef}><Hero onContact={()=>setContactOpen(true)}/>
-  <div className="tech-strip"><div className="shell"><span className="tech-label">TOOLS OF<br/>THE TRADE</span>{[["◇","Laravel"],["∨","Vue.js"],["↗","Inertia.js"],["⌘","React"],["N","Next.js"],["▱","Docker"]].map(([symbol,label])=><span className="tech-item" key={label}><span aria-hidden="true" className="tech-symbol">{symbol}</span>{label}</span>)}</div></div>
+  <div className="tech-strip"><div className="shell"><span className="tech-label">TOOLS OF<br/>THE TRADE</span>{[["◇","Laravel"],["∨","Vue.js"],["↗","Inertia.js"],["⌘","React"],["N","Next.js"],["▱","Docker"],["✦","AI-assisted dev"]].map(([symbol,label])=><span className="tech-item" key={label}><span aria-hidden="true" className="tech-symbol">{symbol}</span>{label}</span>)}</div></div>
   <section id="projects" className="shell section"><div className="section-heading"><div><div className="eyebrow"><span className="short-line"/>01 / SELECTED WORK</div><h2>Real workflows.<br/><span>Thoughtful solutions.</span></h2></div><p>Six systems built for public service. Open a preview to explore the workflow, from the first step to the final result.</p></div><div className="project-grid">{projects.map(project=><ProjectCard key={project.id} project={project}/>)}</div></section>
   <div className="shell about-band"><div><div className="eyebrow"><span className="short-line"/>THE WAY I BUILD</div><h2>Good software starts<br/>with understanding.</h2></div><p>From the first conversation to the final deployment, I care about how a system fits into someone’s day. My focus is simple: <strong>clear interfaces, dependable foundations, and workflows that make sense.</strong> That’s the thread connecting my work across Laravel, Vue, and enterprise systems.</p></div>
-  <section id="timeline" className="shell section"><div className="section-heading"><div><div className="eyebrow"><span className="short-line"/>02 / THE JOURNEY</div><h2>Always building. <span>Always learning.</span></h2></div></div><div className="timeline">{milestones.map(({year,icon:Icon,title,text,type})=><article className="timeline-row" key={year}><span className="timeline-year">{year}</span><span className="timeline-icon"><Icon/></span><div><h3>{title}</h3><p>{text}</p></div><span className="timeline-type">{type}</span></article>)}</div></section>
+  <section id="timeline" className="shell section"><div className="section-heading"><div><div className="eyebrow"><span className="short-line"/>02 / THE JOURNEY</div><h2>Always building. <span>Always learning.</span></h2></div></div><div className="timeline">{milestones.map(({year,icon:Icon,title,text,type})=><article className="timeline-row" key={year}><span className="timeline-year">{year}</span><span className="timeline-icon"><Icon/></span><div><h3>{title}</h3><p>{text}</p></div><span className="timeline-type">{type}</span></article>)}</div>
+    <div className={styles.certifications}><div className={styles.certHeading}><h3 id="certifications-heading">Certifications</h3><p>Recent coursework in AI and data.</p></div><ul className={styles.certGrid}>{monCv.certifications.map(({title,organization})=><li className={styles.certCard} key={title}><span className={styles.certIcon} aria-hidden="true"><BadgeCheck/></span><div><h4>{title}</h4><p>{organization}</p></div></li>)}</ul></div>
+  </section>
   <section id="craft-hobbies" className="shell section craft-section"><div className="craft-layout"><div className="craft-intro"><div className="eyebrow"><span className="short-line"/>03 / BEYOND THE TERMINAL</div><h2>Curiosity doesn't<br/>clock out.</h2><p>New places, long runs, anime, and the small experiments that keep me curious.</p></div><VueCraft/></div><GamesTeaser/></section>
   <section id="contact" className="shell contact-section">
     <div className="eyebrow"><span className="short-line"/>04 / THE NEXT QUEST</div>
