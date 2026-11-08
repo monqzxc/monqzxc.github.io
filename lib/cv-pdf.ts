@@ -80,11 +80,15 @@ export async function createCvDocument(data: CvData, suppliedFonts?: [string, st
     const ensure = (height: number) => {
       if (y + height > BOTTOM) { page++; addPage(page); y = 100; }
     };
-    const paragraph = (value: string, size = 9.4, bold = false, color = "#36343b", gap = 4, indent = 0) => {
+    const paragraph = (value: string, size = 9.4, bold = false, color = "#36343b", gap = 4, indent = 0, url?: string) => {
       if (!value.trim()) return;
       const rows = wrap(value, max - indent, size, bold), leading = size * 1.38;
       if (rows.length * leading < 140) ensure(rows.length * leading + gap);
-      rows.forEach(row => { ensure(leading); if (row) text(page, row, x + indent, y, size, bold, color); y += leading; });
+      rows.forEach(row => {
+        ensure(leading);
+        if (row) { text(page, row, x + indent, y, size, bold, color); if (url) (pages[page][pages[page].length - 1] as TextOp).url = url; }
+        y += leading;
+      });
       y += gap;
     };
     const heading = (label: string) => {
@@ -99,14 +103,10 @@ export async function createCvDocument(data: CvData, suppliedFonts?: [string, st
         const title = compact && entry.period && label !== "Professional development" ? `${entry.title} (${entry.period})` : entry.title;
         const estimated = wrap(title, max, 9.4, true).length * 13 + wrap(entry.organization, max, 9.1).length * 13 + (compact ? 0 : 15) + 10;
         ensure(Math.min(estimated, 120));
-        paragraph(title, 9.4, true, "#2f2c35", 2);
+        // Credential links stay invisible: printed copies show no URL, digital copies keep the title clickable.
+        const url = entry.url?.trim() && /^https?:\/\//i.test(entry.url.trim()) ? entry.url.trim() : undefined;
+        paragraph(title, 9.4, true, "#2f2c35", 2, 0, url);
         paragraph(label === "Professional development" ? [entry.organization, entry.period].filter(Boolean).join(" | ") : entry.organization, 9.1, false, "#49434f", 1);
-        const url = entry.url?.trim();
-        if (url && /^https?:\/\//i.test(url)) {
-          ensure(13);
-          pages[page].push({ kind: "text", text: /credly\.com/i.test(url) ? "Verify on Credly" : "Verify credential", x, y, size: 8.4, bold: false, color: "#5b45a8", spacing: 0, url });
-          y += 13;
-        }
         if (!compact) paragraph(entry.period, 8.8, false, "#706a75", 4);
         if (entry.details) entry.details.split("\n").filter(row => row.trim()).forEach(row => paragraph(`• ${row.replace(/^[•\-]\s*/, "")}`, 9.2, false, "#49434f", 2));
         y += compact ? 3 : 9;
@@ -121,12 +121,12 @@ export async function createCvDocument(data: CvData, suppliedFonts?: [string, st
   left.entries("Education", data.education);
   if (data.skills.trim()) { left.heading("Skills"); left.paragraph(data.skills, 9.4, false, "#49434f", 18); }
   left.entries("Certifications", data.certifications ?? [], true);
+  if (data.eligibility.trim()) { left.heading("Eligibility"); left.paragraph(data.eligibility, 9.2, false, "#49434f", 14); }
   left.entries("Recognition", data.awards, true);
   if (data.interests.trim()) { left.heading("Interests"); left.paragraph(data.interests, 9.2); }
   if (data.summary.trim()) { right.heading("Profile"); right.paragraph(data.summary, 9.6, false, "#49434f", 17); }
   right.entries("Experience", data.experience);
   right.entries("Projects", data.projects ?? []);
-  if (data.eligibility.trim()) { right.heading("Eligibility"); right.paragraph(data.eligibility, 9.2, false, "#49434f", 14); }
   right.entries("Professional development", data.training, true);
   pages.forEach((ops, index) => {
     text(index, `${index + 1} / ${pages.length}`, W - 63, H - 24, 8, false, "#817a87");
