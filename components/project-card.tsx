@@ -32,7 +32,7 @@ function ProjectThumbnail({ project }: { project: Project }) {
   );
 }
 
-export default function ProjectCard({ project }: { project: Project }) {
+export default function ProjectCard({ project, group = "Selected work" }: { project: Project; group?: string }) {
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
@@ -102,7 +102,7 @@ export default function ProjectCard({ project }: { project: Project }) {
         }}
       >
         <div className="walkthrough-dialog-header">
-          <div className="dialog-kicker">Selected work / {project.number} <span>Interactive preview</span></div>
+          <div className="dialog-kicker">{group} / {project.number} <span>Interactive preview</span></div>
           <DialogTitle>{project.title}</DialogTitle>
           <DialogDescription>Explore the {project.steps}-step walkthrough using the step list or the Back and Next buttons.</DialogDescription>
         </div>

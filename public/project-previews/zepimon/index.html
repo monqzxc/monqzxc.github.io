@@ -1,0 +1,86 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../embed.js"></script></head><body>
+<title>Zepimon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="walkthrough.css">
+<link rel="stylesheet" href="../embed.css">
+<style>
+:root{--accent:#6C4BC2;--accent-soft:#E8E0FA;--accent-ink:#FFFFFF}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--accent:#B79AFF;--accent-soft:#2A2145;--accent-ink:#171126}}
+:root[data-theme="dark"]{--accent:#B79AFF;--accent-soft:#2A2145;--accent-ink:#171126}
+.device{display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:center}
+.watch{width:210px;height:210px;flex:none;border-radius:50%;background:#101014;color:#F2F0FA;border:8px solid #2B2A33;box-shadow:0 0 0 2px var(--line);display:grid;place-content:center;justify-items:center;gap:4px;text-align:center;padding:16px}
+.watch small{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#A9A2C2;text-transform:uppercase}
+.watch b{font-family:var(--display);font-size:20px;font-weight:700}
+.watch .km{font-family:var(--display);font-size:38px;font-weight:700;line-height:1}
+.watch .btns{display:flex;gap:6px;margin-top:6px}
+.watch .btns span{font-size:11px;font-weight:600;padding:5px 12px;border-radius:999px;background:#B79AFF;color:#171126}
+.watch .btns span+span{background:#8DC9F2;color:#0C1A2C}
+.egg{width:36px;height:44px;border-radius:50% 50% 46% 46%/60% 60% 40% 40%;background:linear-gradient(160deg,#C7B6FF,#6C4BC2)}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.flow div{border:1px solid var(--line);border-radius:8px;padding:12px 8px;text-align:center;font-size:12.5px;font-weight:600;position:relative}
+.flow div small{display:block;font-weight:400;color:var(--muted);font-size:11.5px;margin-top:2px}
+.flow div.on{border-color:var(--accent);background:var(--accent-soft)}
+@media (max-width:560px){.device{grid-template-columns:1fr;justify-items:center}.watch{width:200px;height:200px}.flow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">Portfolio · Personal project</div>
+    <h1>Zepimon</h1>
+    <p class="lede">A Pokémon walking game for Amazfit watches. Pick an egg, then walk or run: it hatches at 5 km and evolves as you keep going. A companion phone app holds the Dex, journal, missions and Legendary Expeditions, and everything works offline.</p>
+    <div class="stack"><span>Zepp OS watch app</span><span>Expo / React Native</span><span>Supabase sync</span><span>Phone GPS</span><span>Offline-first</span></div>
+  </header>
+  <div id="walkthrough"></div>
+  <p class="foot">Screens are simplified recreations with sample progress. A fan project; Pokémon is a trademark of its owners.</p>
+</div>
+
+<script>
+// Each step: t = title, d = one-line description, url = fake address bar, html = the mock screen.
+window.WALKTHROUGH = {
+  name: "Zepimon",
+  host: "zepimon.example",
+  steps:[
+  {t:"Pick an egg", d:"Choose on the watch, then walk or run", url:"watch/title",
+   html:`<div class="sh"><div><h2>Start an adventure</h2><p>Amazfit Bip 5 Unity · watch app</p></div><span class="pill acc">1 in 50 Shiny</span></div>
+   <div class="device">
+    <div class="watch"><small>Next egg</small><span class="egg" aria-hidden="true"></span><b>Gible</b><small>Today 2.3 km</small><div class="btns"><span>Walk</span><span>Run</span></div></div>
+    <div class="box"><h3>Evolution path</h3><ul class="timeline">
+     <li><span>Hatches into Gible</span><time>5 km</time></li>
+     <li><span>Evolves to Gabite</span><time>10 km</time></li>
+     <li><span>Evolves to Garchomp</span><time>15 km</time></li>
+     <li><span>Mega Garchomp, if chosen</span><time>21 km</time></li>
+    </ul></div>
+   </div>`},
+  {t:"Walk to hatch", d:"Distance is the only currency", url:"watch/adventure",
+   html:`<div class="sh"><div><h2>Adventure in progress</h2><p>Keeps counting with the app closed</p></div><span class="pill ok">● Hatched</span></div>
+   <div class="device">
+    <div class="watch"><small>Gible · walking</small><span class="km">7.42</span><small>km · 1:31:08</small><small>Next: evolve at 10 km</small></div>
+    <div class="grid2" style="align-self:stretch">
+     <div class="box"><h3>To next milestone</h3><span class="big mono">2.58</span><span class="muted" style="font-size:13px"> km</span><div class="bar" style="margin-top:10px"><i style="width:48%"></i></div></div>
+     <div class="box"><h3>Personal bests</h3><dl class="kv"><dt>Highest distance</dt><dd class="mono">21.3 km</dd><dt>Fastest 5 km hatch</dt><dd class="mono">38:12</dd><dt>Steps today</dt><dd class="mono">10,284</dd></dl></div>
+    </div>
+   </div>`},
+  {t:"Sync to phone", d:"Watch, Zepp app, cloud, phone", url:"phone/sync",
+   html:`<div class="sh"><div><h2>Sync</h2><p>Signed in with an email code · watch linked</p></div><span class="pill ok">Synced 1 min ago</span></div>
+   <div class="flow"><div>Watch<small>saves adventure</small></div><div>Zepp app<small>uploads progress</small></div><div>Zepimon cloud<small>Supabase</small></div><div class="on">Phone app<small>Dex updated</small></div></div>
+   <div class="grid2">
+    <div class="box"><h3>Trainer card</h3><dl class="kv"><dt>Dex entries</dt><dd class="mono">214</dd><dt>New from watch</dt><dd>Gible, Gabite</dd><dt>Last watch sync</dt><dd>Today, 7:42 PM</dd></dl></div>
+    <div class="box"><h3>No account?</h3><p class="muted" style="margin:0;font-size:13px">Export JSON from the Zepp app and paste it in. Importing the same export twice never double-counts.</p></div>
+   </div>`},
+  {t:"Collect & explore", d:"Dex, missions and expeditions", url:"phone/journal",
+   html:`<div class="done-banner"><span class="stamp">Dex 214 / 552</span><div><b>Buddy: Garchomp</b><span>6 Shiny · 12 Mega forms · 3 of 39 Legendaries</span></div></div>
+   <div class="grid2">
+    <div class="box"><h3>Weekly missions</h3><ul class="check">
+     <li><span class="tick">✓</span><span>Walk 20 km this week</span><span class="mono muted">20/20</span></li>
+     <li><span class="tick pend">!</span><span>Hatch 3 eggs</span><span class="mono muted">2/3</span></li>
+     <li><span class="tick pend">!</span><span>One run over 10 km</span><span class="mono muted">7.4</span></li>
+    </ul></div>
+    <div class="box"><h3>Legendary Expedition</h3><span class="big mono">18.6</span><span class="muted" style="font-size:13px"> / 25 km</span><div class="bar" style="margin-top:10px"><i style="width:74%"></i></div><p class="muted" style="margin:10px 0 0;font-size:13px">Second clue found. Clear a Legendary Trial, then battle and catch.</p></div>
+   </div>`}
+  ]
+};
+</script>
+<script src="walkthrough.js"></script>
+
+</body></html>

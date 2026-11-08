@@ -1,7 +1,17 @@
 export const projects = [
   {
-    id: "application-exam-management",
+    id: "tesda-track",
     number: "01",
+    category: "AI career guidance",
+    title: "TESDA-TRACK",
+    summary: "Match a learner's goal, in English, Filipino or Taglish, to TESDA qualifications with a local embedding model, then rank nearby training with an explained score.",
+    tags: ["FastAPI + PostgreSQL", "pgvector embeddings", "React 19"],
+    steps: 4,
+    tone: "recruitment",
+  },
+  {
+    id: "application-exam-management",
+    number: "02",
     category: "Recruitment & assessment",
     title: "Application Exam Management",
     summary: "From a competency-based question bank to randomized applicant exams and automatically scored results.",
@@ -11,7 +21,7 @@ export const projects = [
   },
   {
     id: "hris-process",
-    number: "02",
+    number: "03",
     category: "People & operations",
     title: "HRIS Process",
     summary: "Connect offices, plantilla positions, employee records, and daily time records in one personnel workflow.",
@@ -21,7 +31,7 @@ export const projects = [
   },
   {
     id: "job-application",
-    number: "03",
+    number: "04",
     category: "Talent acquisition",
     title: "Job Application",
     summary: "Follow an applicant from finding an opening and submitting requirements through assessment and appointment.",
@@ -31,7 +41,7 @@ export const projects = [
   },
   {
     id: "pcr-management",
-    number: "04",
+    number: "05",
     category: "Performance management",
     title: "PCR Management",
     summary: "Set office commitments, track monthly accomplishments, rate performance, and approve the final report.",
@@ -41,7 +51,7 @@ export const projects = [
   },
   {
     id: "pds-generation",
-    number: "05",
+    number: "06",
     category: "Document automation",
     title: "PDS Generation",
     summary: "Turn personal information, education, work history, and training records into a print-ready Personal Data Sheet.",
@@ -51,7 +61,7 @@ export const projects = [
   },
   {
     id: "arta-client-survey",
-    number: "06",
+    number: "07",
     category: "Client satisfaction",
     title: "ARTA Client Survey",
     summary: "Collect client feedback through office QR links, monitor responses, and generate regional or nationwide satisfaction reports.",
@@ -61,7 +71,20 @@ export const projects = [
   },
 ] as const;
 
-export type Project = (typeof projects)[number];
+export const personalProjects = [
+  {
+    id: "zepimon",
+    number: "01",
+    category: "Wearable game",
+    title: "Zepimon",
+    summary: "A Pokémon walking game for Amazfit watches. Eggs hatch at 5 km and evolve as you go, with a phone app for the Dex, missions and expeditions.",
+    tags: ["Zepp OS watch app", "Expo / React Native", "Supabase sync"],
+    steps: 4,
+    tone: "hris",
+  },
+] as const;
+
+export type Project = (typeof projects)[number] | (typeof personalProjects)[number];
 
 export function projectPreviewUrl(project: Project) {
   return `/project-previews/${project.id}/index.html`;
