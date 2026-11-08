@@ -162,6 +162,19 @@
   letter-spacing: .04em;
 }
 
+.certCard .certDate {
+  margin-top: 4px;
+  color: var(--muted-foreground);
+  font: 12px/1.5 var(--font-sans);
+  letter-spacing: 0;
+}
+
+.certLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
 .verifyLink {
   display: inline-flex;
   align-items: center;

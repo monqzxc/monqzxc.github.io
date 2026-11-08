@@ -6,6 +6,17 @@ export type CvData = {
   summary: string; skills: string; eligibility: string; interests: string;
   experience: CvEntry[]; projects: CvEntry[]; education: CvEntry[]; certifications: CvEntry[]; training: CvEntry[]; awards: CvEntry[];
 };
+export type Certificate = { title: string; issuer: string; issued: string; coursera: string; credly?: string };
+export const googleCertificates: Certificate[] = [
+  { title: "AI for Brainstorming and Planning", issuer: "Google · Coursera", issued: "November 2026", coursera: "https://coursera.org/share/e977a9e6e7b7095763b3e862b1f5977d", credly: "https://www.credly.com/badges/532d2afd-c52d-4d2d-b1e6-65ea3b84f17a/public_url" },
+  { title: "AI Fundamentals", issuer: "Google · Coursera", issued: "November 2026", coursera: "https://coursera.org/share/0d8d5f9248de0db99df050f69da8e513", credly: "https://www.credly.com/badges/5a8a5a26-4b14-4862-bc84-cef03e076c53/public_url" },
+  { title: "AI for App Building", issuer: "Google · Coursera", issued: "October 2025", coursera: "https://coursera.org/share/d1532b27755e5c4fb2212477622f5294", credly: "https://www.credly.com/badges/7d7e3443-3fb6-45be-b898-c6b859b4c9c1/public_url" },
+  { title: "Foundations: Data, Data, Everywhere", issuer: "Google · Coursera", issued: "February 2025", coursera: "https://coursera.org/share/78af210e6c4c5d485cd4eb9ca40b6dae" },
+];
+const certificateEntry = (title: string) => {
+  const cert = googleCertificates.find(c => c.title === title)!;
+  return { title: cert.title, organization: cert.issuer, period: cert.issued, details: "", url: cert.coursera };
+};
 export const blankEntry = (): CvEntry => ({ title: "", organization: "", period: "", details: "" });
 export const blankCv = (): CvData => ({
   name: "", role: "", email: "", phone: "", location: "", website: "", summary: "", skills: "", eligibility: "", interests: "",
@@ -13,12 +24,12 @@ export const blankCv = (): CvData => ({
 });
 export const monCv: CvData = {
   name: "Anthony Cabigayan", role: "Software Engineer", email: "suppmon27@gmail.com", phone: "", location: "Manila, Philippines", website: "github.com/monqzxc",
-  summary: "Software engineer focused on dependable enterprise systems and clear digital workflows. Builds Laravel and Vue applications for public-sector performance management, recruitment, personnel records, and document automation.",
-  skills: "PHP / Laravel\nVue.js / Inertia.js\nJavaScript / React / Next.js\nMySQL\nDocker / Git\nPDF generation / Workflow design\nAI-assisted app building\nAI for brainstorming and planning\nData analysis fundamentals",
+  summary: "Full-stack developer focused on dependable enterprise systems and clear digital workflows. Builds Laravel, Vue, and Python applications for public-sector performance management, recruitment, personnel records, document automation, and AI-driven training recommendations.",
+  skills: "PHP / Laravel\nPython / FastAPI\nVue.js / Inertia.js\nJavaScript / React / Next.js\nMySQL / PostgreSQL\nDocker / Git\nPDF generation / Workflow design\nAI-assisted app building\nAI for brainstorming and planning\nData analysis fundamentals",
   eligibility: "Career Service Professional\nMarch 13, 2022 · Muntinlupa\nRating: 82.5%",
   interests: "Traveling, running, watching anime, gaming, and reading.",
   experience: [
-    { title: "Programmer (Back-end Developer)", organization: "TESDA", period: "November 2022 - Present", details: "Develop enterprise applications using Laravel, Vue, and Inertia.\nBuild performance management, recruitment, and HRIS workflows.\nAutomate Personal Data Sheets and supporting employee documents." },
+    { title: "Full-Stack Developer", organization: "TESDA", period: "November 2022 - Present", details: "Stack: Laravel 12, Vue 3 + Inertia, Python / FastAPI, React, MySQL, PostgreSQL + pgvector, Docker.\nBuilt TESDA-TRACK, an AI-driven training and assessment center recommender using a fine-tuned multilingual embedding model.\nBuilt PCR Management, HRIS, Application Exam Management, Job Application, and ARTA Client Survey systems.\nAutomated Personal Data Sheet generation with QR verification." },
     { title: "Freelance work", organization: "Independent", period: "April 2022 - October 2022", details: "" },
     { title: "IT Support Staff", organization: "TESDA Region IV-A", period: "January 2020 - March 2022", details: "" },
   ],
@@ -30,16 +41,15 @@ export const monCv: CvData = {
     { title: "BS in Computer Science", organization: "St. Nicolas College of Business and Technology", period: "June 2016 - March 2019", details: "" },
     { title: "2-year Computer Programming", organization: "St. Nicolas College of Business and Technology", period: "June 2014 - April 2016", details: "" },
   ],
-  certifications: [
-    { title: "AI for Brainstorming and Planning", organization: "Google · Coursera", period: "", details: "", url: "https://www.credly.com/badges/532d2afd-c52d-4d2d-b1e6-65ea3b84f17a/public_url" },
-    { title: "AI Fundamentals", organization: "Google · Coursera", period: "", details: "", url: "https://www.credly.com/badges/5a8a5a26-4b14-4862-bc84-cef03e076c53/public_url" },
-    { title: "AI for App Building", organization: "Google · Coursera", period: "", details: "", url: "https://www.credly.com/badges/7d7e3443-3fb6-45be-b898-c6b859b4c9c1/public_url" },
-    { title: "Foundations: Data, Data, Everywhere", organization: "Google · Coursera", period: "", details: "" },
-  ],
+  certifications: [],
   training: [
+    certificateEntry("AI for Brainstorming and Planning"),
+    certificateEntry("AI Fundamentals"),
     { title: "Responsible and Ethical Use of Generative AI", organization: "DICT Region 5", period: "October 13, 2025 · 2 hours", details: "" },
+    certificateEntry("AI for App Building"),
     { title: "Introduction to IT Acquisition", organization: "University of the Philippines System - ITDC", period: "September 3, 2025 · 2 hours", details: "" },
     { title: "Introduction to IT Project Management", organization: "University of the Philippines System - ITDC", period: "August 6, 2025 · 2 hours", details: "" },
+    certificateEntry("Foundations: Data, Data, Everywhere"),
     { title: "Architecting on AWS", organization: "Trainocate", period: "January 22-24, 2025 · 24 hours", details: "" },
     { title: "Technical Essentials on AWS", organization: "Trainocate", period: "January 20, 2025 · 8 hours", details: "" },
   ],
