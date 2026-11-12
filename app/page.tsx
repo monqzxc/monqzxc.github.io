@@ -1,4 +1,5 @@
-import Portfolio from "@/components/portfolio";
+import BentoBoard from "@/components/bento-board";
+
 export default function Home() {
-  return <Portfolio />;
+  return <BentoBoard />;
 }

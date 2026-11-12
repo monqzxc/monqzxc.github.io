@@ -1,19 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, FileText, Mail, Play, Sparkles } from "lucide-react";
+import { ArrowRight, FileText, Mail, Play, Sparkles } from "lucide-react";
 import ContactModal from "@/components/contact-modal";
 import { PokemonArt } from "@/components/pokemon-art";
 import { PokemonHabitat, ThemeSelector } from "@/components/pokemon-theme";
 import { GAMES_HREF, games } from "@/lib/games";
+import { PORTFOLIO_HREF } from "@/lib/navigation";
 import { personalProjects, projects } from "@/lib/projects";
 import styles from "./bento-board.module.css";
 
 const projectCount = projects.length + personalProjects.length;
 
 const railLinks = [
-  { href: "/#projects", label: "Work" },
-  { href: "/#timeline", label: "Journey" },
+  { href: `${PORTFOLIO_HREF}#projects`, label: "Work" },
+  { href: `${PORTFOLIO_HREF}#timeline`, label: "Journey" },
   { href: GAMES_HREF, label: "Games" },
   { href: "/cv", label: "CV" },
 ] as const;
@@ -45,9 +46,9 @@ export default function BentoBoard() {
     <div className={styles.page}>
       <PokemonHabitat />
       <header className={styles.topbar}>
-        <a className={styles.back} href="/">
-          <ArrowLeft size={16} aria-hidden="true" />
+        <a className={styles.back} href={PORTFOLIO_HREF}>
           Full portfolio
+          <ArrowRight size={16} aria-hidden="true" />
         </a>
         <ThemeSelector />
       </header>
@@ -99,7 +100,7 @@ export default function BentoBoard() {
           <p className={styles.title} aria-hidden="true">Portfolio</p>
 
           <div className={styles.grid}>
-            <a className={`${styles.card} ${styles.tile} ${styles.media}`} href="/#projects">
+            <a className={`${styles.card} ${styles.tile} ${styles.media}`} href={`${PORTFOLIO_HREF}#projects`}>
               <img src="/images/mon-pokemon-hero.png" alt="" width="1254" height="1254" />
               <span className={styles.play} aria-hidden="true"><Play size={20} fill="currentColor" /></span>
               <span className={styles.mediaCaption}>
@@ -109,11 +110,11 @@ export default function BentoBoard() {
             </a>
 
             <div className={styles.stats}>
-              <a className={`${styles.card} ${styles.tile} ${styles.stat} ${styles.statTop}`} href="/#projects">
+              <a className={`${styles.card} ${styles.tile} ${styles.stat} ${styles.statTop}`} href={`${PORTFOLIO_HREF}#projects`}>
                 <strong>{projectCount}</strong>
                 <span>Projects</span>
               </a>
-              <a className={`${styles.card} ${styles.tile} ${styles.stat} ${styles.statBottom}`} href="/#timeline">
+              <a className={`${styles.card} ${styles.tile} ${styles.stat} ${styles.statBottom}`} href={`${PORTFOLIO_HREF}#timeline`}>
                 <strong>7+</strong>
                 <span>Years building</span>
               </a>
@@ -129,7 +130,7 @@ export default function BentoBoard() {
                 <img src="/images/puzzle/gengar.png" alt="" width="475" height="475" loading="lazy" />
                 <span className={styles.splitTag}><Play size={11} fill="currentColor" aria-hidden="true" />{games.length} mini-games</span>
               </a>
-              <a className={`${styles.tile} ${styles.splitInfo}`} href="/#timeline">
+              <a className={`${styles.tile} ${styles.splitInfo}`} href={`${PORTFOLIO_HREF}#timeline`}>
                 <strong>2019</strong>
                 <span>WorldSkills Kazan<br /><b>Team Philippines.</b></span>
               </a>
