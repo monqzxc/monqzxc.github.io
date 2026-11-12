@@ -20,13 +20,17 @@
   --radius: 22px;
   --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
 
+  /* The habitat is fixed behind the page; let clicks in the margins reach the Pokémon. */
+  position: relative;
+  isolation: isolate;
+  pointer-events: none;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 20px;
-  padding: 24px 24px 48px;
+  padding: 24px 24px 104px;
 }
 
 :global([data-pokemon-theme="gible"]) .page {
@@ -50,7 +54,10 @@
 
 .topbar,
 .board {
+  position: relative;
+  z-index: 1;
   width: min(1180px, 100%);
+  pointer-events: auto;
 }
 
 .topbar {
@@ -82,8 +89,10 @@
   padding: 52px 60px 52px 28px;
   border: 1px solid var(--board-edge);
   border-radius: 28px;
-  background: var(--board);
-  box-shadow: 0 40px 80px -48px #000;
+  background: color-mix(in srgb, var(--board) 58%, transparent);
+  -webkit-backdrop-filter: blur(5px) saturate(1.15);
+  backdrop-filter: blur(5px) saturate(1.15);
+  box-shadow: 0 40px 80px -48px #000, inset 0 1px 0 #ffffff14;
 }
 
 /* Vertical section rail */
@@ -594,9 +603,28 @@
   }
 }
 
-@media (max-width: 600px) {
+/* On narrow screens the habitat is an in-flow stage (see pokemon-habitat.css);
+   place it under the board so every Pokémon stays tappable. */
+@media (max-width: 760px) {
   .page {
-    padding: 12px 12px 32px;
+    padding-bottom: 0;
+  }
+
+  .page > :global(.pokemon-habitat) {
+    order: 3;
+    align-self: stretch;
+    margin: 0 -24px;
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .page > :global(.pokemon-habitat) {
+    margin-inline: -12px;
+  }
+
+  .page {
+    padding: 12px 12px 0;
     justify-content: flex-start;
   }
 
@@ -685,5 +713,11 @@
   .card:has(.tile:active),
   .card.tile:active {
     transform: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .board {
+    background: color-mix(in srgb, var(--board) 88%, transparent);
   }
 }

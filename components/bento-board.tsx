@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ArrowLeft, FileText, Mail, Play, Sparkles } from "lucide-react";
 import ContactModal from "@/components/contact-modal";
 import { PokemonArt } from "@/components/pokemon-art";
-import { ThemeSelector } from "@/components/pokemon-theme";
+import { PokemonHabitat, ThemeSelector } from "@/components/pokemon-theme";
 import { GAMES_HREF, games } from "@/lib/games";
 import { personalProjects, projects } from "@/lib/projects";
 import styles from "./bento-board.module.css";
@@ -43,6 +43,7 @@ export default function BentoBoard() {
 
   return (
     <div className={styles.page}>
+      <PokemonHabitat />
       <header className={styles.topbar}>
         <a className={styles.back} href="/">
           <ArrowLeft size={16} aria-hidden="true" />
