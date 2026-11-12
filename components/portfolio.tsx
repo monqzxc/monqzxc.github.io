@@ -62,5 +62,5 @@ export default function Portfolio() {
       </div>
     </div>
   </section></main>
-  <footer className={`footer ${styles.pageFooter}`}><div className="shell"><div className="footer-left"><span className="footer-mark">mon.</span><p>© {new Date().getFullYear()} Anthony Cabigayan</p></div><div className="footer-right"><span>Thoughtfully built in the Philippines.</span><a href="#about">Back to top <ArrowUp size={14}/></a></div></div></footer><FloatingMenu active={active} onContact={()=>setContactOpen(true)}/><ContactModal open={contactOpen} onClose={()=>setContactOpen(false)}/></div>;
+  <footer className={`footer ${styles.pageFooter}`}><div className="shell"><div className="footer-left"><span className="footer-mark">mon.</span><p>© {new Date().getFullYear()} Anthony Cabigayan</p></div><div className="footer-right"><span>Thoughtfully built in the Philippines.</span><a href="/">Trainer card <ArrowUpRight size={14}/></a><a href="#about">Back to top <ArrowUp size={14}/></a></div></div></footer><FloatingMenu active={active} onContact={()=>setContactOpen(true)}/><ContactModal open={contactOpen} onClose={()=>setContactOpen(false)}/></div>;
 }

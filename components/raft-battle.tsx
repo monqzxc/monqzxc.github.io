@@ -193,7 +193,7 @@ export default function RaftBattle() {
       <a className="skip-link" href="#raft-main">Skip to game</a>
       <header className="raft-topbar">
         <a href="/" className="wordmark" aria-label="Mon home"><strong>mon<span>.</span></strong><span className="raft-wordmark-label">Playground</span></a>
-        <nav aria-label="Playground navigation"><a href={GAMES_HREF}><Gamepad2 size={16} /> All games</a><a href="/#craft-hobbies"><ArrowLeft size={16} /><span>Portfolio</span></a></nav>
+        <nav aria-label="Playground navigation"><a href={GAMES_HREF}><Gamepad2 size={16} /> All games</a><a href="/portfolio/#craft-hobbies"><ArrowLeft size={16} /><span>Portfolio</span></a></nav>
       </header>
       <main id="raft-main" className="raft-main">
         <div className="raft-intro"><div><h1>Poké <span>Raft.</span></h1><p>A friendly rivalry. A perfectly aimed shot. A very big splash.</p></div><span className="raft-mode-note"><Clock3 size={16} /> Two minutes. Make your move.</span></div>
