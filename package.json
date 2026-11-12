@@ -15,6 +15,8 @@
     "test:laser": "node --experimental-strip-types --test scripts/check-laser-grid.mjs",
     "test:raft": "node --experimental-strip-types --test scripts/check-raft-battle.mjs",
     "test:raft:online": "node --experimental-strip-types --test scripts/check-raft-online.mjs",
+    "test:pokemon": "node --experimental-strip-types --test scripts/check-pokemon-behavior.mjs",
+    "build:sprites": "node --experimental-strip-types scripts/build-habitat-sprites.mjs",
     "multiplayer": "node --experimental-strip-types server/raft-server.mjs",
     "multiplayer:install": "npm ci --prefix server",
     "generate:cv": "node scripts/generate-cv.mjs"

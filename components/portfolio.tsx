@@ -12,7 +12,7 @@ import { googleCertificates, monCv } from "@/lib/cv-data";
 import VueCraft from "@/components/vue-craft";
 import Hero from "@/components/hero";
 import { PokemonHabitat, ThemeSelector } from "@/components/pokemon-theme";
-import { PokemonArt } from "@/components/pokemon-art";
+import { PokemonSprite } from "@/components/pokemon-sprite";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import styles from "./portfolio.module.css";
 
@@ -52,8 +52,8 @@ export default function Portfolio() {
       <div className="contact-links">
         <div className={styles.party}>
           <div className={styles.companions} aria-hidden="true">
-            {(["gengar", "gible", "sandshrew"] as const).map(species => (
-              <span className={styles.companion} key={species}><PokemonArt species={species} happy /></span>
+            {(["gengar", "gible", "flygon"] as const).map(species => (
+              <span className={styles.companion} key={species}><PokemonSprite species={species} /></span>
             ))}
           </div>
           <span className={styles.partyCaption}>Ready for the next quest</span>

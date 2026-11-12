@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ArrowRight, FileText, Mail, Play, Sparkles } from "lucide-react";
 import ContactModal from "@/components/contact-modal";
-import { PokemonArt } from "@/components/pokemon-art";
+import { PokemonSprite } from "@/components/pokemon-sprite";
 import { PokemonHabitat, ThemeSelector } from "@/components/pokemon-theme";
 import { GAMES_HREF, games } from "@/lib/games";
 import { PORTFOLIO_HREF } from "@/lib/navigation";
@@ -68,8 +68,8 @@ export default function BentoBoard() {
           <div className={styles.profileBody}>
             <div className={styles.portrait} aria-hidden="true">
               <span className={styles.portraitDisc} />
-              <PokemonArt species="gengar" happy className={`${styles.partner} ${styles.partnerGengar}`} />
-              <PokemonArt species="gible" happy className={`${styles.partner} ${styles.partnerGible}`} />
+              <PokemonSprite species="gengar" className={`${styles.partner} ${styles.partnerGengar}`} />
+              <PokemonSprite species="gible" className={`${styles.partner} ${styles.partnerGible}`} />
             </div>
             <h1 id="bento-name" className={styles.name}>
               <span className={styles.nameIntro}>I’m,</span>
