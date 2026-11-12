@@ -1,0 +1,111 @@
+/* Mon's pixel handheld. Tones follow the active Pokémon theme. */
+.console {
+  --c-outline: #1a1426;
+  --c-body: #c8beec;
+  --c-light: #ece7ff;
+  --c-shade: #968ac4;
+  --c-bezel: #342e48;
+  --c-stripe-a: #a77cff;
+  --c-stripe-b: #ff9ad6;
+  --c-led: #ff465a;
+  --c-lcd: #c4d696;
+  --c-button: #d64a96;
+  --c-button-light: #ffaad2;
+  --c-pad: #221c30;
+  --c-pad-light: #504868;
+
+  position: absolute;
+  top: 12px;
+  bottom: 34px;
+  left: 50%;
+  aspect-ratio: 36 / 52;
+  translate: -50% 0;
+  filter: drop-shadow(0 12px 14px #0008);
+  transform: rotate(-4deg);
+  transition: transform .5s cubic-bezier(.22, 1, .36, 1);
+}
+
+:global([data-pokemon-theme="gible"]) .console {
+  --c-body: #ead29e;
+  --c-light: #fff4d8;
+  --c-shade: #b8975e;
+  --c-bezel: #3a3024;
+  --c-stripe-a: #e3874f;
+  --c-stripe-b: #8dc9f2;
+  --c-button: #c9553a;
+  --c-button-light: #f4a184;
+}
+
+.shell {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.toneo { fill: var(--c-outline); }
+.toneb { fill: var(--c-body); }
+.toneh, .tonem { fill: var(--c-light); }
+.tones { fill: var(--c-shade); }
+.tonek { fill: var(--c-bezel); }
+.tonex { fill: var(--c-stripe-a); }
+.toney { fill: var(--c-stripe-b); }
+.toner { fill: var(--c-led); }
+.tonel { fill: var(--c-lcd); }
+.tonea { fill: var(--c-button); }
+.toneA { fill: var(--c-button-light); }
+.toned { fill: var(--c-pad); }
+.toneD { fill: var(--c-pad-light); }
+
+/* LCD: the partner shows in four-shade green, then switches to colour on hover. */
+.screen {
+  position: absolute;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, #0f380f14 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+.partner {
+  width: auto;
+  height: 92%;
+  filter: grayscale(1) sepia(1) hue-rotate(40deg) saturate(2.2) brightness(.55) contrast(1.6);
+  transition: filter .3s steps(3);
+}
+
+.partnerGible,
+:global([data-pokemon-theme="gible"]) .partnerGengar {
+  display: none;
+}
+
+:global([data-pokemon-theme="gible"]) .partnerGible {
+  display: block;
+}
+
+:global(a:hover) > .console,
+:global(a:focus-visible) > .console {
+  transform: rotate(0deg) scale(1.08) translateY(-4px);
+}
+
+:global(a:hover) > .console .partner,
+:global(a:focus-visible) > .console .partner {
+  filter: none;
+}
+
+:global(a:hover) > .console .toner {
+  fill: #ff8a96;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .console,
+  .partner {
+    transition: none;
+  }
+}

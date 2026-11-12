@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, ArrowUpRight, Menu, X, Trophy, Code2, Building2, Layers, BadgeCheck } from "lucide-react";
+import { ArrowUp, ArrowUpRight, BadgeCheck, Building2, Code2, Home, Layers, Menu, Trophy, X } from "lucide-react";
 import ProjectCard from "@/components/project-card";
 import GamesTeaser from "@/components/games-teaser";
 import FloatingMenu from "@/components/floating-menu";
@@ -17,50 +17,142 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import styles from "./portfolio.module.css";
 
 const milestones = [
-  { year: "2018", icon: Trophy, title: "ASEAN Skills Competition Bangkok 2018", text: "Awarded a Medallion for Excellence, recognizing scores that meet the standard of excellence, independent of podium placings.", type: "MEDALLION FOR EXCELLENCE" },
-  { year: "2019", icon: Trophy, title: "WorldSkills Kazan", text: "Represented Team Philippines in IT Software Solutions for Business at the 45th WorldSkills Competition in Kazan, Russia.", type: "THE GLOBAL STAGE", link: monCv.awards.find(award => award.title === "WorldSkills Kazan")?.url },
-  { year: "2020", icon: Building2, title: "Building for the public sector", text: "Joined TESDA, working on the systems behind human resources and everyday agency operations.", type: "TESDA · PHILIPPINES" },
-  { year: "2022", icon: Code2, title: "A more connected stack", text: "Brought Laravel, Vue, and Inertia together to build reactive interfaces on a reliable backend.", type: "STACK MODERNIZATION" },
-  { year: "2024—now", icon: Layers, title: "Full-stack, from Laravel to AI", text: "As a Full-Stack Developer, building performance management, recruitment, and personnel platforms with Laravel 12 and Vue, and TESDA-TRACK, an AI-driven training and assessment center recommender in Python.", type: "FULL-STACK DEVELOPMENT" },
+  { year: "2018", icon: Trophy, title: "ASEAN Skills Competition, Bangkok", text: "Medallion for Excellence." },
+  { year: "2019", icon: Trophy, title: "WorldSkills Kazan", text: "Represented the Philippines in IT Software Solutions for Business.", link: monCv.awards.find(award => award.title === "WorldSkills Kazan")?.url },
+  { year: "2020", icon: Building2, title: "Joined TESDA", text: "Started building HR and operations systems for the public sector." },
+  { year: "2022", icon: Code2, title: "Laravel, Vue and Inertia", text: "Moved our apps to reactive interfaces on a dependable backend." },
+  { year: "2024—now", icon: Layers, title: "Full-stack, Laravel to AI", text: "Performance, recruitment and personnel platforms, plus TESDA-TRACK, an AI recommender in Python." },
 ];
+
 export default function Portfolio() {
   const revealRef = useScrollReveal();
-  const [menuOpen,setMenuOpen] = useState(false);
-  const [contactOpen,setContactOpen] = useState(false);
-  const [active,setActive] = useState("about");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [active, setActive] = useState("about");
   const menuButton = useRef<HTMLButtonElement>(null);
-  useEffect(()=>{const sections=document.querySelectorAll("main section[id]");const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting)setActive(entry.target.id);});},{rootMargin:"-20% 0px -60% 0px",threshold:0});sections.forEach(section=>observer.observe(section));return()=>observer.disconnect();},[]);
-  useEffect(()=>{if(!menuOpen)return;const close=(e:KeyboardEvent)=>{if(e.key==="Escape"){setMenuOpen(false);menuButton.current?.focus();}};window.addEventListener("keydown",close);return()=>window.removeEventListener("keydown",close);},[menuOpen]);
-  const links=portfolioSections.map(({id,label})=>[id,label]);
-  return <div className="portfolio-page"><a className="skip-link" href="#main">Skip to content</a><header className="site-header"><nav className="shell nav" aria-label="Main navigation"><a className="wordmark" href="#about" aria-label="Mon — back to top"><strong>mon<span>.</span></strong><span className="brand-caption">ANTHONY CABIGAYAN<br/>SOFTWARE ENGINEER</span></a><button className="menu-toggle" ref={menuButton} aria-label={menuOpen?"Close menu":"Open menu"} aria-expanded={menuOpen} aria-controls="site-navigation" onClick={()=>setMenuOpen(!menuOpen)}>{menuOpen?<X size={22}/>:<Menu size={22}/>}</button><div id="site-navigation" className={`nav-links ${menuOpen?"open":""}`}>{links.map(([id,label])=><a className={active===id?"active":""} key={id} href={`#${id}`} onClick={()=>setMenuOpen(false)} aria-current={active===id?"location":undefined}>{label}</a>)}<a href="/cv" onClick={()=>setMenuOpen(false)}>CV Studio</a><button className={`nav-contact ${styles.navContact}`} type="button" aria-haspopup="dialog" onClick={event=>{(menuOpen?menuButton.current:event.currentTarget)?.focus({preventScroll:true});setMenuOpen(false);setContactOpen(true);}}>Let’s talk <ArrowUpRight size={16}/></button></div><ThemeSelector/></nav></header><PokemonHabitat/>
-  <main id="main" ref={revealRef}><Hero onContact={()=>setContactOpen(true)}/>
-  <div className="tech-strip"><div className="shell"><span className="tech-label">TOOLS OF<br/>THE TRADE</span>{[["◇","Laravel"],["P","Python"],["∨","Vue.js"],["↗","Inertia.js"],["⌘","React"],["N","Next.js"],["▱","Docker"],["✦","AI-assisted dev"]].map(([symbol,label])=><span className="tech-item" key={label}><span aria-hidden="true" className="tech-symbol">{symbol}</span>{label}</span>)}</div></div>
-  <section id="projects" className="shell section"><div className="section-heading"><div><div className="eyebrow"><span className="short-line"/>01 / SELECTED WORK</div><h2>Real workflows.<br/><span>Thoughtful solutions.</span></h2></div><p>Seven systems built for public service. Open a preview to explore the workflow, from the first step to the final result.</p></div><div className="project-grid">{projects.map(project=><ProjectCard key={project.id} project={project}/>)}</div>
-    <div className={styles.personalHeading}><h3>Personal projects</h3><p>Built after hours, for fun.</p></div><div className="project-grid">{personalProjects.map(project=><ProjectCard key={project.id} project={project} group="Personal project"/>)}</div></section>
-  <div className="shell about-band"><div><div className="eyebrow"><span className="short-line"/>THE WAY I BUILD</div><h2>Good software starts<br/>with understanding.</h2></div><p>From the first conversation to the final deployment, I care about how a system fits into someone’s day. My focus is simple: <strong>clear interfaces, dependable foundations, and workflows that make sense.</strong> That’s the thread connecting my work across Laravel, Vue, and enterprise systems.</p></div>
-  <section id="timeline" className="shell section"><div className="section-heading"><div><div className="eyebrow"><span className="short-line"/>02 / THE JOURNEY</div><h2>Always building. <span>Always learning.</span></h2></div></div><div className="timeline">{milestones.map(({year,icon:Icon,title,text,type,link})=><article className="timeline-row" key={year}><span className="timeline-year">{year}</span><span className="timeline-icon"><Icon/></span><div><h3>{title}</h3><p>{text}</p>{link&&<a className={styles.verifyLink} href={link} target="_blank" rel="noopener noreferrer" aria-label={`Verify ${title} on Credly (opens in a new tab)`}>Verify on Credly <ArrowUpRight size={14} aria-hidden="true"/></a>}</div><span className="timeline-type">{type}</span></article>)}</div>
-    <div className={styles.certifications}><div className={styles.certHeading}><h3 id="certifications-heading">Certifications</h3><p>Recent coursework in AI and data.</p></div><ul className={styles.certGrid}>{googleCertificates.map(({title,issuer,issued,coursera,credly})=><li className={styles.certCard} key={title}><span className={styles.certIcon} aria-hidden="true"><BadgeCheck/></span><div><h4>{title}</h4><p>{issuer}</p><p className={styles.certDate}>{issued}</p><div className={styles.certLinks}>{credly&&<a className={styles.verifyLink} href={credly} target="_blank" rel="noopener noreferrer" aria-label={`Verify ${title} on Credly (opens in a new tab)`}>Credly <ArrowUpRight size={14} aria-hidden="true"/></a>}<a className={styles.verifyLink} href={coursera} target="_blank" rel="noopener noreferrer" aria-label={`View ${title} certificate on Coursera (opens in a new tab)`}>Coursera <ArrowUpRight size={14} aria-hidden="true"/></a></div></div></li>)}</ul></div>
-  </section>
-  <section id="craft-hobbies" className="shell section craft-section"><div className="craft-layout"><div className="craft-intro"><div className="eyebrow"><span className="short-line"/>03 / BEYOND THE TERMINAL</div><h2>Curiosity doesn't<br/>clock out.</h2><p>New places, long runs, anime, and the small experiments that keep me curious.</p></div><VueCraft/></div><GamesTeaser/></section>
-  <section id="contact" className="shell contact-section">
-    <div className="eyebrow"><span className="short-line"/>04 / THE NEXT QUEST</div>
-    <div className="contact-top">
-      <h2>Something in mind?<br/><span>Let’s team up.</span></h2>
-    </div>
-    <div className="contact-bottom">
-      <p>Open to thoughtful collaborations and enterprise projects. Found me on Upwork? Send me a message there to start our next quest.</p>
-      <div className="contact-links">
-        <div className={styles.party}>
-          <div className={styles.companions} aria-hidden="true">
-            {(["gengar", "gible", "flygon"] as const).map(species => (
-              <span className={styles.companion} key={species}><PokemonSprite species={species} /></span>
-            ))}
+
+  useEffect(() => {
+    const sections = document.querySelectorAll("main section[id]");
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (entry.isIntersecting) setActive(entry.target.id); });
+    }, { rootMargin: "-20% 0px -60% 0px", threshold: 0 });
+    sections.forEach(section => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setMenuOpen(false); menuButton.current?.focus(); }
+    };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [menuOpen]);
+
+  const openContact = () => setContactOpen(true);
+
+  return (
+    <div className="portfolio-page">
+      <a className="skip-link" href="#main">Skip to content</a>
+      <header className="site-header">
+        <nav className="shell nav" aria-label="Main navigation">
+          {/* The wordmark leads home to the trainer card. */}
+          <a className="wordmark" href="/" aria-label="Mon — back to the trainer card"><strong>mon<span>.</span></strong><span className="brand-caption">ANTHONY CABIGAYAN<br />SOFTWARE ENGINEER</span></a>
+          <button className="menu-toggle" ref={menuButton} aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} aria-controls="site-navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={22} /> : <Menu size={22} />}</button>
+          <div id="site-navigation" className={`nav-links ${menuOpen ? "open" : ""}`}>
+            {portfolioSections.map(({ id, label }) => <a className={active === id ? "active" : ""} key={id} href={`#${id}`} onClick={() => setMenuOpen(false)} aria-current={active === id ? "location" : undefined}>{label}</a>)}
+            <a href="/cv" onClick={() => setMenuOpen(false)}>CV Studio</a>
+            <button className={`nav-contact ${styles.navContact}`} type="button" aria-haspopup="dialog" onClick={event => { (menuOpen ? menuButton.current : event.currentTarget)?.focus({ preventScroll: true }); setMenuOpen(false); openContact(); }}>Let’s talk <ArrowUpRight size={16} aria-hidden="true" /></button>
           </div>
-          <span className={styles.partyCaption}>Ready for the next quest</span>
+          <ThemeSelector />
+        </nav>
+      </header>
+      <PokemonHabitat />
+
+      <main id="main" ref={revealRef}>
+        <Hero onContact={openContact} />
+
+        <section id="projects" className="shell section">
+          <div className="section-heading">
+            <h2>Selected work</h2>
+            <p>Seven systems built for public service, and one for fun. Open any to click through it.</p>
+          </div>
+          <div className="project-grid">
+            {projects.map(project => <ProjectCard key={project.id} project={project} />)}
+            {personalProjects.map(project => <ProjectCard key={project.id} project={project} group="After hours" />)}
+          </div>
+        </section>
+
+        <section id="timeline" className="shell section">
+          <div className="section-heading"><h2>Journey</h2></div>
+          <ol className="timeline">
+            {milestones.map(({ year, icon: Icon, title, text, link }) => (
+              <li className="timeline-row" key={year}>
+                <span className="timeline-year">{year}</span>
+                <span className="timeline-icon" aria-hidden="true"><Icon /></span>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                  {link && <a className={styles.verifyLink} href={link} target="_blank" rel="noopener noreferrer" aria-label={`Verify ${title} on Credly (opens in a new tab)`}>Verify on Credly <ArrowUpRight size={14} aria-hidden="true" /></a>}
+                </div>
+              </li>
+            ))}
+          </ol>
+          <div className={styles.certifications}>
+            <div className={styles.certHeading}><h3 id="certifications-heading">Certifications</h3></div>
+            <ul className={styles.certGrid} aria-labelledby="certifications-heading">
+              {googleCertificates.map(({ title, issuer, issued, coursera, credly }) => (
+                <li className={styles.certCard} key={title} data-reveal>
+                  <span className={styles.certIcon} aria-hidden="true"><BadgeCheck /></span>
+                  <div>
+                    <h4>{title}</h4>
+                    <p>{issuer} · {issued}</p>
+                    <div className={styles.certLinks}>
+                      {credly && <a className={styles.verifyLink} href={credly} target="_blank" rel="noopener noreferrer" aria-label={`Verify ${title} on Credly (opens in a new tab)`}>Credly <ArrowUpRight size={14} aria-hidden="true" /></a>}
+                      <a className={styles.verifyLink} href={coursera} target="_blank" rel="noopener noreferrer" aria-label={`View ${title} certificate on Coursera (opens in a new tab)`}>Coursera <ArrowUpRight size={14} aria-hidden="true" /></a>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section id="craft-hobbies" className="shell section craft-section">
+          <div className="craft-layout">
+            <div className="craft-intro">
+              <h2>Off the clock</h2>
+              <p>Long runs, new places, anime, and small experiments.</p>
+            </div>
+            <VueCraft />
+          </div>
+          <GamesTeaser />
+        </section>
+
+        <section id="contact" className="shell contact-section">
+          <div className="contact-top"><h2>Let’s build something.</h2></div>
+          <div className="contact-bottom">
+            <p>Open to collaborations and enterprise projects, here or on Upwork.</p>
+            <div className="contact-links">
+              <div className={styles.companions} aria-hidden="true">
+                {(["gengar", "gible", "flygon"] as const).map(species => (
+                  <span className={styles.companion} key={species}><PokemonSprite species={species} /></span>
+                ))}
+              </div>
+              <SocialLinks onContact={openContact} />
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className={`footer ${styles.pageFooter}`}>
+        <div className="shell">
+          <div className="footer-left"><a className="footer-mark" href="/" aria-label="Mon — back to the trainer card">mon.</a><p>© {new Date().getFullYear()} Anthony Cabigayan</p></div>
+          <div className="footer-right"><a href="/"><Home size={14} aria-hidden="true" /> Trainer card</a><a href="#about">Back to top <ArrowUp size={14} aria-hidden="true" /></a></div>
         </div>
-        <SocialLinks onContact={()=>setContactOpen(true)}/>
-      </div>
+      </footer>
+      <FloatingMenu active={active} onContact={openContact} />
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
     </div>
-  </section></main>
-  <footer className={`footer ${styles.pageFooter}`}><div className="shell"><div className="footer-left"><span className="footer-mark">mon.</span><p>© {new Date().getFullYear()} Anthony Cabigayan</p></div><div className="footer-right"><span>Thoughtfully built in the Philippines.</span><a href="/">Trainer card <ArrowUpRight size={14}/></a><a href="#about">Back to top <ArrowUp size={14}/></a></div></div></footer><FloatingMenu active={active} onContact={()=>setContactOpen(true)}/><ContactModal open={contactOpen} onClose={()=>setContactOpen(false)}/></div>;
+  );
 }

@@ -70,7 +70,7 @@ export default function ProjectCard({ project, group = "Selected work" }: { proj
         <DialogTrigger asChild>
           <button type="button" className={`project-visual walkthrough-visual ${project.tone}`} aria-label={`Preview ${project.title}`}>
             <span className="visual-top">
-              <span className="visual-label"><span className="project-index">{project.number}</span>{project.category}</span>
+              <span className="visual-label"><span className="project-index">{project.number}</span>{group !== "Selected work" && group}</span>
               <Maximize2 size={16} aria-hidden="true" />
             </span>
             <ProjectThumbnail project={project} />

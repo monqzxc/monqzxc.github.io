@@ -1,0 +1,614 @@
+{
+ "gengar": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    4,
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    4
+   ]
+  }
+ },
+ "haunter": {
+  "walk": {
+   "width": 32,
+   "height": 56,
+   "durations": [
+    6,
+    6,
+    6,
+    10,
+    6,
+    6,
+    6,
+    6,
+    10,
+    6
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    2,
+    6,
+    2,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    4
+   ]
+  }
+ },
+ "gastly": {
+  "walk": {
+   "width": 48,
+   "height": 64,
+   "durations": [
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    1,
+    1,
+    2,
+    2,
+    2,
+    3
+   ]
+  }
+ },
+ "giratina": {
+  "walk": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    12,
+    12,
+    12,
+    12
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 96,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "mismagius": {
+  "walk": {
+   "width": 32,
+   "height": 64,
+   "durations": [
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "drifblim": {
+  "walk": {
+   "width": 32,
+   "height": 64,
+   "durations": [
+    5,
+    3,
+    5,
+    7,
+    9,
+    7,
+    5,
+    5
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "chandelure": {
+  "walk": {
+   "width": 40,
+   "height": 64,
+   "durations": [
+    4,
+    4,
+    6,
+    6,
+    6,
+    6,
+    4,
+    4
+   ]
+  },
+  "attack": {
+   "width": 80,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "dusknoir": {
+  "walk": {
+   "width": 48,
+   "height": 72,
+   "durations": [
+    12,
+    12,
+    12,
+    12
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 88,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  },
+  "scale": 1.5
+ },
+ "sableye": {
+  "walk": {
+   "width": 24,
+   "height": 40,
+   "durations": [
+    6,
+    8,
+    6,
+    8
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "mimikyu": {
+  "walk": {
+   "width": 32,
+   "height": 48,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 72,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  },
+  "scale": 1.5
+ },
+ "gible": {
+  "walk": {
+   "width": 24,
+   "height": 40,
+   "durations": [
+    7,
+    7,
+    7,
+    7
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  },
+  "scale": 1.5
+ },
+ "garchomp": {
+  "walk": {
+   "width": 40,
+   "height": 48,
+   "durations": [
+    10,
+    10,
+    10,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "flygon": {
+  "walk": {
+   "width": 32,
+   "height": 64,
+   "durations": [
+    8,
+    8,
+    8,
+    8
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    2,
+    6,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "donphan": {
+  "walk": {
+   "width": 40,
+   "height": 32,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 72,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "groudon": {
+  "walk": {
+   "width": 64,
+   "height": 88,
+   "durations": [
+    10,
+    12,
+    10,
+    12
+   ]
+  },
+  "attack": {
+   "width": 88,
+   "height": 104,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "cubone": {
+  "walk": {
+   "width": 32,
+   "height": 32,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  },
+  "scale": 1.5
+ },
+ "sandslash": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "hippowdon": {
+  "walk": {
+   "width": 40,
+   "height": 40,
+   "durations": [
+    10,
+    10,
+    10,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  },
+  "scale": 1.5
+ },
+ "gliscor": {
+  "walk": {
+   "width": 32,
+   "height": 72,
+   "durations": [
+    6,
+    4,
+    4,
+    4,
+    8,
+    4,
+    4,
+    4
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  },
+  "scale": 1.5
+ }
+}

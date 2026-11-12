@@ -1,10 +1,13 @@
+import type { SpriteName } from "@/lib/pokemon-roster";
+
 export type Game = {
   slug: string;
   name: string;
   description: string;
   players: string;
   category: string;
-  artwork: readonly [string, string];
+  /** Two pixel sprites for the card art. */
+  sprites: readonly [SpriteName, SpriteName];
 };
 
 export const GAMES_HREF = "/play/";
@@ -17,7 +20,7 @@ export const games: readonly Game[] = [
     description: "Shift mirrors, bend the laser, and guide Deoxys into a black hole. Find your way through an endless sequence of space puzzles.",
     players: "1 player",
     category: "Laser puzzle",
-    artwork: ["/images/laser/deoxys.png", "/images/puzzle/mew.png"],
+    sprites: ["deoxys", "mew"],
   },
   {
     slug: "raft",
@@ -26,7 +29,7 @@ export const games: readonly Game[] = [
       "Aim, catch the wind, and beat the two-minute clock. Challenge a friend online or on one device, or battle Easy or Hard AI.",
     players: "1–2 players",
     category: "Artillery",
-    artwork: ["/images/puzzle/charizard.png", "/images/puzzle/bidoof.png"],
+    sprites: ["charizard", "bidoof"],
   },
   {
     slug: "puzzle",
@@ -35,7 +38,7 @@ export const games: readonly Game[] = [
       "Slide the tiles into place with eight Pokémon to choose from. Try a 3×3 or 4×4 board and beat your best time.",
     players: "1 player",
     category: "Puzzle",
-    artwork: ["/images/puzzle/gengar.png", "/images/puzzle/pikachu.png"],
+    sprites: ["gengar", "pikachu"],
   },
 ];
 

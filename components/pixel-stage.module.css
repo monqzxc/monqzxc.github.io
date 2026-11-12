@@ -1,0 +1,154 @@
+/* Two partners facing off on pixel pads. `--stage-px` scales the whole stage. */
+.stage {
+  --stage-px: 1;
+  --pad-fill: color-mix(in srgb, var(--primary) 22%, #120f1d);
+  --pad-rim: color-mix(in srgb, var(--primary) 46%, #2a2340);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: calc(28px * var(--stage-px));
+  padding-top: calc(36px * var(--stage-px));
+}
+
+:global([data-pokemon-theme="gible"]) .stage {
+  --pad-fill: #5a4630;
+  --pad-rim: #8a6c48;
+}
+
+.fighter {
+  position: relative;
+  flex-shrink: 0;
+  width: calc(44px * var(--scale) * var(--stage-px));
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 30%;
+  background: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button.fighter {
+  cursor: pointer;
+}
+
+button.fighter:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 6px;
+}
+
+.pad {
+  position: absolute;
+  left: -10%;
+  bottom: -9%;
+  width: 120%;
+  height: auto;
+}
+
+.padFill { fill: var(--pad-fill); }
+.padRim { fill: var(--pad-rim); }
+
+.facing,
+.body,
+.fx {
+  position: absolute;
+  inset: 0;
+}
+
+.right .facing {
+  transform: scaleX(-1);
+}
+
+.body {
+  transform-origin: 50% 95%;
+  filter: drop-shadow(0 10px 8px #0006);
+}
+
+.fx {
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Battle stance between turns, a lunge on the attack, a flinch when struck. */
+.fighter :global(.pokemon-motion) {
+  visibility: hidden;
+}
+
+.fighter:is([data-state="idle"], [data-state="hit"]) :global(.pokemon-motion.is-walk),
+.fighter[data-state="attack"] :global(.pokemon-motion.is-attack) {
+  visibility: visible;
+}
+
+.fighter:is([data-state="idle"], [data-state="hit"]) :global(.is-walk .pokemon-motion-strip) {
+  animation: stage-loop calc(var(--strip-ms) * 1.8) steps(var(--frames)) infinite;
+}
+
+.fighter[data-state="attack"] :global(.is-attack .pokemon-motion-strip) {
+  animation: stage-strike calc(var(--activity-duration) * .5) steps(var(--frames), jump-none) calc(var(--activity-duration) * .08) both;
+}
+
+.fighter[data-state="attack"] .body {
+  animation: stage-lunge var(--activity-duration) cubic-bezier(.2, .8, .3, 1) both;
+}
+
+.fighter[data-state="hit"] .body {
+  animation: stage-flinch .42s ease-out both;
+}
+
+button.fighter:hover .body {
+  filter: drop-shadow(0 10px 8px #0006) brightness(1.12);
+}
+
+.callout {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 4px);
+  z-index: 3;
+  padding: 3px 10px;
+  border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--background) 90%, transparent);
+  color: var(--foreground);
+  font-size: calc(12px * max(var(--stage-px), .85));
+  font-weight: 700;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  pointer-events: none;
+  translate: -50% 0;
+  animation: stage-callout var(--activity-duration) ease-out both;
+}
+
+@keyframes stage-loop { to { transform: translateX(-100%); } }
+@keyframes stage-strike { from { transform: translateX(0); } to { transform: translateX(calc(100% / var(--frames) - 100%)); } }
+@keyframes stage-lunge {
+  0% { transform: none; }
+  18% { transform: translateX(-6%) scale(.96, 1.04); }
+  34% { transform: translateX(14%) scale(1.05, .96); }
+  60% { transform: translateX(6%); }
+  100% { transform: none; }
+}
+@keyframes stage-flinch {
+  0% { transform: none; filter: drop-shadow(0 10px 8px #0006) brightness(2.2); }
+  25% { transform: translateX(-7%) rotate(-3deg); }
+  50% { transform: translateX(4%) rotate(2deg); filter: drop-shadow(0 10px 8px #0006); }
+  100% { transform: none; }
+}
+@keyframes stage-callout { 0% { opacity: 0; transform: translateY(4px); } 12%, 78% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .stage *,
+  .stage :global(*) {
+    animation: none !important;
+  }
+
+  .fighter :global(.pokemon-motion.is-attack),
+  .fx {
+    display: none;
+  }
+
+  .fighter :global(.pokemon-motion.is-walk) {
+    visibility: visible;
+  }
+}

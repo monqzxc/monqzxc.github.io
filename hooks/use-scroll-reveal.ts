@@ -12,8 +12,8 @@ export function useScrollReveal() {
     if (!container || motion.matches || !("IntersectionObserver" in window)) return;
 
     const targets = Array.from(container.querySelectorAll<HTMLElement>([
-      ".tech-strip", ".section-heading", ".project-card", ".about-band > *",
-      ".timeline-row", ".craft-intro", ".vue-craft", ".contact-section > *",
+      ".section-heading", ".project-card", ".timeline-row", "[data-reveal]",
+      ".craft-layout", ".games-list > li", ".contact-section > *",
     ].join(",")));
 
     const observer = new IntersectionObserver((entries) => {

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, FileText, Mail, Play, Sparkles } from "lucide-react";
+import { ArrowUpRight, FileText, Mail, Play, Sparkles } from "lucide-react";
 import ContactModal from "@/components/contact-modal";
+import { PixelConsole } from "@/components/pixel-console";
+import { PixelStage } from "@/components/pixel-stage";
 import { PokemonSprite } from "@/components/pokemon-sprite";
 import { PokemonHabitat, ThemeSelector } from "@/components/pokemon-theme";
 import { GAMES_HREF, games } from "@/lib/games";
@@ -45,13 +47,6 @@ export default function BentoBoard() {
   return (
     <div className={styles.page}>
       <PokemonHabitat />
-      <header className={styles.topbar}>
-        <a className={styles.back} href={PORTFOLIO_HREF}>
-          Full portfolio
-          <ArrowRight size={16} aria-hidden="true" />
-        </a>
-        <ThemeSelector />
-      </header>
 
       <main className={styles.board}>
         <nav className={styles.rail} aria-label="Portfolio sections">
@@ -66,16 +61,24 @@ export default function BentoBoard() {
             Trainer Card
           </p>
           <div className={styles.profileBody}>
+            <div className={styles.themePick}>
+              <ThemeSelector />
+            </div>
             <div className={styles.portrait} aria-hidden="true">
               <span className={styles.portraitDisc} />
               <PokemonSprite species="gengar" className={`${styles.partner} ${styles.partnerGengar}`} />
               <PokemonSprite species="gible" className={`${styles.partner} ${styles.partnerGible}`} />
             </div>
             <h1 id="bento-name" className={styles.name}>
-              <span className={styles.nameIntro}>I’m,</span>
-              Anthony
-              <br />
-              Cabigayan
+              {/* Stretched over the whole card: the trainer card opens the full portfolio. */}
+              <a className={styles.profileLink} href={PORTFOLIO_HREF}>
+                <span className={styles.nameIntro}>I’m,</span>
+                Anthony
+                <br />
+                Cabigayan
+                <span className="sr-only"> — open the full portfolio</span>
+              </a>
+              <ArrowUpRight className={styles.profileArrow} size={26} aria-hidden="true" />
             </h1>
             <p className={styles.role}>Software Engineer · call me Mon</p>
             <div className={styles.profileFoot}>
@@ -101,7 +104,7 @@ export default function BentoBoard() {
 
           <div className={styles.grid}>
             <a className={`${styles.card} ${styles.tile} ${styles.media}`} href={`${PORTFOLIO_HREF}#projects`}>
-              <img src="/images/mon-pokemon-hero.png" alt="" width="1254" height="1254" />
+              <PixelStage className={styles.mediaStage} />
               <span className={styles.play} aria-hidden="true"><Play size={20} fill="currentColor" /></span>
               <span className={styles.mediaCaption}>
                 <strong>Selected work</strong>
@@ -127,7 +130,7 @@ export default function BentoBoard() {
 
             <div className={`${styles.card} ${styles.split}`}>
               <a className={`${styles.tile} ${styles.splitArt}`} href={GAMES_HREF} aria-label={`Play ${games.length} Pokémon mini-games`}>
-                <img src="/images/puzzle/gengar.png" alt="" width="475" height="475" loading="lazy" />
+                <PixelConsole />
                 <span className={styles.splitTag}><Play size={11} fill="currentColor" aria-hidden="true" />{games.length} mini-games</span>
               </a>
               <a className={`${styles.tile} ${styles.splitInfo}`} href={`${PORTFOLIO_HREF}#timeline`}>

@@ -30,7 +30,7 @@
   align-items: center;
   justify-content: center;
   gap: 20px;
-  padding: 24px 24px 104px;
+  padding: clamp(16px, 3vh, 28px) 24px clamp(56px, 9vh, 84px);
 }
 
 :global([data-pokemon-theme="gible"]) .page {
@@ -52,41 +52,18 @@
   --media-bg: linear-gradient(140deg, #f2d08e, #e39a6c 55%, #8dc9f2);
 }
 
-.topbar,
 .board {
   position: relative;
   z-index: 1;
-  width: min(1180px, 100%);
+  width: min(1120px, 100%);
   pointer-events: auto;
-}
-
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.back {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  color: var(--muted-foreground);
-  font-size: 14px;
-  font-weight: 500;
-  transition: color .2s;
-}
-
-.back:hover {
-  color: var(--foreground);
 }
 
 .board {
   display: grid;
   grid-template-columns: auto minmax(0, 5fr) minmax(0, 7fr);
-  gap: 36px;
-  padding: 52px 60px 52px 28px;
+  gap: clamp(22px, 3vh, 32px);
+  padding: clamp(24px, 4vh, 40px) clamp(28px, 4vw, 48px) clamp(24px, 4vh, 40px) 20px;
   border: 1px solid var(--board-edge);
   border-radius: 28px;
   background: color-mix(in srgb, var(--board) 58%, transparent);
@@ -101,7 +78,7 @@
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  padding-top: 120px;
+  padding-top: 80px;
 }
 
 .rail a {
@@ -175,7 +152,7 @@
 /* Profile / trainer card */
 .profile {
   --tab-height: 48px;
-  --tab-width: 42%;
+  --tab-width: 36%;
   display: flex;
   flex-direction: column;
   color: var(--profile-fg);
@@ -225,14 +202,80 @@
   transform-origin: bottom left;
 }
 
+/* The name's link stretches over the whole card; controls inside sit above it. */
+.profileLink {
+  color: inherit;
+  outline: none;
+}
+
+.profileLink::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--tab-height)) 0 0;
+  z-index: 1;
+  border-radius: var(--radius);
+}
+
+.profileLink:focus-visible::after {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.profileArrow {
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: .1em;
+  opacity: .55;
+  transition: transform .35s var(--ease-spring), opacity .2s;
+}
+
+.profile:hover .profileArrow,
+.profile:has(.profileLink:focus-visible) .profileArrow {
+  opacity: 1;
+  transform: translate(4px, -4px);
+}
+
+.themePick,
+.contact,
+.seal {
+  position: relative;
+  z-index: 2;
+}
+
+.themePick {
+  position: absolute;
+  top: calc(-1 * var(--tab-height) + 5px);
+  right: 8px;
+}
+
+.themePick :global(.theme-selector) {
+  border-color: color-mix(in srgb, var(--profile-fg) 22%, transparent);
+  background: color-mix(in srgb, var(--profile-fg) 10%, transparent);
+}
+
+.themePick :global(.theme-choice) {
+  min-height: 30px;
+  color: color-mix(in srgb, var(--profile-fg) 72%, transparent);
+}
+
+.themePick :global(.theme-choice.is-selected) {
+  color: var(--profile-fg);
+  background: color-mix(in srgb, var(--profile-fg) 18%, transparent);
+  border-color: color-mix(in srgb, var(--profile-fg) 30%, transparent);
+}
+
+.themePick :global(.habitat-pause) {
+  height: 30px;
+  color: color-mix(in srgb, var(--profile-fg) 72%, transparent);
+}
+
 .profileBody {
   position: relative;
   z-index: 1;
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 520px;
-  padding: 0 30px 30px;
+  padding: 0 26px 24px;
   border-radius: var(--radius) 0 var(--radius) var(--radius);
   background: var(--profile-bg);
 }
@@ -240,7 +283,7 @@
 .portrait {
   position: relative;
   align-self: flex-end;
-  width: min(72%, 290px);
+  width: min(64%, 250px, 31vh);
   aspect-ratio: 1;
   margin-top: -6px;
   border: 5px solid #fff;
@@ -279,9 +322,9 @@
 
 .name {
   margin: auto 0 0;
-  padding-top: 24px;
+  padding-top: 16px;
   font-family: var(--font-display);
-  font-size: clamp(34px, 3.6vw, 52px);
+  font-size: clamp(30px, min(3.4vw, 5.4vh), 48px);
   font-weight: 600;
   letter-spacing: -.045em;
   line-height: 1.02;
@@ -304,7 +347,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 18px;
+  margin-top: 12px;
 }
 
 .contact {
@@ -328,8 +371,8 @@
 
 .seal {
   flex-shrink: 0;
-  width: 104px;
-  height: 104px;
+  width: clamp(76px, 11vh, 96px);
+  height: clamp(76px, 11vh, 96px);
   color: var(--seal-bg);
 }
 
@@ -346,7 +389,7 @@
 .showcase {
   display: flex;
   flex-direction: column;
-  gap: 34px;
+  gap: clamp(18px, 3vh, 28px);
   min-width: 0;
 }
 
@@ -357,7 +400,7 @@
   padding-right: .16em;
   color: var(--ink);
   font-family: var(--font-display);
-  font-size: clamp(60px, 9.2vw, 124px);
+  font-size: clamp(52px, min(8.4vw, 12vh), 112px);
   font-weight: 800;
   letter-spacing: -.055em;
   line-height: .95;
@@ -378,8 +421,8 @@
   flex: 1;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-template-rows: minmax(270px, 1.65fr) minmax(160px, 1fr);
-  gap: 34px;
+  grid-template-rows: minmax(190px, 1.65fr) minmax(130px, 1fr);
+  gap: clamp(18px, 3vh, 28px);
 }
 
 /* Featured media */
@@ -389,39 +432,42 @@
   color: #14121f;
 }
 
-.media img {
+/* The partners trade moves above the caption. */
+.mediaStage {
+  --stage-px: .62;
+  --pad-fill: #ffffff59;
+  --pad-rim: #ffffff8c;
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  padding: 14px 14px 46px;
-  object-fit: contain;
+  inset: 0 0 52px;
+  gap: 44px;
+  align-content: center;
+  align-items: center;
   transition: transform .5s var(--ease-spring);
 }
 
-.media:hover img {
-  transform: scale(1.06) rotate(-1.5deg);
+.media:hover .mediaStage {
+  transform: scale(1.06);
 }
 
 .play {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
   display: grid;
   place-items: center;
-  width: 58px;
-  height: 58px;
+  width: 44px;
+  height: 44px;
   padding-left: 3px;
   border-radius: 50%;
   background: #ffffffe6;
   color: #14121f;
   box-shadow: 0 10px 24px -10px #0009;
-  transform: translate(-50%, -50%);
   transition: transform .3s var(--ease-spring);
 }
 
 .media:hover .play {
-  transform: translate(-50%, -50%) scale(1.14);
+  transform: scale(1.14);
 }
 
 .mediaCaption {
@@ -527,20 +573,6 @@
   color: #fff;
 }
 
-.splitArt img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  padding: 12px 12px 30px;
-  object-fit: contain;
-  transition: transform .45s var(--ease-spring);
-}
-
-.splitArt:hover img {
-  transform: scale(1.12) rotate(5deg);
-}
-
 .splitTag {
   position: absolute;
   left: 14px;
@@ -590,7 +622,74 @@
     padding: 12px 14px;
   }
 
-  .profileBody {
+  /* The name's link stretches over the whole card; controls inside sit above it. */
+.profileLink {
+  color: inherit;
+  outline: none;
+}
+
+.profileLink::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--tab-height)) 0 0;
+  z-index: 1;
+  border-radius: var(--radius);
+}
+
+.profileLink:focus-visible::after {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.profileArrow {
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: .1em;
+  opacity: .55;
+  transition: transform .35s var(--ease-spring), opacity .2s;
+}
+
+.profile:hover .profileArrow,
+.profile:has(.profileLink:focus-visible) .profileArrow {
+  opacity: 1;
+  transform: translate(4px, -4px);
+}
+
+.themePick,
+.contact,
+.seal {
+  position: relative;
+  z-index: 2;
+}
+
+.themePick {
+  position: absolute;
+  top: calc(-1 * var(--tab-height) + 5px);
+  right: 8px;
+}
+
+.themePick :global(.theme-selector) {
+  border-color: color-mix(in srgb, var(--profile-fg) 22%, transparent);
+  background: color-mix(in srgb, var(--profile-fg) 10%, transparent);
+}
+
+.themePick :global(.theme-choice) {
+  min-height: 30px;
+  color: color-mix(in srgb, var(--profile-fg) 72%, transparent);
+}
+
+.themePick :global(.theme-choice.is-selected) {
+  color: var(--profile-fg);
+  background: color-mix(in srgb, var(--profile-fg) 18%, transparent);
+  border-color: color-mix(in srgb, var(--profile-fg) 30%, transparent);
+}
+
+.themePick :global(.habitat-pause) {
+  height: 30px;
+  color: color-mix(in srgb, var(--profile-fg) 72%, transparent);
+}
+
+.profileBody {
     min-height: 0;
   }
 
@@ -634,10 +733,91 @@
   }
 
   .profile {
-    --tab-width: 52%;
+    --tab-width: 46%;
   }
 
-  .profileBody {
+  /* Sprites only on phones; the names stay for screen readers. */
+  .themePick :global(.theme-choice) {
+    padding-inline: 3px;
+  }
+
+  .themePick :global(.theme-choice > span:last-child) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* The name's link stretches over the whole card; controls inside sit above it. */
+.profileLink {
+  color: inherit;
+  outline: none;
+}
+
+.profileLink::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--tab-height)) 0 0;
+  z-index: 1;
+  border-radius: var(--radius);
+}
+
+.profileLink:focus-visible::after {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.profileArrow {
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: .1em;
+  opacity: .55;
+  transition: transform .35s var(--ease-spring), opacity .2s;
+}
+
+.profile:hover .profileArrow,
+.profile:has(.profileLink:focus-visible) .profileArrow {
+  opacity: 1;
+  transform: translate(4px, -4px);
+}
+
+.themePick,
+.contact,
+.seal {
+  position: relative;
+  z-index: 2;
+}
+
+.themePick {
+  position: absolute;
+  top: calc(-1 * var(--tab-height) + 5px);
+  right: 8px;
+}
+
+.themePick :global(.theme-selector) {
+  border-color: color-mix(in srgb, var(--profile-fg) 22%, transparent);
+  background: color-mix(in srgb, var(--profile-fg) 10%, transparent);
+}
+
+.themePick :global(.theme-choice) {
+  min-height: 30px;
+  color: color-mix(in srgb, var(--profile-fg) 72%, transparent);
+}
+
+.themePick :global(.theme-choice.is-selected) {
+  color: var(--profile-fg);
+  background: color-mix(in srgb, var(--profile-fg) 18%, transparent);
+  border-color: color-mix(in srgb, var(--profile-fg) 30%, transparent);
+}
+
+.themePick :global(.habitat-pause) {
+  height: 30px;
+  color: color-mix(in srgb, var(--profile-fg) 72%, transparent);
+}
+
+.profileBody {
     padding: 0 20px 22px;
   }
 

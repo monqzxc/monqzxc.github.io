@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, Users } from "lucide-react";
+import { PokemonSprite } from "@/components/pokemon-sprite";
 import { games, gameHref } from "@/lib/games";
 
 export default function GameCards({ headingLevel = 2, idPrefix = "game" }: { headingLevel?: 2 | 3; idPrefix?: string }) {
@@ -11,7 +12,7 @@ export default function GameCards({ headingLevel = 2, idPrefix = "game" }: { hea
         <li key={game.slug}>
           <Link className="game-card" href={gameHref(game)} aria-labelledby={`${idPrefix}-${game.slug}`}>
             <div className="game-card-art" aria-hidden="true">
-              {game.artwork.map((image, index) => <img key={image} src={image} alt="" width={240} height={240} loading="lazy" className={index === 0 ? "game-art-first" : "game-art-second"} />)}
+              {game.sprites.map((species, index) => <PokemonSprite key={species} species={species} className={index === 0 ? "game-art-first" : "game-art-second"} />)}
             </div>
             <div className="game-card-copy">
               <Heading id={`${idPrefix}-${game.slug}`}>{game.name}</Heading>

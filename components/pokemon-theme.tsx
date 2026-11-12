@@ -1,11 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Pause, Play } from "lucide-react";
-import { MoveEffect, PokemonSprite, ShinyBurst, ShinyGlow, ShinyStars } from "@/components/pokemon-sprite";
+import { MoveEffect, PokemonMotion, PokemonSprite, ShinyBurst, ShinyGlow, ShinyStars } from "@/components/pokemon-sprite";
 import { PokemonScenery } from "@/components/pokemon-scenery";
-import { createPokemonRoutine, isEntranceActivity, nextPokemonRoutine } from "@/lib/pokemon-behavior";
-import { MOVES, RESIDENTS, SPECIES, SPRITE_FEET, SPRITE_SIZE, type PokemonSpecies, type PokemonTheme } from "@/lib/pokemon-roster";
+import { createCast, createPokemonRoutine, isEntranceActivity, isHiddenActivity, isTravelActivity, nextPokemonRoutine, recast, type CastMember } from "@/lib/pokemon-behavior";
+import { MOTION } from "@/lib/pokemon-motion";
+import { MOVES, SPECIES, SPRITE_FEET, SPRITE_SIZE, type PokemonSpecies, type PokemonTheme } from "@/lib/pokemon-roster";
 
 const STORAGE_KEY = "mon-pokemon-theme";
 const ThemeContext = createContext<{
@@ -77,13 +78,16 @@ export function ThemeSelector() {
 
 type HabitatBounds = { width: number; height: number };
 const GREETING_MS = 2400;
+/** Chance that a resident who goes offstage is replaced from the bench. */
+const SWAP_ODDS = .55;
 
-function PokemonResident({ species, slot, compact, bounds, scaleFactor, groundHeight, paused }: {
-  species: PokemonSpecies; slot: number; compact: boolean; bounds: HabitatBounds; scaleFactor: number; groundHeight: number; paused: boolean;
+function PokemonResident({ species, home, entering, slot, compact, bounds, scaleFactor, groundHeight, paused, onOffstage }: {
+  species: PokemonSpecies; home: number; entering: boolean; slot: number; compact: boolean; bounds: HabitatBounds; scaleFactor: number; groundHeight: number; paused: boolean;
+  onOffstage: (slot: number) => void;
 }) {
   const info = SPECIES[species];
   const air = info.movement === "air";
-  const [routine, setRoutine] = useState(() => createPokemonRoutine(species, slot, compact));
+  const [routine, setRoutine] = useState(() => createPokemonRoutine(species, slot, compact, home, entering));
   const [happy, setHappy] = useState(false);
   const [greeting, setGreeting] = useState(0);
   const [hovered, setHovered] = useState(false);
@@ -115,6 +119,13 @@ function PokemonResident({ species, slot, compact, bounds, scaleFactor, groundHe
     };
   }, [routine, species, slot, compact, stopped]);
 
+  // Once it is out of sight, the habitat may swap it for someone on the bench.
+  const offstage = useRef(onOffstage);
+  offstage.current = onOffstage;
+  useEffect(() => {
+    if (routine.cycle > 0 && isHiddenActivity(routine.activity)) offstage.current(slot);
+  }, [routine, slot]);
+
   function greet() {
     if (timer.current) clearTimeout(timer.current);
     setHappy(true);
@@ -139,8 +150,10 @@ function PokemonResident({ species, slot, compact, bounds, scaleFactor, groundHe
     "--bob-delay": `${-slot * .7}s`,
   } as CSSProperties;
 
+  // On the move or mid-attack it turns side-on; it faces you again to idle, react, or be greeted.
+  const pose = MOTION[species] && !interacting ? (activity === "attack" ? "attack" : isTravelActivity(activity) ? "walk" : null) : null;
   const classes = [
-    "pokemon-slot", air ? "is-air" : "is-ground", info.ghost && "is-ghost", info.legendary && "is-legendary",
+    "pokemon-slot", air ? "is-air" : "is-ground", info.ghost && "is-ghost", info.legendary && "is-legendary", pose && `pose-${pose}`,
     routine.shiny && "is-shiny", interacting && "is-interacting", happy && `is-greeting reacts-${info.reaction}`,
   ].filter(Boolean).join(" ");
 
@@ -162,6 +175,7 @@ function PokemonResident({ species, slot, compact, bounds, scaleFactor, groundHe
             onBlur={() => setFocused(false)}>
             <span className="pokemon-window"><span className="pokemon-emerge"><span className="pokemon-facing"><span className="pokemon-body">
               <PokemonSprite species={species} shiny={routine.shiny} className="pokemon-character" />
+              <PokemonMotion species={species} shiny={routine.shiny} />
             </span></span></span></span>
           </button>
           <span className="pokemon-fx" aria-hidden="true">
@@ -217,11 +231,18 @@ export function PokemonHabitat() {
   const scaleFactor = compact || bounds.width >= 1100 ? 1 : .8;
   const groundHeight = compact ? 24 : 38;
   const stopped = paused || hidden || reducedMotion;
-  const residents = compact ? RESIDENTS[theme].filter(species => SPECIES[species].compact) : RESIDENTS[theme];
+  // Ten residents per theme, five on stage; whoever goes offstage may hand over to the bench.
+  const [cast, setCast] = useState<CastMember[]>([]);
+  useEffect(() => {
+    if (ready) setCast(createCast(theme, compact));
+  }, [ready, theme, compact]);
+  const onOffstage = useCallback((slot: number) => {
+    if (Math.random() < SWAP_ODDS) setCast(current => recast(current, slot, theme));
+  }, [theme]);
   return (
     <aside ref={habitatRef} className={`pokemon-habitat habitat-${theme} ${stopped ? "is-paused" : ""}`} data-ready={ready} aria-hidden={!ready || undefined} aria-label={theme === "gengar" ? "Moonlit Pokémon graveyard" : "Pokémon mountain trail"} style={{ "--habitat-ground-height": `${groundHeight}px` } as CSSProperties}>
       <PokemonScenery theme={theme} />
-      {ready && bounds.width > 0 && residents.map((species, slot) => <PokemonResident key={`${theme}-${species}-${compact}-${reducedMotion}`} species={species} slot={slot} compact={compact} bounds={bounds} scaleFactor={scaleFactor} groundHeight={groundHeight} paused={stopped} />)}
+      {ready && bounds.width > 0 && cast.map(({ species, home, entering }, slot) => <PokemonResident key={`${theme}-${species}-${compact}-${reducedMotion}`} species={species} home={home} entering={entering} onOffstage={onOffstage} slot={slot} compact={compact} bounds={bounds} scaleFactor={scaleFactor} groundHeight={groundHeight} paused={stopped} />)}
     </aside>
   );
 }

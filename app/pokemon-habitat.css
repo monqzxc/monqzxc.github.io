@@ -48,13 +48,26 @@
 .pokemon-resident:focus-visible { outline-offset: 1px; }
 .pokemon-window, .pokemon-emerge, .pokemon-facing, .pokemon-body { display: block; width: 100%; }
 .pokemon-facing { transform: scaleX(var(--facing)); }
-.pokemon-body { transform-origin: 50% 95%; }
+.pokemon-body { position: relative; transform-origin: 50% 95%; }
 .pokemon-character { width: 100%; }
-:where(.pokemon-slot.is-ghost.is-air) .pokemon-character { filter: drop-shadow(0 4px 12px #a271f640); }
-.pokemon-slot[data-species="darkrai"] .pokemon-character { filter: drop-shadow(0 0 10px #000c) drop-shadow(0 0 4px #e0405a55); }
-.pokemon-slot[data-species="giratina"] .pokemon-character { filter: drop-shadow(0 0 8px #e0b84a40); }
-.pokemon-slot[data-species="groudon"] .pokemon-character { filter: drop-shadow(0 0 10px #ff6a2a55); }
-.pokemon-slot.is-shiny .pokemon-character { filter: drop-shadow(0 0 4px #ffd23f99); }
+:where(.pokemon-slot.is-ghost.is-air) :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 4px 12px #a271f640); }
+.pokemon-slot[data-species="giratina"] :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 0 8px #e0b84a40); }
+.pokemon-slot[data-species="groudon"] :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 0 10px #ff6a2a55); }
+.pokemon-slot.is-shiny :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 0 4px #ffd23f99); }
+
+/* Side view: travelling and attacking swap the front sprite for a side-on strip.
+   Hidden strips keep their box so the sheet is already loaded when it is needed. */
+.pokemon-motion { position: absolute; display: block; overflow: hidden; visibility: hidden; pointer-events: none; }
+.pokemon-motion-strip { position: absolute; left: 0; top: 0; height: 200%; background-size: 100% 100%; background-repeat: no-repeat; image-rendering: pixelated; }
+.pokemon-motion.is-shiny .pokemon-motion-strip { top: -100%; }
+.pokemon-slot:is(.pose-walk, .pose-attack) .pokemon-character { visibility: hidden; }
+.pokemon-slot.pose-walk .pokemon-motion.is-walk, .pokemon-slot.pose-attack .pokemon-motion.is-attack { visibility: visible; }
+.pokemon-slot.pose-walk .is-walk .pokemon-motion-strip { animation: sprite-frames calc(var(--strip-ms) * var(--stride, 1)) steps(var(--frames)) infinite; }
+.pokemon-slot.pose-walk[data-activity="run"] { --stride: .6; }
+.pokemon-slot.pose-walk[data-activity="fly"] { --stride: .8; }
+.pokemon-slot.pose-walk[data-activity="float"] { --stride: 1.6; }
+/* The strike lands as the move leaves the mouth, then holds its last frame. */
+.pokemon-slot.pose-attack .is-attack .pokemon-motion-strip { animation: move-frames calc(var(--activity-duration) * .5) steps(var(--frames), jump-none) calc(var(--activity-duration) * .08) both; }
 
 /* Frame pace follows the action. */
 .pokemon-slot[data-activity="walk"] { --frame-ms: 440ms; }
@@ -89,7 +102,7 @@
 .pokemon-portal { position: absolute; inset: 8%; border: 1px solid #bca0ef70; border-radius: 50%; background: radial-gradient(ellipse, #aa7cdd1a, transparent 65%); box-shadow: 0 0 17px #9970e532, inset 0 0 12px #9970e524; opacity: 0; }
 .habitat-gible .pokemon-portal { border-color: #e2bf8466; background: radial-gradient(ellipse, #d8ab6a33, transparent 68%); box-shadow: 0 0 18px #d6a35a2e, inset 0 0 12px #e4c08a2a; }
 .pokemon-slot.is-legendary .pokemon-portal { inset: -6%; }
-.pokemon-slot[data-species="darkrai"] .pokemon-portal { border-color: #e0405a66; background: radial-gradient(ellipse, #0009, transparent 70%); box-shadow: 0 0 26px #000b, inset 0 0 16px #e0405a33; }
+.pokemon-slot[data-species="giratina"] .pokemon-portal { border-color: #e0405a66; background: radial-gradient(ellipse, #0009, transparent 70%); box-shadow: 0 0 26px #000b, inset 0 0 16px #e0405a33; }
 .pokemon-slot:is([data-activity="appear"], [data-activity="vanish"]) .pokemon-portal { animation: ghost-portal var(--activity-duration) ease-in-out both; }
 .pokemon-slot[data-activity="appear"] .pokemon-presence { animation: ghost-arrive var(--activity-duration) ease-out both; }
 .pokemon-slot[data-activity="vanish"] .pokemon-presence { animation: ghost-depart var(--activity-duration) ease-in both; }
@@ -274,7 +287,8 @@
   .pokemon-habitat .pokemon-slot .pokemon-presence { opacity: var(--presence-opacity) !important; visibility: visible !important; }
   .pokemon-habitat .pokemon-emerge { transform: none !important; }
   .pokemon-habitat .pokemon-window { clip-path: none !important; }
-  .pokemon-dust, .pokemon-portal, .pokemon-mound, .pokemon-fx > :not(.fx-greeting), .shiny-burst, .pokemon-callout { display: none; }
+  .pokemon-dust, .pokemon-portal, .pokemon-mound, .pokemon-fx > :not(.fx-greeting), .shiny-burst, .pokemon-callout, .pokemon-motion { display: none; }
+  .pokemon-habitat .pokemon-character { visibility: visible !important; }
   /* Shiny stars hold still at full brightness, as in the app. */
   .shiny-glow { opacity: .58; }
 }

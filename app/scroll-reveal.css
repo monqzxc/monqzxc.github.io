@@ -8,6 +8,10 @@
   opacity: 0;
   transform: translateY(26px);
 }
+/* Each kind of content arrives its own way: cards rise, the journey reads left to right. */
+.project-card[data-reveal-state="pending"] { transform: translateY(34px) scale(.97); }
+.timeline-row[data-reveal-state="pending"] { transform: translateX(-22px); }
+.games-list > li[data-reveal-state="pending"] { transform: translateY(20px) rotate(-1deg); }
 [data-reveal-state="visible"] {
   opacity: 1;
   transform: none;

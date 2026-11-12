@@ -1,4 +1,4 @@
-/* A typographic introduction beside the isometric MON illustration. */
+/* A typographic introduction beside the partners' pixel battle stage. */
 .illustrated-hero {
   padding-top: 0;
   isolation: isolate;
@@ -11,12 +11,6 @@
 }
 .illustrated-hero .hero-copy {
   padding-block: 32px;
-}
-.illustrated-hero .hero-role {
-  color: #e8eda3;
-  font-size: 13px;
-  letter-spacing: .14em;
-  margin-bottom: 26px;
 }
 .illustrated-hero h1 {
   font-size: clamp(40px, 4.45vw, 68px);
@@ -48,88 +42,62 @@
   line-height: 1.85;
 }
 .illustrated-hero .hero-actions { margin-top: 28px; gap: 22px; }
-.illustrated-hero .hero-location {
-  display: flex;
-  margin-top: 28px;
-  color: #97a5ae;
-  font-size: 12px;
-  gap: 8px;
-}
-.hero-diorama {
-  position: relative;
+/* The partners' battle stage: the one moving moment above the fold. */
+.hero-stage {
+  display: grid;
+  justify-items: center;
+  gap: 26px;
   min-width: 0;
-  margin: 0 -30px 0 -8px;
-  align-self: center;
+  margin: 0;
   animation-delay: .1s;
 }
-.hero-diorama img {
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 100%;
-  height: clamp(450px, 46vw, 660px);
-  object-fit: contain;
-  filter: drop-shadow(0 30px 28px #0005);
+.hero-stage > div { --stage-px: 1.15; }
+.hero-stage .habitat-hint { margin: 0; }
+.hero-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 30px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #a9b3bb;
+  font-size: 13px;
+  font-weight: 550;
+  letter-spacing: -.01em;
 }
-.diorama-glow {
-  position: absolute;
-  inset: 8% -2% 3%;
-  z-index: -1;
-  background:
-    radial-gradient(ellipse at 38% 52%, #8371b526, transparent 59%),
-    radial-gradient(ellipse at 66% 58%, #598ab420, transparent 60%);
-  filter: blur(28px);
-  pointer-events: none;
+.hero-stack li + li::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin: 0 18px 2px -18px;
+  translate: 7px 0;
+  background: color-mix(in srgb, var(--primary) 70%, transparent);
 }
-.hero-diorama figcaption {
-  position: absolute;
-  right: 10%;
-  bottom: 3%;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 16px;
-  padding: 11px 16px;
-  border: 1px solid #e7e8f127;
-  border-radius: 100px;
-  background: #b8c4db09;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  color: #bac6d0;
-  font-size: 12px;
-  line-height: 1.5;
-  letter-spacing: .02em;
-}
-.hero-diorama figcaption > span:last-child { color: var(--primary); }
-.illustrated-hero .hero-bottom { padding-block: 24px 28px; }
+[data-pokemon-theme="gible"] .hero-stack { color: #c0b29a; }
 
 @media (min-width: 1600px) {
-  .illustrated-hero .hero-main { min-height: 720px; }
+  .illustrated-hero .hero-main { min-height: 680px; }
 }
 @media (max-width: 1100px) {
   .illustrated-hero .hero-main { min-height: 555px; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
   .illustrated-hero h1 { font-size: clamp(35px, 4.7vw, 53px); }
-  .hero-diorama { margin-inline: -4px -20px; }
-  .hero-diorama img { height: 500px; }
+  .hero-stage > div { --stage-px: .85; }
   .illustrated-hero .hero-actions { gap: 16px; }
   .illustrated-hero .button-primary { padding-inline: 17px; gap: 15px; }
 }
 @media (max-width: 760px) {
   .illustrated-hero .hero-main { grid-template-columns: minmax(0, 1fr); gap: 0; min-height: 0; padding-block: 0; }
   .illustrated-hero .hero-copy { padding: 42px 0 0; }
-  .illustrated-hero .hero-role { font-size: 12px; margin-bottom: 20px; }
   .illustrated-hero h1 { font-size: clamp(37px, 10.7vw, 67px); margin-bottom: 18px; line-height: 1.04; }
   .hero-moniker { font-size: 19px; margin-bottom: 10px; }
   .illustrated-hero .hero-description { max-width: 440px; line-height: 1.75; }
   .illustrated-hero .hero-actions { margin-top: 23px; gap: 24px; }
-  .illustrated-hero .hero-location { margin-top: 22px; }
-  .hero-diorama { margin: 4px -12px 0; }
-  .hero-diorama img { height: auto; aspect-ratio: 1; }
-  .hero-diorama figcaption { right: 7%; bottom: 2%; font-size: 12px; padding: 8px 13px; }
-  .illustrated-hero .hero-bottom { padding-block: 25px; }
+  .hero-stage { margin-top: 36px; gap: 20px; }
+  .hero-stage > div { --stage-px: .62; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero-diorama { animation: none; }
+  .hero-stage { animation: none; }
 }
 
 .hero-cv-links{display:flex;gap:23px;align-items:center;flex-wrap:wrap;margin-top:22px;font-size:14px;color:#c5b4e0}.hero-cv-links a{display:inline-flex;gap:7px;align-items:center}.hero-cv-links a:hover{color:#fff}

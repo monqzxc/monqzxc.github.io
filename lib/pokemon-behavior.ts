@@ -1,4 +1,4 @@
-import { SPECIES, type PokemonSpecies, type SpeciesInfo, type VisibleActivity } from "./pokemon-roster.ts";
+import { RESIDENTS, SPECIES, type PokemonSpecies, type PokemonTheme, type SpeciesInfo, type VisibleActivity } from "./pokemon-roster.ts";
 
 export type PokemonActivity = VisibleActivity | "vanish" | "hidden" | "appear" | "burrow" | "underground" | "emerge";
 export type HabitatPoint = { x: number; y: number };
@@ -87,16 +87,72 @@ function pick(repertoire: SpeciesInfo["repertoire"], exclude: PokemonActivity, r
   return options[options.length - 1][0];
 }
 
-export function createPokemonRoutine(species: PokemonSpecies, slot: number, compact: boolean): PokemonRoutine {
+/**
+ * `home` is the desktop zone it starts in. `entering` starts it offstage, so a
+ * newcomer swapped into the cast arrives with a proper entrance instead of popping in.
+ */
+export function createPokemonRoutine(species: PokemonSpecies, slot: number, compact: boolean, home = 0, entering = false): PokemonRoutine {
   const info = SPECIES[species];
-  const zone = info.home;
+  const zone = home;
   const area = zoneFor(info, slot, compact, zone);
   const inset = (area.right - area.left) * .15;
   const point = { x: slot % 2 ? area.right - inset : area.left + inset, y: (area.top + area.bottom) / 2 };
   const base = { from: point, to: point, facing: (point.x > 50 ? -1 : 1) as 1 | -1, cycle: 0, zone, shiny: false };
+  const offstage = info.exit === "burrow" ? "underground" : "hidden";
+  if (entering) return { ...base, activity: offstage, duration: 700 + slot * 150, actsLeft: 0 };
   // Legendaries wait offstage so their first entrance is a surprise.
-  if (info.legendary) return { ...base, activity: info.exit === "burrow" ? "underground" : "hidden", duration: LEGEND_FIRST_ENTRANCE_MS + slot * 400, actsLeft: 0 };
+  if (info.legendary) return { ...base, activity: offstage, duration: LEGEND_FIRST_ENTRANCE_MS + slot * 400, actsLeft: 0 };
   return { ...base, activity: info.movement === "air" ? "float" : "idle", duration: 2200 + slot * 750, actsLeft: 3 };
+}
+
+// ── The cast: ten residents per theme, at most five on stage ────────────────
+export const CAST_SIZE = 5;
+/** Phones get one patch per resident across a short strip. */
+export const COMPACT_CAST_SIZE = 4;
+export type CastMember = { species: PokemonSpecies; home: number; entering: boolean };
+
+/** The least crowded zone for this species' kind of movement. */
+function freeHome(cast: CastMember[], species: PokemonSpecies, random: Random) {
+  const { movement } = SPECIES[species];
+  const zones = movement === "air" ? airZones : groundZones;
+  const used = zones.map((_, zone) => cast.filter(member => SPECIES[member.species].movement === movement && member.home === zone).length);
+  const least = Math.min(...used);
+  const options = used.flatMap((count, zone) => count === least ? [zone] : []);
+  return options[Math.floor(between(0, options.length, random))];
+}
+
+/** A benched resident: never a second legendary, preferably moving like `prefer`. */
+function fromBench(theme: PokemonTheme, onStage: PokemonSpecies[], random: Random, prefer?: SpeciesInfo["movement"]) {
+  const legend = onStage.some(species => SPECIES[species].legendary);
+  let bench = RESIDENTS[theme].filter(species => !onStage.includes(species) && !(legend && SPECIES[species].legendary));
+  const alike = bench.filter(species => SPECIES[species].movement === prefer);
+  if (alike.length) bench = alike;
+  return bench.length ? bench[Math.floor(between(0, bench.length, random))] : undefined;
+}
+
+/** The opening cast: the theme's partner first, then walkers and flyers in balance. */
+export function createCast(theme: PokemonTheme, compact: boolean, random: Random = Math.random): CastMember[] {
+  const size = compact ? COMPACT_CAST_SIZE : CAST_SIZE;
+  const cast: CastMember[] = [{ species: theme, home: 0, entering: false }];
+  while (cast.length < size) {
+    const walkers = cast.filter(member => SPECIES[member.species].movement === "ground").length;
+    const species = fromBench(theme, cast.map(member => member.species), random, walkers * 2 <= cast.length ? "ground" : "air");
+    if (!species) break;
+    cast.push({ species, home: freeHome(cast, species, random), entering: false });
+  }
+  return cast;
+}
+
+/** Swap the resident in `slot`, who has just gone offstage, for someone from the bench. The partner stays. */
+export function recast(cast: CastMember[], slot: number, theme: PokemonTheme, random: Random = Math.random): CastMember[] {
+  const leaving = cast[slot];
+  if (!leaving || leaving.species === theme) return cast;
+  const others = cast.filter((_, index) => index !== slot);
+  const movement = SPECIES[leaving.species].movement;
+  const species = fromBench(theme, [...others.map(member => member.species), leaving.species], random, movement);
+  if (!species) return cast;
+  const home = SPECIES[species].movement === movement ? leaving.home : freeHome(others, species, random);
+  return cast.map((member, index) => index === slot ? { species, home, entering: true } : member);
 }
 
 /** Choose destinations only between activities; hidden phases conceal teleportation and shiny rolls. */

@@ -1,16 +1,39 @@
 import type { CSSProperties } from "react";
-import { MOVES, moveUrl, spriteUrl, type MoveId, type PokemonSpecies } from "@/lib/pokemon-roster";
+import { MOTION } from "@/lib/pokemon-motion";
+import { MOVES, moveUrl, motionUrl, SPRITE_FEET, SPRITE_SIZE, spriteUrl, type MoveId, type PokemonSpecies, type SpriteName } from "@/lib/pokemon-roster";
 
 /**
  * A pixel-art Pokémon from its packed sheet. Frames advance with a stepped transform on
  * the compositor, and the shiny form is the sheet's second row, so swapping it is free.
  */
-export function PokemonSprite({ species, shiny = false, className }: { species: PokemonSpecies; shiny?: boolean; className?: string }) {
+export function PokemonSprite({ species, shiny = false, className }: { species: SpriteName; shiny?: boolean; className?: string }) {
   return (
     <span className={`pokemon-sprite${shiny ? " is-shiny" : ""}${className ? ` ${className}` : ""}`} aria-hidden="true">
       <span className="pokemon-sprite-sheet" style={{ backgroundImage: `url(${spriteUrl(species)})` }} />
     </span>
   );
+}
+
+/**
+ * Side-view walk and attack strips, laid over the front sprite and sized so the body
+ * matches it, feet on the same line. CSS shows whichever one the current activity needs;
+ * both stay in the layout while hidden so their sheets are loaded before the first step.
+ */
+export function PokemonMotion({ species, shiny = false }: { species: PokemonSpecies; shiny?: boolean }) {
+  const info = MOTION[species];
+  if (!info) return null;
+  const unit = info.scale / SPRITE_SIZE * 100;
+  const box = {
+    left: `${50 - info.centre * unit}%`,
+    top: `${SPRITE_FEET * 100 - info.feet * unit}%`,
+    width: `${info.width * unit}%`,
+    aspectRatio: `${info.width} / ${info.height}`,
+  };
+  return (["walk", "attack"] as const).map(anim => (
+    <span key={anim} className={`pokemon-motion is-${anim}${shiny ? " is-shiny" : ""}`} style={{ ...box, "--frames": info[anim].frames, "--strip-ms": `${info[anim].ms}ms` } as CSSProperties} aria-hidden="true">
+      <span className="pokemon-motion-strip" style={{ width: `${info[anim].frames * 100}%`, backgroundImage: `url(${motionUrl(species, anim)})` }} />
+    </span>
+  ));
 }
 
 /** One play of a move strip from pokemon-moves; frames step across the strip. */
