@@ -1,4 +1,4 @@
-/* A typographic introduction beside the partners' pixel battle stage. */
+/* A typographic introduction beside Mon's Pokémon illustration. */
 .illustrated-hero {
   padding-top: 0;
   isolation: isolate;
@@ -42,17 +42,31 @@
   line-height: 1.85;
 }
 .illustrated-hero .hero-actions { margin-top: 28px; gap: 22px; }
-/* The partners' battle stage: the one moving moment above the fold. */
 .hero-stage {
+  position: relative;
+  isolation: isolate;
   display: grid;
-  justify-items: center;
-  gap: 26px;
+  place-items: center;
   min-width: 0;
   margin: 0;
   animation-delay: .1s;
 }
-.hero-stage > div { --stage-px: 1.15; }
-.hero-stage .habitat-hint { margin: 0; }
+.hero-stage::before {
+  position: absolute;
+  z-index: -1;
+  inset: 12% 4% 12%;
+  content: "";
+  background:
+    radial-gradient(ellipse at 40% 66%, rgb(155 112 255 / 28%), transparent 29%),
+    radial-gradient(ellipse at 71% 75%, rgb(102 211 239 / 25%), transparent 25%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+.hero-art {
+  display: block;
+  width: min(100%, 620px);
+  height: auto;
+}
 .hero-stack {
   display: flex;
   flex-wrap: wrap;
@@ -82,7 +96,6 @@
 @media (max-width: 1100px) {
   .illustrated-hero .hero-main { min-height: 555px; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
   .illustrated-hero h1 { font-size: clamp(35px, 4.7vw, 53px); }
-  .hero-stage > div { --stage-px: .85; }
   .illustrated-hero .hero-actions { gap: 16px; }
   .illustrated-hero .button-primary { padding-inline: 17px; gap: 15px; }
 }
@@ -93,8 +106,7 @@
   .hero-moniker { font-size: 19px; margin-bottom: 10px; }
   .illustrated-hero .hero-description { max-width: 440px; line-height: 1.75; }
   .illustrated-hero .hero-actions { margin-top: 23px; gap: 24px; }
-  .hero-stage { margin-top: 36px; gap: 20px; }
-  .hero-stage > div { --stage-px: .62; }
+  .hero-stage { margin-top: 36px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-stage { animation: none; }

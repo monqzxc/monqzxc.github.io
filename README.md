@@ -53,14 +53,13 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | React/Vue lifecycle boundary | `components/vue-craft.tsx` |
 | Page title and description | `app/layout.tsx` |
 | MON, Gengar, and Gible hero artwork | `public/images/mon-pokemon-hero.png` |
-| Exact artwork prompt and desktop preview | `docs/hero-art-prompt.txt`, `docs/hero-preview.jpg` |
 | Favicon | `public/favicon.svg` |
 
 Selected work includes TESDA-TRACK, Application Exam Management, HRIS Process, Job Application, PCR Management, PDS Generation, and ARTA Client Survey. A separate Personal projects group shows Zepimon (`personalProjects` in `lib/projects.ts`). Each card shows its supplied HTML walkthrough and opens an interactive preview with working step navigation. A separate link opens the complete walkthrough in a new tab. The previews use simplified screens and sample data. The email and GitHub links come from your supplied HTML; placeholder social-profile links were omitted.
 
 The walkthroughs are bundled under `public/project-previews/` so GitHub Pages exports include their HTML, CSS, and JavaScript. Original source folders remain separate. The shared `embed.js` and `embed.css` adapt the same HTML for thumbnails and dialogs; opening a page without a preview parameter shows the full original introduction. Walkthrough fonts request Google Fonts with local system fallbacks.
 
-The hero follows the supplied reference's composition, pairing bold name typography with an isometric MON sculpture above Gengar and Gible. Its transparent PNG was created with the built-in image generation tool and is included at 1254 × 1254 pixels. The exact prompt is included in `docs/hero-art-prompt.txt`.
+The hero pairs bold name typography with the supplied MON, Gengar, and Gible artwork. The original image is used unchanged, with a soft purple-and-blue glow behind the characters.
 
 The hero keeps the professional name, role, and work link prominent, with the personality line “Serious about systems. Soft spot for Pokémon.” The purple and blue theme continues through navigation, project previews, badges, the career timeline, interest tabs, and the contact panel. `app/pokemon-theme.css` loads after the base glass and hero styles.
 

@@ -1,5 +1,5 @@
-import { ArrowDown, Download, MousePointer2 } from "lucide-react";
-import { PixelStage } from "@/components/pixel-stage";
+import Image from "next/image";
+import { ArrowDown, Download } from "lucide-react";
 import SocialLinks from "@/components/social-links";
 
 const STACK = ["Laravel", "Vue", "Python", "React", "Next.js", "Docker"];
@@ -22,8 +22,15 @@ export default function Hero({ onContact }: { onContact: () => void }) {
           </ul>
         </div>
         <figure className="hero-stage entrance">
-          <PixelStage interactive />
-          <figcaption className="habitat-hint"><MousePointer2 aria-hidden="true" />Tap Gengar or Gible to attack.</figcaption>
+          <Image
+            className="hero-art"
+            src="/images/mon-pokemon-hero.png"
+            width={1254}
+            height={1254}
+            sizes="(max-width: 760px) 100vw, (max-width: 1100px) 55vw, 60vw"
+            alt="Gengar and Gible standing together on a stage beneath a MON sign."
+            preload
+          />
         </figure>
       </div>
     </section>
