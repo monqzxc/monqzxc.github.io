@@ -168,9 +168,6 @@ export function ThemeSelector() {
       <Popover.Root open={open} onOpenChange={setOpen}>
         <Popover.Trigger className="theme-trigger" disabled={!ready} aria-busy={!ready} aria-label={`Habitat: ${SPECIES[theme].name}, ${THEMES[theme].type} type${rotating ? `, changing ${rotation.mode === "order" ? "in order" : "at random"}` : ""}. Change habitat`}>
           <span className="theme-trigger-sprite" aria-hidden="true"><ThemePartner className="theme-sprite" /></span>
-          <span className="theme-trigger-label" aria-hidden="true">
-            {THEME_ORDER.map(option => <span key={option} className="for-theme" data-for={option}>{SPECIES[option].name}</span>)}
-          </span>
           {rotating && (
             <span className={`theme-rotation-badge ${counting ? "" : "is-held"}`} aria-hidden="true">
               {timed && <Countdown key={cycle} ms={ms} elapsed={elapsed}>{style => <svg viewBox="0 0 20 20" style={style}><circle cx="10" cy="10" r="8.5" /></svg>}</Countdown>}
@@ -373,7 +370,12 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
           </span>
           {routine.shiny && <ShinyStars />}
           {activity === "attack" && !happy && <span key={`call-${routine.cycle}`} className="pokemon-callout" aria-hidden="true">{info.moveName}!</span>}
-          {(hovered || focused) && !happy && <span className="pokemon-name" aria-hidden="true">{routine.shiny && <span>✦</span>}{info.name}{rarity && <small>{rarity}</small>}</span>}
+          {(hovered || focused) && !happy && (
+            <span className="pokemon-hover-hello" aria-hidden="true">
+              <PokemonSprite species={species} shiny={routine.shiny} className="pokemon-hover-sprite" />
+              <span>Hi!</span>
+            </span>
+          )}
           {happy && <span key={greeting} className="pokemon-hello" aria-hidden="true">{routine.shiny && <span>✦</span>}{info.cry}</span>}
         </div>
         {/* Outside the fading layer so the sparkle reads while the Pokémon is still materialising. */}

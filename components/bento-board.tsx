@@ -2,24 +2,32 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ArrowUpRight, FileText, Mail, Play, Sparkles } from "lucide-react";
-import ContactModal from "@/components/contact-modal";
+import { ArrowUpRight, FileText, Play, Sparkles } from "lucide-react";
 import { PixelConsole } from "@/components/pixel-console";
 import { PixelStage } from "@/components/pixel-stage";
 import { PokemonHabitat, ThemeSelector } from "@/components/pokemon-theme";
 import { GAMES_HREF, games } from "@/lib/games";
 import { PORTFOLIO_HREF } from "@/lib/navigation";
-import { googleCertificates } from "@/lib/cv-data";
 import { personalProjects, projects } from "@/lib/projects";
 import styles from "./bento-board.module.css";
 
 const projectCount = projects.length + personalProjects.length;
+
+// Developer work began with freelance projects in April 2022 (see lib/cv-data.ts).
+const DEV_SINCE = new Date(2022, 3, 1);
+
+function yearsSince(start: Date, now = new Date()) {
+  const months = (now.getFullYear() - start.getFullYear()) * 12 + now.getMonth() - start.getMonth();
+  return Math.max(1, Math.floor(months / 12));
+}
+const rotatingTitles = ["Full-Stack Developer", "Pokémon Trainer", "Distance Runner", "Anime Fan", "Gamer"] as const;
 
 const railLinks = [
   { href: `${PORTFOLIO_HREF}#projects`, label: "Work" },
   { href: `${PORTFOLIO_HREF}#timeline`, label: "Journey" },
   { href: GAMES_HREF, label: "Games" },
   { href: "/cv", label: "CV" },
+  { href: `${PORTFOLIO_HREF}#contact`, label: "Contact" },
 ] as const;
 
 function PortfolioSeal() {
@@ -30,29 +38,29 @@ function PortfolioSeal() {
       </defs>
       <circle cx="60" cy="60" r="58" fill="none" stroke="currentColor" strokeOpacity=".72" />
       <circle cx="60" cy="60" r="52" fill="var(--seal-bg)" stroke="var(--seal-accent)" strokeOpacity=".58" />
-      <path d="M24 60h25 M71 60h25" fill="none" stroke="var(--seal-accent)" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M27 64h18 M75 64h18" fill="none" stroke="var(--seal-fg)" strokeOpacity=".3" strokeWidth=".75" />
+      <path d="M22 60h23 M75 60h23" fill="none" stroke="var(--seal-red)" strokeWidth="3" strokeLinecap="round" />
+      <path d="M25 64h19 M76 64h19" fill="none" stroke="var(--seal-accent)" strokeOpacity=".5" strokeWidth="1.25" strokeLinecap="round" />
       <g className={styles.sealText}>
         <text fill="var(--seal-fg)" fontSize="10.5" fontWeight="600" letterSpacing="3.4">
           <textPath href="#bento-seal-path">{`${new Date().getFullYear()} · MON · DEV PORTFOLIO ·`}</textPath>
         </text>
       </g>
-      <circle cx="60" cy="60" r="13" fill="var(--seal-bg)" stroke="var(--seal-accent)" strokeWidth="2" />
-      <circle cx="60" cy="60" r="6.5" fill="var(--seal-button)" />
-      <circle cx="58" cy="57.5" r="1.6" fill="var(--seal-fg)" opacity=".72" />
+      <circle cx="60" cy="60" r="13" fill="var(--seal-bg)" stroke="var(--seal-red)" strokeWidth="2.25" />
+      <circle cx="60" cy="60" r="6.5" fill="var(--seal-red)" />
+      <circle cx="58" cy="57.5" r="1.6" fill="var(--seal-bg)" opacity=".9" />
     </svg>
   );
 }
 
 export default function BentoBoard() {
-  const [contactOpen, setContactOpen] = useState(false);
+  const [titleIndex, setTitleIndex] = useState(0);
 
   return (
     <div className={styles.page}>
       <PokemonHabitat />
 
       <main className={styles.board}>
-        <nav className={styles.rail} aria-label="Portfolio sections">
+        <nav className={styles.rail} aria-label="Portfolio navigation">
           {railLinks.map(({ href, label }) => (
             <a key={label} href={href}>{label}</a>
           ))}
@@ -68,49 +76,53 @@ export default function BentoBoard() {
               <ThemeSelector />
             </div>
             <div className={styles.portrait} aria-hidden="true">
+              <span className={styles.portraitRing} />
               <span className={styles.portraitDisc} />
-              <Image
-                className={styles.partner}
-                src="/images/anthony-portrait-cutout.png"
-                width={768}
-                height={768}
-                sizes="(max-width: 760px) 58vw, 260px"
-                alt=""
-                preload
-              />
+              <span className={styles.portraitCutout}>
+                <Image
+                  className={styles.partner}
+                  src="/images/anthony-portrait-cutout.png"
+                  width={768}
+                  height={768}
+                  sizes="(max-width: 760px) 80vw, 360px"
+                  alt=""
+                  preload
+                />
+              </span>
             </div>
-            <h1 id="bento-name" className={styles.name}>
-              {/* Stretched over the whole card: the trainer card opens the full portfolio. */}
-              <a className={styles.profileLink} href={PORTFOLIO_HREF}>
-                <span className={styles.nameIntro}>I’m,</span>
-                Anthony
-                <br />
-                Cabigayan
-                <span className="sr-only"> — open the full portfolio</span>
-              </a>
-              <ArrowUpRight className={styles.profileArrow} size={26} aria-hidden="true" />
-            </h1>
-            <p className={styles.role}>Software Engineer · call me Mon</p>
             <div className={styles.profileFoot}>
-              <button
-                type="button"
-                className={styles.contact}
-                aria-haspopup="dialog"
-                onClick={event => {
-                  event.currentTarget.focus({ preventScroll: true });
-                  setContactOpen(true);
-                }}
-              >
-                Send me a message
-                <Mail size={16} aria-hidden="true" />
-              </button>
+              <h1 id="bento-name" className={styles.name}>
+                {/* Stretched over the whole card: the trainer card opens the full portfolio. */}
+                <a className={styles.profileLink} href={PORTFOLIO_HREF}>
+                  <span className={styles.namePrimary}>
+                    <span className={styles.nameIntro}>I’m</span> Mon,
+                    <ArrowUpRight className={styles.profileArrow} size={26} aria-hidden="true" />
+                  </span>
+                  <span className={styles.nameReal}>Anthony Cabigayan</span>
+                  <span className="sr-only"> — open the full portfolio</span>
+                </a>
+              </h1>
+              <div className={styles.identity}>
+                <p className={styles.role}>Software engineer, Manila.</p>
+              </div>
               <PortfolioSeal />
             </div>
           </div>
         </section>
 
         <div className={styles.showcase}>
-          <p className={styles.title} aria-hidden="true">Portfolio</p>
+          <p className={styles.title} aria-hidden="true">
+            <span className={styles.titleMeasure}>
+              Full-Stack Developer<span className={styles.titleArrow} />
+            </span>
+            <span
+              key={rotatingTitles[titleIndex]}
+              className={styles.titleText}
+              onAnimationEnd={() => setTitleIndex(index => (index + 1) % rotatingTitles.length)}
+            >
+              {rotatingTitles[titleIndex]}<span className={styles.titleArrow} />
+            </span>
+          </p>
 
           <div className={styles.grid}>
             <a className={`${styles.card} ${styles.tile} ${styles.media}`} href={`${PORTFOLIO_HREF}#craft-hobbies`}>
@@ -127,9 +139,10 @@ export default function BentoBoard() {
                 <strong>{projectCount}</strong>
                 <span>Projects</span>
               </a>
-              <a className={`${styles.card} ${styles.tile} ${styles.stat} ${styles.statBottom}`} href={`${PORTFOLIO_HREF}#certifications`}>
-                <strong>{googleCertificates.length}</strong>
-                <span>Certifications</span>
+              <a className={`${styles.card} ${styles.tile} ${styles.stat} ${styles.statBottom}`} href={`${PORTFOLIO_HREF}#timeline`}>
+                {/* Counted at render; a build from before an anniversary may differ by a year. */}
+                <strong suppressHydrationWarning>{yearsSince(DEV_SINCE)}+</strong>
+                <span>Years as a developer</span>
               </a>
             </div>
 
@@ -152,7 +165,6 @@ export default function BentoBoard() {
         </div>
       </main>
 
-      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
     </div>
   );
 }
