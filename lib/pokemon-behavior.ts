@@ -19,7 +19,9 @@ type Zone = { left: number; right: number; top: number; bottom: number };
 type Random = () => number;
 
 export const SHINY_ODDS = 20;
-/** Legendaries hold the stage this long once fully visible, then stay away just as long. */
+/** Legendaries and mythicals: rare visitors who make one fixed appearance, then stay away. */
+export const isSpecial = (info: SpeciesInfo) => Boolean(info.legendary || info.mythical);
+/** Specials hold the stage this long once fully visible, then stay away just as long. */
 export const LEGEND_VISIBLE_MS = 5000;
 export const LEGEND_HIDDEN_MS = 5000;
 const LEGEND_FIRST_ENTRANCE_MS = 4000;
@@ -100,8 +102,8 @@ export function createPokemonRoutine(species: PokemonSpecies, slot: number, comp
   const base = { from: point, to: point, facing: (point.x > 50 ? -1 : 1) as 1 | -1, cycle: 0, zone, shiny: false };
   const offstage = info.exit === "burrow" ? "underground" : "hidden";
   if (entering) return { ...base, activity: offstage, duration: 700 + slot * 150, actsLeft: 0 };
-  // Legendaries wait offstage so their first entrance is a surprise.
-  if (info.legendary) return { ...base, activity: offstage, duration: LEGEND_FIRST_ENTRANCE_MS + slot * 400, actsLeft: 0 };
+  // Specials wait offstage so their first entrance is a surprise.
+  if (isSpecial(info)) return { ...base, activity: offstage, duration: LEGEND_FIRST_ENTRANCE_MS + slot * 400, actsLeft: 0 };
   return { ...base, activity: info.movement === "air" ? "float" : "idle", duration: 2200 + slot * 750, actsLeft: 3 };
 }
 
@@ -121,10 +123,10 @@ function freeHome(cast: CastMember[], species: PokemonSpecies, random: Random) {
   return options[Math.floor(between(0, options.length, random))];
 }
 
-/** A benched resident: never a second legendary, preferably moving like `prefer`. */
+/** A benched resident: never a second legendary or mythical, preferably moving like `prefer`. */
 function fromBench(theme: PokemonTheme, onStage: PokemonSpecies[], random: Random, prefer?: SpeciesInfo["movement"]) {
-  const legend = onStage.some(species => SPECIES[species].legendary);
-  let bench = RESIDENTS[theme].filter(species => !onStage.includes(species) && !(legend && SPECIES[species].legendary));
+  const legend = onStage.some(species => isSpecial(SPECIES[species]));
+  let bench = RESIDENTS[theme].filter(species => !onStage.includes(species) && !(legend && isSpecial(SPECIES[species])));
   const alike = bench.filter(species => SPECIES[species].movement === prefer);
   if (alike.length) bench = alike;
   return bench.length ? bench[Math.floor(between(0, bench.length, random))] : undefined;
@@ -160,6 +162,7 @@ export function nextPokemonRoutine(species: PokemonSpecies, slot: number, compac
   const info = SPECIES[species];
   const air = info.movement === "air";
   const burrows = info.exit === "burrow";
+  const special = isSpecial(info);
   const position = current.to;
   const area = zoneFor(info, slot, compact, current.zone);
   const next = (activity: PokemonActivity, duration: number, to = position, extra: Partial<Pick<PokemonRoutine, "zone" | "shiny" | "actsLeft" | "facing">> = {}, from = position): PokemonRoutine => ({
@@ -169,15 +172,15 @@ export function nextPokemonRoutine(species: PokemonSpecies, slot: number, compac
   });
   // Reappear facing the middle of the page, so moves fly inward instead of off-screen.
   const inward = (point: HabitatPoint): 1 | -1 => point.x > 50 ? -1 : 1;
-  const leave = () => next(burrows ? "burrow" : "vanish", info.legendary ? 1000 : burrows ? 1200 : 1300);
+  const leave = () => next(burrows ? "burrow" : "vanish", special ? 1000 : burrows ? 1200 : 1300);
 
   // Gone: pick the next spot while nobody can see the jump.
   if (current.activity === "vanish" || current.activity === "burrow") {
     const hiddenAs = burrows ? "underground" : "hidden";
-    if (info.legendary || (air && !compact)) {
+    if (special || (air && !compact)) {
       const zone = compact ? current.zone : otherZone(current.zone, zonesFor(info).length, random);
       const destination = pointIn(zoneFor(info, slot, compact, zone), random);
-      return next(hiddenAs, info.legendary ? LEGEND_HIDDEN_MS : between(1000, 2300, random), destination, { zone, facing: inward(destination) }, destination);
+      return next(hiddenAs, special ? LEGEND_HIDDEN_MS : between(1000, 2300, random), destination, { zone, facing: inward(destination) }, destination);
     }
     // Ground residents stay in their patch but always resurface on its other half.
     const middle = (area.left + area.right) / 2;
@@ -189,14 +192,15 @@ export function nextPokemonRoutine(species: PokemonSpecies, slot: number, compac
   // Coming back: this is the only moment a shiny can be rolled.
   if (isHiddenActivity(current.activity)) {
     const shiny = random() * SHINY_ODDS < 1;
-    const acts = info.legendary ? 0 : Math.round(between(species === "diglett" ? 1 : 3, species === "diglett" ? 3 : 6, random));
-    return next(burrows ? "emerge" : "appear", info.legendary ? 1200 : burrows ? 1500 : 1400, position, { shiny, actsLeft: acts });
+    const acts = special ? 0 : Math.round(between(species === "diglett" ? 1 : 3, species === "diglett" ? 3 : 6, random));
+    return next(burrows ? "emerge" : "appear", special ? 1200 : burrows ? 1500 : 1400, position, { shiny, actsLeft: acts });
   }
 
-  // A legendary's visit is a fixed five-second show: roar, signature move, a moment to pose.
-  if (info.legendary) {
-    if (isEntranceActivity(current.activity)) return next("roar", LEGEND_ROAR_MS);
-    if (current.activity === "roar") return next("attack", LEGEND_MOVE_MS);
+  // A special's visit is a fixed five-second show: a roar (or a mythical's smile), signature move, a moment to pose.
+  if (special) {
+    const greeting = info.legendary ? "roar" : "smile";
+    if (isEntranceActivity(current.activity)) return next(greeting, LEGEND_ROAR_MS);
+    if (current.activity === greeting) return next("attack", LEGEND_MOVE_MS);
     if (current.activity === "attack") return next(air ? "float" : "idle", LEGEND_VISIBLE_MS - LEGEND_ROAR_MS - LEGEND_MOVE_MS);
     return leave();
   }

@@ -1,0 +1,218 @@
+/*
+ * Water (Piplup), Fire (Charmander) and Grass (Bulbasaur) palettes.
+ * Each theme sets nine tokens; one shared rule set below derives every surface from them,
+ * mirroring what ground-theme.css spells out by hand for Gible.
+ *   --hab-tone      the habitat's colour: buttons, highlights, active states
+ *   --hab-tone-2    its partner colour: secondary accents, alternating cards
+ *   --hab-surface   raised panels        --hab-on-tone       text on --hab-tone
+ *   --hab-text      body copy            --hab-text-dim  captions and metadata
+ */
+:root[data-pokemon-theme="piplup"] {
+  --background: #0b1622;
+  --foreground: #eaf4fb;
+  --hab-surface: #13243a;
+  --hab-tone: #6ec3f5;
+  --hab-tone-2: #f2c46b;
+  --hab-on-tone: #06192a;
+  --hab-text: #a9c0d2;
+  --hab-text-dim: #8aa4b8;
+  --hab-glow-a: #2f7fc22a;
+  --hab-glow-b: #e0a84a14;
+}
+:root[data-pokemon-theme="charmander"] {
+  --background: #170d0b;
+  --foreground: #fbefe6;
+  --hab-surface: #26150f;
+  --hab-tone: #ff8a4c;
+  --hab-tone-2: #ffd36b;
+  --hab-on-tone: #2a0f04;
+  --hab-text: #d0b2a3;
+  --hab-text-dim: #ab9184;
+  --hab-glow-a: #d2481d26;
+  --hab-glow-b: #e0a8301a;
+}
+:root[data-pokemon-theme="bulbasaur"] {
+  --background: #0d1610;
+  --foreground: #eef6e8;
+  --hab-surface: #16251a;
+  --hab-tone: #86d17a;
+  --hab-tone-2: #6fd0c4;
+  --hab-on-tone: #0d2410;
+  --hab-text: #b0c5ad;
+  --hab-text-dim: #8fa68c;
+  --hab-glow-a: #4f9a4a24;
+  --hab-glow-b: #3fa89a16;
+}
+
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) {
+  --card: var(--hab-surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--hab-surface);
+  --popover-foreground: var(--foreground);
+  --primary: var(--hab-tone);
+  --primary-foreground: var(--hab-on-tone);
+  --secondary: color-mix(in srgb, var(--hab-surface) 80%, var(--hab-tone));
+  --secondary-foreground: var(--foreground);
+  --muted: color-mix(in srgb, var(--hab-surface) 88%, var(--foreground));
+  --muted-foreground: var(--hab-text);
+  --accent: var(--hab-tone-2);
+  --accent-foreground: var(--hab-on-tone);
+  --border: color-mix(in srgb, var(--hab-tone) 17%, transparent);
+  --input: color-mix(in srgb, var(--hab-tone) 45%, var(--hab-surface));
+  --ring: var(--hab-tone);
+  /* The original two-partner accents, re-pointed so shared rules follow the habitat. */
+  --gengar: var(--hab-tone);
+  --gible: var(--hab-tone-2);
+  --glass-surface: linear-gradient(140deg, color-mix(in srgb, var(--hab-tone) 6%, transparent), color-mix(in srgb, var(--hab-tone-2) 3%, transparent));
+  --glass-edge: color-mix(in srgb, var(--hab-tone) 17%, transparent);
+  --glass-shadow: 0 24px 60px -35px #000b, inset 0 1px 0 color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) body {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse at 6% 3%, var(--hab-glow-a), transparent 38%),
+    radial-gradient(ellipse at 97% 30%, var(--hab-glow-b), transparent 42%),
+    radial-gradient(ellipse at 5% 82%, var(--hab-glow-a), transparent 40%);
+}
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) ::selection { background: var(--hab-tone); color: var(--hab-on-tone); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(button, a, [tabindex]):focus-visible { outline-color: var(--hab-tone); }
+
+/* Header and navigation */
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .site-header {
+  border-color: color-mix(in srgb, var(--hab-tone) 17%, transparent);
+  background: linear-gradient(115deg, color-mix(in srgb, var(--hab-surface) 82%, transparent), color-mix(in srgb, var(--background) 86%, transparent));
+  box-shadow: 0 15px 40px -25px #000a, inset 0 1px 0 color-mix(in srgb, var(--foreground) 7%, transparent);
+}
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .brand-caption { color: var(--hab-text-dim); border-color: color-mix(in srgb, var(--hab-tone) 18%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.wordmark strong, .footer-mark) { color: var(--foreground); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .nav-links a { color: var(--hab-text); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .nav-links a.active { color: color-mix(in srgb, var(--hab-tone) 55%, var(--foreground)); border-color: color-mix(in srgb, var(--hab-tone) 21%, transparent); background: color-mix(in srgb, var(--hab-tone) 9%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .nav-links a:hover { color: var(--foreground); background: color-mix(in srgb, var(--hab-tone) 6%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .nav-links .nav-contact { border-color: color-mix(in srgb, var(--hab-tone-2) 26%, transparent); background: color-mix(in srgb, var(--hab-tone-2) 5%, transparent); color: color-mix(in srgb, var(--hab-tone-2) 55%, var(--foreground)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .nav-links .nav-contact:hover { border-color: color-mix(in srgb, var(--hab-tone-2) 45%, transparent); background: color-mix(in srgb, var(--hab-tone-2) 11%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .nav-links.open { background: color-mix(in srgb, var(--hab-surface) 96%, transparent); border-color: color-mix(in srgb, var(--hab-tone) 25%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .menu-toggle { border-color: color-mix(in srgb, var(--hab-tone) 25%, transparent); background: color-mix(in srgb, var(--hab-tone) 3%, transparent); color: color-mix(in srgb, var(--hab-tone) 35%, var(--foreground)); }
+
+/* Hero */
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .eyebrow { color: var(--hab-text); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .illustrated-hero .hero-role { color: color-mix(in srgb, var(--hab-tone) 80%, var(--foreground)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .illustrated-hero h1 > span { color: var(--foreground); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .illustrated-hero h1 > span:nth-child(2) { color: color-mix(in srgb, var(--hab-tone) 70%, var(--foreground)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .hero-moniker { color: color-mix(in srgb, var(--hab-text) 50%, var(--foreground)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.hero-description, .illustrated-hero .hero-description) { color: var(--hab-text); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .hero-description strong { color: var(--foreground); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .hero-personality { color: color-mix(in srgb, var(--hab-text) 80%, var(--hab-tone)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .illustrated-hero .hero-location { color: var(--hab-text-dim); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .hero-cv-links { color: color-mix(in srgb, var(--hab-tone) 55%, var(--hab-text)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .hero-cv-links a:hover { color: var(--foreground); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .hero-stack { color: var(--hab-text); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .button-primary {
+  color: var(--hab-on-tone);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--hab-tone) 85%, #fff), var(--hab-tone));
+  border-color: color-mix(in srgb, var(--hab-tone) 60%, #fff);
+  box-shadow: inset 0 1px 0 #ffffff70, 0 7px 28px -17px color-mix(in srgb, var(--hab-tone) 50%, transparent);
+}
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .button-primary:hover {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--hab-tone) 70%, #fff), color-mix(in srgb, var(--hab-tone) 90%, #fff));
+  box-shadow: inset 0 1px 0 #fff7, 0 8px 32px -15px color-mix(in srgb, var(--hab-tone) 50%, transparent);
+}
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .text-link { color: color-mix(in srgb, var(--hab-text) 50%, var(--foreground)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .text-link:hover { color: var(--hab-tone-2); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .diorama-glow { background: radial-gradient(ellipse at 30% 53%, color-mix(in srgb, var(--hab-tone) 16%, transparent), transparent 58%), radial-gradient(ellipse at 76% 66%, color-mix(in srgb, var(--hab-tone-2) 13%, transparent), transparent 60%); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .hero-diorama figcaption.companion-strip { border-color: color-mix(in srgb, var(--hab-tone) 17%, transparent); background: linear-gradient(110deg, color-mix(in srgb, var(--hab-surface) 84%, transparent), color-mix(in srgb, var(--background) 84%, transparent)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .companion + .companion { border-color: color-mix(in srgb, var(--hab-tone) 14%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .companion small { color: var(--hab-text); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .illustrated-hero .hero-bottom { border-color: color-mix(in srgb, var(--hab-tone) 14%, transparent); background: linear-gradient(100deg, color-mix(in srgb, var(--hab-tone) 4%, transparent), color-mix(in srgb, var(--hab-tone-2) 3%, transparent)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .credential svg { color: var(--hab-tone); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .credential:nth-child(2) svg { color: var(--hab-tone-2); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .credential:nth-child(3) svg { color: color-mix(in srgb, var(--hab-tone) 50%, var(--hab-tone-2)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .credential strong { color: color-mix(in srgb, var(--foreground) 92%, var(--hab-tone)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .credential > span { color: var(--hab-text-dim); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .scroll-link { color: var(--hab-text-dim); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .tech-strip { background: color-mix(in srgb, var(--background) 56%, transparent); border-color: color-mix(in srgb, var(--hab-tone) 12%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .tech-item { color: var(--hab-text); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .tech-item .tech-symbol { color: var(--hab-tone); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .tech-item:nth-child(even) .tech-symbol { color: var(--hab-tone-2); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .tech-label { color: var(--hab-text-dim); }
+
+/* Projects */
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .section-heading h2 span { color: color-mix(in srgb, var(--hab-tone) 65%, var(--hab-text)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.section-heading > p, .project-info p, .timeline-row p, .craft-intro p, .craft-detail p, .contact-bottom p) { color: var(--hab-text); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .project-card:nth-child(odd) { --card-tone: var(--hab-tone); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .project-card:nth-child(even) { --card-tone: var(--hab-tone-2); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.project-visual, .project-visual.recruitment, .project-visual.records, .project-visual.hris) { border-color: color-mix(in srgb, var(--hab-tone) 16%, transparent); background: linear-gradient(135deg, color-mix(in srgb, var(--hab-tone) 12%, transparent), color-mix(in srgb, var(--hab-surface) 4%, transparent)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.project-visual.recruitment, .project-visual.hris) { background: linear-gradient(135deg, color-mix(in srgb, var(--hab-tone-2) 12%, transparent), color-mix(in srgb, var(--hab-surface) 4%, transparent)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .visual-top { color: var(--hab-text); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .project-info h3 { color: var(--foreground); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .project-button { border-color: color-mix(in srgb, var(--hab-tone) 26%, transparent); background: color-mix(in srgb, var(--hab-tone) 5%, transparent); color: color-mix(in srgb, var(--hab-tone) 70%, var(--foreground)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .project-button:hover { background: var(--card-tone); border-color: var(--card-tone); color: var(--hab-on-tone); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .tag { border-color: color-mix(in srgb, var(--hab-tone) 22%, transparent); background: color-mix(in srgb, var(--hab-tone) 5%, transparent); color: color-mix(in srgb, var(--hab-tone) 30%, var(--hab-text)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .tag:nth-child(2n) { background: color-mix(in srgb, var(--hab-tone-2) 5%, transparent); border-color: color-mix(in srgb, var(--hab-tone-2) 18%, transparent); color: color-mix(in srgb, var(--hab-tone-2) 30%, var(--hab-text)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.mini-app, .mini-app.recruit) { background: var(--hab-surface); color: var(--foreground); border-color: color-mix(in srgb, var(--hab-tone) 30%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.mini-app-header, .recruit .mini-app-header) { border-color: color-mix(in srgb, var(--hab-tone) 17%, transparent); background: color-mix(in srgb, var(--hab-tone) 6%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .mini-app-header > span { color: var(--hab-text); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.mini-logo, .recruit .mini-logo) { color: color-mix(in srgb, var(--hab-tone) 60%, #fff); background: color-mix(in srgb, var(--hab-tone) 35%, var(--hab-surface)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.mini-subtitle, .mini-stat span, .mock-caption, .personnel-summary p) { color: var(--hab-text); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .mini-stat { background: color-mix(in srgb, var(--hab-tone) 5%, transparent); border-color: color-mix(in srgb, var(--hab-tone) 17%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .mini-stat strong { color: color-mix(in srgb, var(--hab-tone) 60%, var(--foreground)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.mini-row, .recruit .mini-row) { border-color: color-mix(in srgb, var(--hab-tone) 13%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .mini-badge { background: color-mix(in srgb, var(--hab-tone-2) 14%, transparent); color: color-mix(in srgb, var(--hab-tone-2) 70%, #fff); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .mini-badge.amber { background: #ddad5726; color: #eed090; }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .mini-badge.lavender { background: color-mix(in srgb, var(--hab-tone) 16%, transparent); color: color-mix(in srgb, var(--hab-tone) 70%, #fff); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .mini-bar { background: color-mix(in srgb, var(--hab-tone) 12%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .mini-bar i { background: var(--hab-tone); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.candidate, .personnel-avatar) { background: color-mix(in srgb, var(--hab-tone) 18%, transparent); color: color-mix(in srgb, var(--hab-tone) 70%, #fff); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .mini-tabs { color: var(--hab-text-dim); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .mini-tabs span:first-child { color: color-mix(in srgb, var(--hab-tone-2) 60%, #fff); border-color: var(--hab-tone-2); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .personnel-cards > div { border-color: color-mix(in srgb, var(--hab-tone) 16%, transparent); background: color-mix(in srgb, var(--hab-tone) 4%, transparent); }
+
+/* About, timeline, craft */
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .about-band { border-color: color-mix(in srgb, var(--hab-tone) 18%, transparent); background: linear-gradient(120deg, color-mix(in srgb, var(--hab-tone) 6%, transparent), color-mix(in srgb, var(--hab-tone-2) 5%, transparent)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .about-band p { color: var(--hab-text); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .about-band p strong { color: var(--foreground); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .timeline { background: color-mix(in srgb, var(--hab-tone) 3%, transparent); border-color: color-mix(in srgb, var(--hab-tone) 17%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .timeline-row { border-color: color-mix(in srgb, var(--hab-tone) 12%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .timeline-year { color: color-mix(in srgb, var(--hab-tone) 75%, var(--hab-text)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .timeline-type { color: var(--hab-text-dim); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .timeline-icon { color: var(--hab-tone); border-color: color-mix(in srgb, var(--hab-tone) 25%, transparent); background: linear-gradient(145deg, color-mix(in srgb, var(--hab-tone) 14%, transparent), color-mix(in srgb, var(--hab-tone) 4%, transparent)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .timeline-row:nth-child(even) .timeline-icon { color: var(--hab-tone-2); border-color: color-mix(in srgb, var(--hab-tone-2) 22%, transparent); background: color-mix(in srgb, var(--hab-tone-2) 7%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .craft-layout { background: linear-gradient(120deg, color-mix(in srgb, var(--hab-tone) 9%, transparent), color-mix(in srgb, var(--hab-tone-2) 7%, transparent)); border-color: color-mix(in srgb, var(--hab-tone) 22%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .craft-tab { border-color: color-mix(in srgb, var(--hab-tone) 18%, transparent); color: var(--hab-text); background: color-mix(in srgb, var(--hab-tone) 4%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .craft-tab svg { color: color-mix(in srgb, var(--hab-tone) 75%, var(--hab-text)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .craft-tab[aria-selected=true] {
+  background: linear-gradient(125deg, color-mix(in srgb, var(--hab-tone) 19%, transparent), color-mix(in srgb, var(--hab-tone) 11%, transparent));
+  color: color-mix(in srgb, var(--hab-tone) 35%, var(--foreground));
+  border-color: color-mix(in srgb, var(--hab-tone) 45%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--foreground) 10%, transparent), 0 3px 20px -12px color-mix(in srgb, var(--hab-tone) 21%, transparent);
+}
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .craft-tab[aria-selected=true] svg { color: color-mix(in srgb, var(--hab-tone) 70%, #fff); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .craft-tab:hover:not([aria-selected=true]) { background: color-mix(in srgb, var(--hab-tone-2) 9%, transparent); color: var(--foreground); border-color: color-mix(in srgb, var(--hab-tone-2) 31%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .craft-detail { background: color-mix(in srgb, var(--background) 33%, transparent); border-color: color-mix(in srgb, var(--hab-tone) 15%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .craft-detail .craft-kicker { color: color-mix(in srgb, var(--hab-tone) 70%, var(--hab-text)); }
+
+/* Contact, footer, dialogs */
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .contact-section {
+  border-color: color-mix(in srgb, var(--hab-tone) 31%, transparent);
+  background: radial-gradient(ellipse at 0 0, color-mix(in srgb, var(--hab-tone) 14%, transparent), transparent 62%), radial-gradient(ellipse at 100% 100%, color-mix(in srgb, var(--hab-tone-2) 12%, transparent), transparent 62%), var(--hab-surface);
+}
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .contact-section h2 span { color: color-mix(in srgb, var(--hab-tone) 80%, #fff); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .contact-orbit {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--hab-tone) 85%, #fff), color-mix(in srgb, var(--hab-tone-2) 75%, #fff));
+  color: var(--hab-on-tone);
+  border-color: color-mix(in srgb, var(--hab-tone) 45%, #fff);
+  box-shadow: inset 0 1px 0 #fff6, 0 12px 35px -22px color-mix(in srgb, var(--hab-tone) 50%, transparent);
+}
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .email-group a { color: color-mix(in srgb, var(--hab-tone) 35%, var(--foreground)); text-decoration-color: color-mix(in srgb, var(--hab-tone) 52%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .copy-button { border-color: color-mix(in srgb, var(--hab-tone) 26%, transparent); background: color-mix(in srgb, var(--hab-tone) 5%, transparent); color: color-mix(in srgb, var(--hab-tone) 55%, var(--foreground)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .copy-button:hover { background: color-mix(in srgb, var(--hab-tone) 14%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .footer { background: color-mix(in srgb, var(--background) 14%, transparent); border-color: color-mix(in srgb, var(--hab-tone) 14%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.footer-left p, .footer-right) { color: var(--hab-text-dim); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .project-dialog { background: linear-gradient(130deg, color-mix(in srgb, var(--hab-surface) 96%, transparent), color-mix(in srgb, var(--background) 97%, transparent)); border-color: color-mix(in srgb, var(--hab-tone) 34%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.project-dialog [data-slot=dialog-description], .dialog-content li) { color: color-mix(in srgb, var(--hab-text) 80%, var(--foreground)); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) .dialog-note { color: var(--hab-text-dim); border-color: color-mix(in srgb, var(--hab-tone) 20%, transparent); }
+:root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) [data-slot=dialog-overlay] { background: color-mix(in srgb, var(--background) 55%, transparent); }
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root:is([data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]) :is(.site-header, .project-card, .about-band, .timeline, .craft-layout, .contact-section, .project-dialog) { background-color: var(--hab-surface); }
+}

@@ -36,6 +36,39 @@
   --c-button-light: #f4a184;
 }
 
+:global([data-pokemon-theme="piplup"]) .console {
+  --c-body: #a9d8f2;
+  --c-light: #e6f6ff;
+  --c-shade: #6aa6cc;
+  --c-bezel: #1f3448;
+  --c-stripe-a: #4a9fd8;
+  --c-stripe-b: #f2c46b;
+  --c-button: #e0a03a;
+  --c-button-light: #ffd98a;
+}
+
+:global([data-pokemon-theme="charmander"]) .console {
+  --c-body: #f2a272;
+  --c-light: #ffe2cc;
+  --c-shade: #c4683c;
+  --c-bezel: #3a1d14;
+  --c-stripe-a: #e8582a;
+  --c-stripe-b: #ffd36b;
+  --c-button: #c43a1f;
+  --c-button-light: #ff9a72;
+}
+
+:global([data-pokemon-theme="bulbasaur"]) .console {
+  --c-body: #a8dca0;
+  --c-light: #e8f8e2;
+  --c-shade: #6ea86a;
+  --c-bezel: #213a26;
+  --c-stripe-a: #4f9a52;
+  --c-stripe-b: #6fd0c4;
+  --c-button: #d9607e;
+  --c-button-light: #f7a6bc;
+}
+
 .shell {
   display: block;
   width: 100%;
@@ -80,14 +113,6 @@
   transition: filter .3s steps(3);
 }
 
-.partnerGible,
-:global([data-pokemon-theme="gible"]) .partnerGengar {
-  display: none;
-}
-
-:global([data-pokemon-theme="gible"]) .partnerGible {
-  display: block;
-}
 
 :global(a:hover) > .console,
 :global(a:focus-visible) > .console {

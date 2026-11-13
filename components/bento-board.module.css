@@ -6,8 +6,10 @@
   --profile-bg: #6c60d2;
   --profile-fg: #ffffff;
   --portrait-disc: #f0a9ff;
-  --seal-bg: #0b0a14;
-  --seal-fg: #ffffff;
+  --seal-bg: #fffdf7;
+  --seal-fg: #21172d;
+  --seal-accent: #7352ad;
+  --seal-button: #7352ad;
   --tile-a-bg: #a6ddd4;
   --tile-a-fg: #10201d;
   --tile-b-bg: #9a78d0;
@@ -39,8 +41,10 @@
   --profile-bg: #e2b666;
   --profile-fg: #24180c;
   --portrait-disc: #8dc9f2;
-  --seal-bg: #24180c;
-  --seal-fg: #f6edda;
+  --seal-bg: #fff9e9;
+  --seal-fg: #2a1e10;
+  --seal-accent: #765018;
+  --seal-button: #765018;
   --tile-a-bg: #9fcdbb;
   --tile-a-fg: #10201a;
   --tile-b-bg: #b9603f;
@@ -50,6 +54,69 @@
   --tile-d-bg: #8dc9f2;
   --tile-d-fg: #0c1a2c;
   --media-bg: linear-gradient(140deg, #f2d08e, #e39a6c 55%, #8dc9f2);
+}
+
+:global([data-pokemon-theme="piplup"]) .page {
+  --board: #12202f;
+  --board-edge: #8fd6ff2a;
+  --profile-bg: #4a9fd8;
+  --profile-fg: #06192a;
+  --portrait-disc: #f2c46b;
+  --seal-bg: #f7fbff;
+  --seal-fg: #06192a;
+  --seal-accent: #276b90;
+  --seal-button: #276b90;
+  --tile-a-bg: #9fdcf5;
+  --tile-a-fg: #06192a;
+  --tile-b-bg: #2f6fa8;
+  --tile-b-fg: #ffffff;
+  --tile-c-bg: #1f344a;
+  --tile-c-fg: #eaf4fb;
+  --tile-d-bg: #f2c46b;
+  --tile-d-fg: #2a1a04;
+  --media-bg: linear-gradient(140deg, #9fdcf5, #4a9fd8 55%, #f2c46b);
+}
+
+:global([data-pokemon-theme="charmander"]) .page {
+  --board: #221310;
+  --board-edge: #ff8a4c2e;
+  --profile-bg: #f07a3a;
+  --profile-fg: #2a0f04;
+  --portrait-disc: #ffd36b;
+  --seal-bg: #fff9f3;
+  --seal-fg: #2a0f04;
+  --seal-accent: #9f3f20;
+  --seal-button: #9f3f20;
+  --tile-a-bg: #ffd36b;
+  --tile-a-fg: #2a1a04;
+  --tile-b-bg: #b8361f;
+  --tile-b-fg: #ffffff;
+  --tile-c-bg: #3a221b;
+  --tile-c-fg: #fbefe6;
+  --tile-d-bg: #7fc6d8;
+  --tile-d-fg: #0c1a24;
+  --media-bg: linear-gradient(140deg, #ffd36b, #ff8a4c 55%, #b8361f);
+}
+
+:global([data-pokemon-theme="bulbasaur"]) .page {
+  --board: #142118;
+  --board-edge: #86d17a2a;
+  --profile-bg: #6fbf73;
+  --profile-fg: #0d2410;
+  --portrait-disc: #6fd0c4;
+  --seal-bg: #f8fff8;
+  --seal-fg: #0d2410;
+  --seal-accent: #376b43;
+  --seal-button: #376b43;
+  --tile-a-bg: #6fd0c4;
+  --tile-a-fg: #072420;
+  --tile-b-bg: #3f7d46;
+  --tile-b-fg: #ffffff;
+  --tile-c-bg: #23382a;
+  --tile-c-fg: #eef6e8;
+  --tile-d-bg: #f28fb1;
+  --tile-d-fg: #2a0c18;
+  --media-bg: linear-gradient(140deg, #c9f0a5, #6fbf73 55%, #6fd0c4);
 }
 
 .board {
@@ -248,20 +315,30 @@
   right: 8px;
 }
 
-.themePick :global(.theme-selector) {
-  border-color: color-mix(in srgb, var(--profile-fg) 22%, transparent);
+.themePick :global(.theme-trigger) {
+  min-height: 34px;
+  color: var(--profile-fg);
+  border-color: color-mix(in srgb, var(--profile-fg) 24%, transparent);
   background: color-mix(in srgb, var(--profile-fg) 10%, transparent);
 }
 
-.themePick :global(.theme-choice) {
-  min-height: 30px;
-  color: color-mix(in srgb, var(--profile-fg) 72%, transparent);
+.themePick :global(.theme-trigger:hover),
+.themePick :global(.theme-trigger[data-state="open"]) {
+  border-color: color-mix(in srgb, var(--profile-fg) 42%, transparent);
+  background: color-mix(in srgb, var(--profile-fg) 18%, transparent);
 }
 
-.themePick :global(.theme-choice.is-selected) {
+.themePick :global(:is(.theme-trigger-sprite, .theme-rotation-badge)) {
   color: var(--profile-fg);
-  background: color-mix(in srgb, var(--profile-fg) 18%, transparent);
-  border-color: color-mix(in srgb, var(--profile-fg) 30%, transparent);
+  background: color-mix(in srgb, var(--profile-fg) 12%, transparent);
+}
+
+.themePick :global(.theme-rotation-badge) {
+  border-radius: 50%;
+}
+
+.themePick :global(.theme-trigger-chevron) {
+  color: color-mix(in srgb, var(--profile-fg) 70%, transparent);
 }
 
 .themePick :global(.habitat-pause) {
@@ -286,6 +363,7 @@
   width: min(64%, 250px, 31vh);
   aspect-ratio: 1;
   margin-top: -6px;
+  overflow: visible;
   border: 5px solid #fff;
   border-radius: 50%;
 }
@@ -299,26 +377,28 @@
 
 .partner {
   position: absolute;
-  left: 4%;
-  bottom: -9%;
-  width: 92%;
-  height: 92%;
-  filter: drop-shadow(0 14px 14px #0005);
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(1) contrast(1.12) drop-shadow(0 14px 14px #0007);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0 82%, transparent 100%);
+  scale: 1.1;
+  translate: 0 6px;
+  animation: portrait-float 4s ease-in-out infinite alternate;
   transition: transform .45s var(--ease-spring);
 }
 
 .profile:hover .partner {
-  transform: translateY(-8px) rotate(-4deg) scale(1.05);
+  transform: translateY(-8px) rotate(-3deg) scale(1.04);
 }
 
-.partnerGible,
-:global([data-pokemon-theme="gible"]) .partnerGengar {
-  display: none;
+@keyframes portrait-float {
+  to { translate: 0 2px; }
 }
 
-:global([data-pokemon-theme="gible"]) .partnerGible {
-  display: block;
-}
 
 .name {
   margin: auto 0 0;
@@ -371,9 +451,9 @@
 
 .seal {
   flex-shrink: 0;
-  width: clamp(76px, 11vh, 96px);
-  height: clamp(76px, 11vh, 96px);
-  color: var(--seal-bg);
+  width: clamp(80px, 11.5vh, 104px);
+  height: clamp(80px, 11.5vh, 104px);
+  color: var(--seal-accent);
 }
 
 .sealText {
@@ -668,20 +748,30 @@
   right: 8px;
 }
 
-.themePick :global(.theme-selector) {
-  border-color: color-mix(in srgb, var(--profile-fg) 22%, transparent);
+.themePick :global(.theme-trigger) {
+  min-height: 34px;
+  color: var(--profile-fg);
+  border-color: color-mix(in srgb, var(--profile-fg) 24%, transparent);
   background: color-mix(in srgb, var(--profile-fg) 10%, transparent);
 }
 
-.themePick :global(.theme-choice) {
-  min-height: 30px;
-  color: color-mix(in srgb, var(--profile-fg) 72%, transparent);
+.themePick :global(.theme-trigger:hover),
+.themePick :global(.theme-trigger[data-state="open"]) {
+  border-color: color-mix(in srgb, var(--profile-fg) 42%, transparent);
+  background: color-mix(in srgb, var(--profile-fg) 18%, transparent);
 }
 
-.themePick :global(.theme-choice.is-selected) {
+.themePick :global(:is(.theme-trigger-sprite, .theme-rotation-badge)) {
   color: var(--profile-fg);
-  background: color-mix(in srgb, var(--profile-fg) 18%, transparent);
-  border-color: color-mix(in srgb, var(--profile-fg) 30%, transparent);
+  background: color-mix(in srgb, var(--profile-fg) 12%, transparent);
+}
+
+.themePick :global(.theme-rotation-badge) {
+  border-radius: 50%;
+}
+
+.themePick :global(.theme-trigger-chevron) {
+  color: color-mix(in srgb, var(--profile-fg) 70%, transparent);
 }
 
 .themePick :global(.habitat-pause) {
@@ -736,18 +826,9 @@
     --tab-width: 46%;
   }
 
-  /* Sprites only on phones; the names stay for screen readers. */
-  .themePick :global(.theme-choice) {
-    padding-inline: 3px;
-  }
-
-  .themePick :global(.theme-choice > span:last-child) {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+  /* Sprite only on phones; the trigger's label stays for screen readers. */
+  .themePick :global(.theme-trigger-label) {
+    display: none;
   }
 
   /* The name's link stretches over the whole card; controls inside sit above it. */
@@ -796,20 +877,30 @@
   right: 8px;
 }
 
-.themePick :global(.theme-selector) {
-  border-color: color-mix(in srgb, var(--profile-fg) 22%, transparent);
+.themePick :global(.theme-trigger) {
+  min-height: 34px;
+  color: var(--profile-fg);
+  border-color: color-mix(in srgb, var(--profile-fg) 24%, transparent);
   background: color-mix(in srgb, var(--profile-fg) 10%, transparent);
 }
 
-.themePick :global(.theme-choice) {
-  min-height: 30px;
-  color: color-mix(in srgb, var(--profile-fg) 72%, transparent);
+.themePick :global(.theme-trigger:hover),
+.themePick :global(.theme-trigger[data-state="open"]) {
+  border-color: color-mix(in srgb, var(--profile-fg) 42%, transparent);
+  background: color-mix(in srgb, var(--profile-fg) 18%, transparent);
 }
 
-.themePick :global(.theme-choice.is-selected) {
+.themePick :global(:is(.theme-trigger-sprite, .theme-rotation-badge)) {
   color: var(--profile-fg);
-  background: color-mix(in srgb, var(--profile-fg) 18%, transparent);
-  border-color: color-mix(in srgb, var(--profile-fg) 30%, transparent);
+  background: color-mix(in srgb, var(--profile-fg) 12%, transparent);
+}
+
+.themePick :global(.theme-rotation-badge) {
+  border-radius: 50%;
+}
+
+.themePick :global(.theme-trigger-chevron) {
+  color: color-mix(in srgb, var(--profile-fg) 70%, transparent);
 }
 
 .themePick :global(.habitat-pause) {
@@ -822,8 +913,8 @@
   }
 
   .seal {
-    width: 84px;
-    height: 84px;
+    width: 92px;
+    height: 92px;
   }
 
   .showcase {

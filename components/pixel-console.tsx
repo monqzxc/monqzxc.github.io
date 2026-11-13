@@ -1,4 +1,4 @@
-import { PokemonSprite } from "@/components/pokemon-sprite";
+import { ThemePartner } from "@/components/pokemon-theme";
 import styles from "./pixel-console.module.css";
 
 /*
@@ -90,8 +90,7 @@ export function PixelConsole() {
         ))}
       </svg>
       <span className={styles.screen} style={{ left: percent(LCD.x, WIDTH), top: percent(LCD.y, HEIGHT), width: percent(LCD.width, WIDTH), height: percent(LCD.height, HEIGHT) }}>
-        <PokemonSprite species="gengar" className={`${styles.partner} ${styles.partnerGengar}`} />
-        <PokemonSprite species="gible" className={`${styles.partner} ${styles.partnerGible}`} />
+        <ThemePartner className={styles.partner} />
       </span>
     </span>
   );

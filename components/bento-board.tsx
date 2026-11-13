@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ArrowUpRight, FileText, Mail, Play, Sparkles } from "lucide-react";
 import ContactModal from "@/components/contact-modal";
 import { PixelConsole } from "@/components/pixel-console";
 import { PixelStage } from "@/components/pixel-stage";
-import { PokemonSprite } from "@/components/pokemon-sprite";
 import { PokemonHabitat, ThemeSelector } from "@/components/pokemon-theme";
 import { GAMES_HREF, games } from "@/lib/games";
 import { PORTFOLIO_HREF } from "@/lib/navigation";
+import { googleCertificates } from "@/lib/cv-data";
 import { personalProjects, projects } from "@/lib/projects";
 import styles from "./bento-board.module.css";
 
@@ -27,16 +28,18 @@ function PortfolioSeal() {
       <defs>
         <path id="bento-seal-path" d="M60 60m-41 0a41 41 0 1 1 82 0a41 41 0 1 1-82 0" />
       </defs>
-      <circle cx="60" cy="60" r="58" fill="none" stroke="currentColor" strokeOpacity=".35" />
-      <circle cx="60" cy="60" r="52" fill="var(--seal-bg)" />
+      <circle cx="60" cy="60" r="58" fill="none" stroke="currentColor" strokeOpacity=".72" />
+      <circle cx="60" cy="60" r="52" fill="var(--seal-bg)" stroke="var(--seal-accent)" strokeOpacity=".58" />
+      <path d="M24 60h25 M71 60h25" fill="none" stroke="var(--seal-accent)" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M27 64h18 M75 64h18" fill="none" stroke="var(--seal-fg)" strokeOpacity=".3" strokeWidth=".75" />
       <g className={styles.sealText}>
         <text fill="var(--seal-fg)" fontSize="10.5" fontWeight="600" letterSpacing="3.4">
           <textPath href="#bento-seal-path">{`${new Date().getFullYear()} · MON · DEV PORTFOLIO ·`}</textPath>
         </text>
       </g>
-      <path d="M30 60h60" stroke="var(--seal-fg)" strokeOpacity=".3" strokeWidth="1.5" />
-      <circle cx="60" cy="60" r="12" fill="var(--seal-bg)" stroke="var(--seal-fg)" strokeOpacity=".3" strokeWidth="1.5" />
-      <circle cx="60" cy="60" r="7" fill="var(--seal-fg)" />
+      <circle cx="60" cy="60" r="13" fill="var(--seal-bg)" stroke="var(--seal-accent)" strokeWidth="2" />
+      <circle cx="60" cy="60" r="6.5" fill="var(--seal-button)" />
+      <circle cx="58" cy="57.5" r="1.6" fill="var(--seal-fg)" opacity=".72" />
     </svg>
   );
 }
@@ -66,8 +69,15 @@ export default function BentoBoard() {
             </div>
             <div className={styles.portrait} aria-hidden="true">
               <span className={styles.portraitDisc} />
-              <PokemonSprite species="gengar" className={`${styles.partner} ${styles.partnerGengar}`} />
-              <PokemonSprite species="gible" className={`${styles.partner} ${styles.partnerGible}`} />
+              <Image
+                className={styles.partner}
+                src="/images/anthony-portrait-cutout.png"
+                width={768}
+                height={768}
+                sizes="(max-width: 760px) 58vw, 260px"
+                alt=""
+                preload
+              />
             </div>
             <h1 id="bento-name" className={styles.name}>
               {/* Stretched over the whole card: the trainer card opens the full portfolio. */}
@@ -103,12 +113,12 @@ export default function BentoBoard() {
           <p className={styles.title} aria-hidden="true">Portfolio</p>
 
           <div className={styles.grid}>
-            <a className={`${styles.card} ${styles.tile} ${styles.media}`} href={`${PORTFOLIO_HREF}#projects`}>
+            <a className={`${styles.card} ${styles.tile} ${styles.media}`} href={`${PORTFOLIO_HREF}#craft-hobbies`}>
               <PixelStage className={styles.mediaStage} />
               <span className={styles.play} aria-hidden="true"><Play size={20} fill="currentColor" /></span>
               <span className={styles.mediaCaption}>
-                <strong>Selected work</strong>
-                <span>Step-by-step walkthroughs of real systems</span>
+                <strong>Off the clock</strong>
+                <span>Runs, anime, new places, and a walking game where 5 km hatches an egg</span>
               </span>
             </a>
 
@@ -117,9 +127,9 @@ export default function BentoBoard() {
                 <strong>{projectCount}</strong>
                 <span>Projects</span>
               </a>
-              <a className={`${styles.card} ${styles.tile} ${styles.stat} ${styles.statBottom}`} href={`${PORTFOLIO_HREF}#timeline`}>
-                <strong>7+</strong>
-                <span>Years building</span>
+              <a className={`${styles.card} ${styles.tile} ${styles.stat} ${styles.statBottom}`} href={`${PORTFOLIO_HREF}#certifications`}>
+                <strong>{googleCertificates.length}</strong>
+                <span>Certifications</span>
               </a>
             </div>
 

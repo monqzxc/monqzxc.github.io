@@ -48,6 +48,11 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | Glass surfaces, typography, and visual refinements | `app/glass-theme.css` |
 | Illustrated hero layout and responsive rules | `app/hero.css` |
 | Final purple/blue palette, panels, buttons, and character labels | `app/pokemon-theme.css` |
+| Gible (Ground) palette | `app/ground-theme.css` |
+| Piplup (Water), Charmander (Fire), and Bulbasaur (Grass) palettes, built from a few tokens each | `app/elemental-theme.css` |
+| Habitat rosters, legendaries and mythicals, and theme metadata | `lib/pokemon-roster.ts` |
+| Automatic habitat changes (in order or shuffled, on a timer or each visit) | `lib/theme-rotation.ts` |
+| Side-view sprite download from PMD SpriteCollab | `scripts/fetch-habitat-motion.mjs` |
 | Self-hosted fonts and their OFL licenses | `public/fonts/` |
 | Vue interests and tab behavior | `components/craft-app.ts` |
 | React/Vue lifecycle boundary | `components/vue-craft.tsx` |

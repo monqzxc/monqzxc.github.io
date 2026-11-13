@@ -98,7 +98,7 @@ export default function Portfolio() {
               </li>
             ))}
           </ol>
-          <div className={styles.certifications}>
+          <div id="certifications" className={styles.certifications}>
             <div className={styles.certHeading}><h3 id="certifications-heading">Certifications</h3></div>
             <ul className={styles.certGrid} aria-labelledby="certifications-heading">
               {googleCertificates.map(({ title, issuer, issued, coursera, credly }) => (

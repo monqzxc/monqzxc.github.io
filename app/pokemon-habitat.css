@@ -9,15 +9,85 @@
 .site-header .nav-links { order: 1; }
 .theme-controls { order: 2; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .site-header .menu-toggle { order: 3; flex-shrink: 0; }
-.theme-selector { display: flex; gap: 3px; margin: 0; padding: 4px; min-width: 0; border: 1px solid var(--border); border-radius: 100px; background: color-mix(in srgb, var(--background) 70%, transparent); }
-.theme-choice { display: flex; align-items: center; justify-content: center; gap: 3px; min-height: 36px; padding: 1px 10px 1px 3px; border: 1px solid transparent; border-radius: 100px; color: var(--muted-foreground); cursor: pointer; font-size: 12px; font-weight: 600; transition: background .2s, color .2s, border-color .2s; }
-.theme-choice .theme-sprite { width: 33px; height: 33px; flex-shrink: 0; margin-block: -3px; transition: filter .2s; }
-.theme-choice:not(.is-selected) .theme-sprite { filter: saturate(.55) brightness(.9); }
-.theme-choice:not(.is-selected) .pokemon-sprite-sheet { animation-play-state: paused; }
-.theme-choice:hover .theme-sprite { filter: none; animation: theme-sprite-hop .42s cubic-bezier(.3, .7, .4, 1); }
-.theme-choice:hover { color: var(--foreground); background: color-mix(in srgb, var(--primary) 8%, transparent); }
-.theme-choice.is-selected { color: var(--foreground); background: color-mix(in srgb, var(--primary) 17%, transparent); border-color: color-mix(in srgb, var(--primary) 32%, transparent); }
-.theme-choice:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 3px; }
+/* Only the active theme's partner shows; all are in the markup so the first paint is already right. */
+.for-theme { display: contents; }
+:root[data-pokemon-theme="gengar"] .for-theme:not([data-for="gengar"]),
+:root[data-pokemon-theme="gible"] .for-theme:not([data-for="gible"]),
+:root[data-pokemon-theme="piplup"] .for-theme:not([data-for="piplup"]),
+:root[data-pokemon-theme="charmander"] .for-theme:not([data-for="charmander"]),
+:root[data-pokemon-theme="bulbasaur"] .for-theme:not([data-for="bulbasaur"]) { display: none; }
+
+/* ── Habitat picker: a pill showing the partner, opening a panel of habitats ── */
+.theme-trigger { display: flex; align-items: center; gap: 4px; min-height: 40px; padding: 2px 10px 2px 3px; border: 1px solid var(--border); border-radius: 100px; background: color-mix(in srgb, var(--background) 70%, transparent); color: var(--foreground); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .2s, border-color .2s, box-shadow .2s; }
+.theme-trigger:disabled { cursor: progress; }
+.theme-trigger:hover, .theme-trigger[data-state="open"] { border-color: color-mix(in srgb, var(--primary) 45%, transparent); background: color-mix(in srgb, var(--primary) 12%, var(--background)); }
+.theme-trigger[data-state="open"] { box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent); }
+.theme-trigger:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.theme-trigger-sprite { display: grid; place-items: center; width: 34px; height: 34px; margin-block: -2px; border-radius: 50%; background: color-mix(in srgb, var(--primary) 16%, transparent); }
+.theme-trigger .theme-sprite { width: 32px; height: 32px; }
+.theme-trigger:hover .theme-sprite { animation: theme-sprite-hop .42s cubic-bezier(.3, .7, .4, 1); }
+.theme-trigger-label { white-space: nowrap; }
+.theme-trigger-chevron { flex-shrink: 0; color: var(--muted-foreground); transition: transform .25s cubic-bezier(.3, .7, .4, 1); }
+.theme-trigger[data-state="open"] .theme-trigger-chevron { transform: rotate(180deg); }
+/* A small ring empties as the countdown to the next habitat runs. */
+.theme-rotation-badge { position: relative; display: grid; place-items: center; width: 20px; height: 20px; flex-shrink: 0; color: var(--primary); }
+.theme-rotation-badge svg { position: absolute; inset: 0; rotate: -90deg; }
+.theme-rotation-badge circle { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 53.4; stroke-dashoffset: 0; opacity: .8; animation: rotation-countdown var(--rotation-ms) linear var(--rotation-delay, 0ms) both; }
+.theme-rotation-badge.is-held circle, .theme-next-bar.is-held i { animation-play-state: paused; }
+.theme-rotation-badge > :is(.lucide, svg:last-child) { width: 10px; height: 10px; }
+
+.theme-panel { z-index: 60; width: min(352px, calc(100vw - 24px)); max-height: min(760px, var(--radix-popover-content-available-height, calc(100dvh - 90px))); overflow: auto; overscroll-behavior: contain; padding: 12px; border: 1px solid color-mix(in srgb, var(--primary) 26%, transparent); border-radius: 20px; background: color-mix(in srgb, var(--background) 92%, var(--primary)); color: var(--foreground); box-shadow: 0 30px 70px -28px #000d, inset 0 1px 0 color-mix(in srgb, var(--foreground) 8%, transparent); transform-origin: var(--radix-popover-content-transform-origin); animation: theme-panel-in .22s cubic-bezier(.2, .9, .3, 1.15); }
+.theme-panel[data-state="closed"] { animation: theme-panel-out .14s ease-in both; }
+.theme-panel-arrow { fill: color-mix(in srgb, var(--background) 92%, var(--primary)); }
+.theme-panel-head { padding: 2px 4px 9px; }
+.theme-panel-title { margin: 0; font-family: var(--font-display, inherit); font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+.theme-panel-sub { margin: 2px 0 0; color: var(--muted-foreground); font-size: 12px; line-height: 1.5; }
+
+.theme-options { display: grid; gap: 5px; }
+.theme-option { --swatch: var(--primary); position: relative; display: grid; grid-template-columns: 42px 1fr 22px; align-items: center; gap: 10px; padding: 5px 10px 5px 5px; border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--foreground) 3%, transparent); cursor: pointer; transition: background .2s, border-color .2s, transform .2s; }
+.theme-option:hover { border-color: color-mix(in srgb, var(--swatch) 40%, transparent); background: color-mix(in srgb, var(--swatch) 8%, transparent); }
+.theme-option:active { transform: scale(.985); }
+.theme-option.is-selected { border-color: color-mix(in srgb, var(--swatch) 70%, transparent); background: linear-gradient(110deg, color-mix(in srgb, var(--swatch) 20%, transparent), color-mix(in srgb, var(--swatch) 6%, transparent)); }
+.theme-option:has(input:focus-visible) { outline: 2px solid var(--swatch); outline-offset: 2px; }
+.theme-option-stage { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 11px; background: radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--swatch) 32%, transparent), color-mix(in srgb, var(--swatch) 8%, transparent) 70%); }
+.theme-option-sprite { width: 40px; }
+.theme-option:not(.is-selected):not(:hover) .theme-option-sprite { filter: saturate(.7) brightness(.92); }
+.theme-option:not(.is-selected):not(:hover) .pokemon-sprite-sheet { animation-play-state: paused; }
+.theme-option:hover .theme-option-sprite { animation: theme-sprite-hop .42s cubic-bezier(.3, .7, .4, 1); }
+.theme-option-text { display: grid; gap: 0; min-width: 0; }
+/* Habitat and visitors share a line to keep each row short. */
+.theme-option-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.theme-option-name { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; }
+.theme-option-type { padding: 1px 7px; border-radius: 100px; background: color-mix(in srgb, var(--swatch) 22%, transparent); color: color-mix(in srgb, var(--swatch) 55%, var(--foreground)); font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.theme-option-habitat { color: var(--muted-foreground); font-size: 12px; }
+.theme-option-specials { display: flex; flex-wrap: wrap; gap: 3px 8px; font-size: 11px; font-weight: 600; }
+.theme-option-specials > span { display: inline-flex; align-items: center; gap: 3px; }
+.theme-option-specials .is-legendary { color: #f5cf63; }
+.theme-option-specials .is-mythical { color: #f6a6e0; }
+.theme-option-check { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--swatch); color: #10101a; opacity: 0; transform: scale(.4); transition: opacity .18s, transform .25s cubic-bezier(.3, 1.5, .5, 1); }
+.theme-option.is-selected .theme-option-check { opacity: 1; transform: none; }
+
+.theme-setting { margin: 12px 0 0; padding: 0; border: 0; min-width: 0; }
+.theme-setting legend { padding: 0 4px 7px; color: var(--muted-foreground); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.theme-setting:disabled { opacity: .45; }
+.theme-segmented { display: grid; grid-template-columns: repeat(3, 1fr); padding: 3px; border: 1px solid var(--border); border-radius: 12px; background: color-mix(in srgb, var(--foreground) 3%, transparent); }
+.theme-segmented label, .theme-chips label { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px; border: 1px solid transparent; color: var(--muted-foreground); font-size: 12px; font-weight: 600; cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.theme-segmented label { border-radius: 9px; }
+.theme-segmented label:hover, .theme-chips label:hover { color: var(--foreground); }
+.theme-segmented label.is-selected { background: var(--primary); color: var(--primary-foreground); box-shadow: 0 4px 14px -8px var(--primary); }
+.theme-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.theme-chips label { flex: 1 0 auto; padding-inline: 10px; border-color: var(--border); border-radius: 100px; }
+.theme-chips label.is-selected { border-color: color-mix(in srgb, var(--primary) 60%, transparent); background: color-mix(in srgb, var(--primary) 16%, transparent); color: var(--foreground); }
+.theme-setting:disabled label { cursor: not-allowed; }
+:is(.theme-segmented, .theme-chips) label:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.theme-next { position: relative; display: flex; align-items: center; gap: 8px; min-height: 40px; margin: 12px 0 0; padding: 8px 10px; overflow: hidden; border-radius: 12px; background: color-mix(in srgb, var(--primary) 8%, transparent); color: var(--muted-foreground); font-size: 12px; line-height: 1.4; }
+.theme-next strong { color: var(--foreground); }
+.theme-next-sprite { display: grid; place-items: center; width: 26px; height: 26px; flex-shrink: 0; color: var(--primary); }
+.theme-next-sprite .pokemon-sprite { width: 26px; }
+.theme-next-bar { position: absolute; inset: auto 0 0; height: 3px; background: color-mix(in srgb, var(--primary) 14%, transparent); }
+.theme-next-bar i { display: block; height: 100%; background: var(--primary); transform-origin: left; animation: rotation-progress var(--rotation-ms) linear var(--rotation-delay, 0ms) both; }
+
 .habitat-pause { display: grid; place-items: center; width: 28px; height: 36px; border: 0; border-radius: 9px; background: transparent; color: var(--muted-foreground); }
 .habitat-pause:hover { color: var(--foreground); background: color-mix(in srgb, var(--primary) 12%, transparent); }
 .habitat-hint { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; color: var(--muted-foreground); font-size: 11px; }
@@ -53,7 +123,12 @@
 :where(.pokemon-slot.is-ghost.is-air) :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 4px 12px #a271f640); }
 .pokemon-slot[data-species="giratina"] :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 0 8px #e0b84a40); }
 .pokemon-slot[data-species="groudon"] :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 0 10px #ff6a2a55); }
-.pokemon-slot.is-shiny :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 0 4px #ffd23f99); }
+.pokemon-slot[data-species="kyogre"] :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 0 10px #3fa9ff66); }
+.pokemon-slot[data-species="ho_oh"] :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 0 12px #ffb03f66); }
+.pokemon-slot[data-species="virizion"] :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 0 9px #7be38a55); }
+/* Mythicals shimmer with a soft prismatic halo. */
+.pokemon-slot.is-mythical :is(.pokemon-character, .pokemon-motion) { animation: mythical-halo 3.2s ease-in-out infinite; }
+.pokemon-slot.is-shiny :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 0 4px #ffd23f99); animation: none; }
 
 /* Side view: travelling and attacking swap the front sprite for a side-on strip.
    Hidden strips keep their box so the sheet is already loaded when it is needed. */
@@ -101,7 +176,11 @@
 /* Fading away: a ghostly portal, or a puff of sand on the mountain trail. */
 .pokemon-portal { position: absolute; inset: 8%; border: 1px solid #bca0ef70; border-radius: 50%; background: radial-gradient(ellipse, #aa7cdd1a, transparent 65%); box-shadow: 0 0 17px #9970e532, inset 0 0 12px #9970e524; opacity: 0; }
 .habitat-gible .pokemon-portal { border-color: #e2bf8466; background: radial-gradient(ellipse, #d8ab6a33, transparent 68%); box-shadow: 0 0 18px #d6a35a2e, inset 0 0 12px #e4c08a2a; }
-.pokemon-slot.is-legendary .pokemon-portal { inset: -6%; }
+.habitat-piplup .pokemon-portal { border-color: #8fd6ff80; background: radial-gradient(ellipse, #3fa9ff26, transparent 66%); box-shadow: 0 0 18px #3fa9ff38, inset 0 0 12px #bfe9ff30; }
+.habitat-charmander .pokemon-portal { border-color: #ffa25c80; background: radial-gradient(ellipse, #ff6a2a30, transparent 66%); box-shadow: 0 0 20px #ff6a2a40, inset 0 0 12px #ffd36b30; }
+.habitat-bulbasaur .pokemon-portal { border-color: #9be38a75; background: radial-gradient(ellipse, #5fc66a26, transparent 66%); box-shadow: 0 0 18px #5fc66a33, inset 0 0 12px #c9f5a52a; }
+.pokemon-slot.is-legendary .pokemon-portal, .pokemon-slot.is-mythical .pokemon-portal { inset: -6%; }
+.pokemon-slot.is-mythical .pokemon-portal { border-color: #ffc0ec99; background: radial-gradient(ellipse, #ff9be033, transparent 66%); box-shadow: 0 0 24px #ff9be04d, inset 0 0 14px #b8f0ff40; }
 .pokemon-slot[data-species="giratina"] .pokemon-portal { border-color: #e0405a66; background: radial-gradient(ellipse, #0009, transparent 70%); box-shadow: 0 0 26px #000b, inset 0 0 16px #e0405a33; }
 .pokemon-slot:is([data-activity="appear"], [data-activity="vanish"]) .pokemon-portal { animation: ghost-portal var(--activity-duration) ease-in-out both; }
 .pokemon-slot[data-activity="appear"] .pokemon-presence { animation: ghost-arrive var(--activity-duration) ease-out both; }
@@ -120,6 +199,9 @@
 .pokemon-dust { position: absolute; inset: 0; pointer-events: none; }
 .pokemon-dust i { position: absolute; left: 30%; bottom: 4%; width: 5px; height: 4px; border-radius: 40%; background: #d0a76e; opacity: 0; --dust-drift: -21px; }
 .habitat-gengar .pokemon-dust i { background: #8f78ad; }
+.habitat-piplup .pokemon-dust i { background: #a8dcf5; border-radius: 50%; }
+.habitat-charmander .pokemon-dust i { background: #ff9a52; }
+.habitat-bulbasaur .pokemon-dust i { background: #8fcf74; }
 .pokemon-dust i:nth-child(2) { left: 60%; width: 4px; --dust-drift: 24px; }
 .pokemon-dust i:nth-child(3) { left: 48%; width: 3px; --dust-drift: -7px; }
 .pokemon-slot:is([data-activity="burrow"], [data-activity="emerge"]) .pokemon-dust i { animation: soil-scatter .65s ease-out infinite; }
@@ -154,6 +236,12 @@
 .pokemon-callout.is-shiny-callout { color: #ffd23f; border-color: #ffd23f80; animation-delay: .35s; }
 .pokemon-name { animation: pokemon-label-in .16s ease-out both; }
 .pokemon-name > span, .pokemon-hello > span { color: #ffd23f; }
+.pokemon-name > small { margin-left: 2px; padding-left: 6px; border-left: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent); color: var(--muted-foreground); font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.pokemon-slot.is-legendary .pokemon-name > small { color: #f5cf63; }
+.pokemon-slot.is-mythical .pokemon-name > small { color: #f6a6e0; }
+.pokemon-callout.is-rarity-callout { font-size: 11px; animation-delay: .35s; }
+.pokemon-callout.is-legendary { color: #f5cf63; border-color: #f5cf6380; }
+.pokemon-callout.is-mythical { color: #f6a6e0; border-color: #f6a6e080; background: linear-gradient(90deg, color-mix(in srgb, var(--background) 88%, #ff9be0), color-mix(in srgb, var(--background) 88%, #8fd6ff)); }
 
 /* ── Shiny: a ground glow behind, twinkling stars in front, a burst on arrival ── */
 .shiny-glow { position: absolute; left: 10%; top: 80%; width: 80%; height: 24%; border: 2px solid #ffd23f; border-radius: 50%; background: #ffe27a40; opacity: .8; animation: shiny-glow 2.2s ease-in-out infinite; }
@@ -249,14 +337,22 @@
 @keyframes shiny-twinkle { 0%, 100% { opacity: 0; scale: .4; } 50% { opacity: 1; scale: 1; } }
 @keyframes shiny-burst { 0% { opacity: 0; transform: rotate(var(--a)) translateY(0) scale(.5); } 15% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateY(-135%) scale(1.1); } }
 @keyframes theme-sprite-hop { 40% { transform: translateY(-4px); } }
+@keyframes theme-panel-in { from { opacity: 0; transform: translateY(-6px) scale(.96); } }
+@keyframes theme-panel-out { to { opacity: 0; transform: translateY(-4px) scale(.98); } }
+@keyframes rotation-countdown { to { stroke-dashoffset: 53.4; } }
+@keyframes rotation-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes mythical-halo {
+  0%, 100% { filter: drop-shadow(0 0 6px #ff9be080) drop-shadow(0 0 2px #fff6); }
+  50% { filter: drop-shadow(0 0 9px #8fd6ff90) drop-shadow(0 0 3px #fffa); }
+}
 
 @media (max-width: 1440px) { .site-header .brand-caption { display: none; } }
 @media (min-width: 761px) and (max-width: 1100px) {
   .site-header .nav { gap: 10px; padding-inline: 18px; }
   .nav-links a { font-size: 12px; padding-inline: 7px; }
   .nav-links .nav-contact { padding-inline: 9px; }
-  .theme-choice { padding-right: 7px; font-size: 11px; gap: 2px; }
-  .theme-choice .theme-sprite { width: 30px; height: 30px; }
+  .theme-trigger { padding-right: 8px; font-size: 11px; }
+  .theme-trigger-label { display: none; }
   .theme-controls { gap: 1px; }
 }
 @media (min-width: 761px) and (max-width: 940px) {
@@ -267,8 +363,12 @@
 @media (max-width: 760px) {
   .site-header .nav { gap: 8px; padding-inline: 12px; }
   .theme-controls { margin-left: auto; gap: 1px; }
-  .theme-choice { min-height: 34px; font-size: 11px; padding-inline: 2px 7px; gap: 1px; }
-  .theme-choice .theme-sprite { width: 28px; height: 28px; }
+  .theme-trigger { min-height: 36px; padding-right: 7px; gap: 2px; }
+  .theme-panel-sub { display: none; }
+  .theme-panel-head { padding-bottom: 7px; }
+  .theme-trigger-label { display: none; }
+  .theme-trigger-sprite { width: 30px; height: 30px; }
+  .theme-trigger .theme-sprite { width: 28px; height: 28px; }
   .habitat-pause { width: 24px; }
   .site-header .menu-toggle { padding: 7px; }
   /* Give every resident its own tappable patch on narrow screens. */
@@ -277,13 +377,16 @@
 }
 @media (max-width: 359px) {
   .site-header .nav { gap: 5px; padding-inline: 9px; }
-  .theme-choice .theme-sprite { width: 24px; height: 24px; }
-  .theme-choice { padding-inline: 2px 5px; }
-  .theme-selector { padding: 3px; }
+  .theme-trigger-sprite { width: 26px; height: 26px; }
+  .theme-trigger .theme-sprite { width: 24px; height: 24px; }
+  .theme-trigger { padding-right: 5px; }
   .site-header .wordmark strong { font-size: 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pokemon-habitat *, .pokemon-habitat *::before, .pokemon-habitat *::after, .theme-choice * { animation: none !important; transition: none !important; }
+  .pokemon-habitat *, .pokemon-habitat *::before, .pokemon-habitat *::after, .theme-trigger *, .theme-option * { animation: none !important; transition: none !important; }
+  .theme-panel, .theme-panel[data-state="closed"] { animation: none; }
+  /* The countdown still shows, as a static amount rather than a moving one. */
+  .theme-rotation-badge circle, .theme-next-bar i { animation: none !important; }
   .pokemon-habitat .pokemon-slot .pokemon-presence { opacity: var(--presence-opacity) !important; visibility: visible !important; }
   .pokemon-habitat .pokemon-emerge { transform: none !important; }
   .pokemon-habitat .pokemon-window { clip-path: none !important; }
@@ -293,3 +396,6 @@
   .shiny-glow { opacity: .58; }
 }
 @media print { .pokemon-habitat, .theme-controls, .habitat-hint { display: none; } }
+
+/* Switching habitats crossfades the whole page where View Transitions are supported. */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .5s; animation-timing-function: cubic-bezier(.4, 0, .2, 1); }

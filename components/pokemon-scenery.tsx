@@ -1,4 +1,7 @@
-type SceneryProps = { theme: "gengar" | "gible" };
+import type { ReactNode } from "react";
+import type { PokemonTheme } from "@/lib/pokemon-roster";
+
+type SceneryProps = { theme: PokemonTheme };
 
 function HauntedManor() {
   return <svg className="scenery-edge scenery-edge-left scenery-manor" viewBox="0 0 440 390" preserveAspectRatio="xMinYMax meet" fill="none" aria-hidden="true" focusable="false">
@@ -91,29 +94,195 @@ function PineGrove() {
   </svg>;
 }
 
+function LighthouseCove() {
+  return <svg className="scenery-edge scenery-edge-left scenery-lighthouse" viewBox="0 0 440 390" preserveAspectRatio="xMinYMax meet" fill="none" aria-hidden="true" focusable="false">
+    <path d="M0 370V250l38-30 52 8 44 40 30 58 46 30 40 14H0Z" fill="#1b2c40" />
+    <path d="m0 262 40-26 48 6-26 30-38 8L0 296Z" fill="#24405a" />
+    <path d="m88 242 42 34 26 52-38-18-20-38Z" fill="#203952" />
+    <g stroke="#3d6688" strokeWidth="2" opacity=".5"><path d="m14 268 22-10 18 6m40 8 18 14 10 22M30 318l20 6" /></g>
+    <path d="M58 236 68 92h40l10 144Z" fill="#7d93a8" opacity=".62" />
+    <g fill="#8c4256" opacity=".7"><path d="M66 120h44l1.6 22H64.6ZM63 172h50l1.7 24H61.3Z" /></g>
+    <path d="M62 94h52l-4-10H66Z" fill="#253b52" />
+    <path d="M70 84V62h36v22Z" fill="#203347" stroke="#4d7899" strokeWidth="2" />
+    <path className="scenery-beacon-core" d="M76 66h24v16H76Z" fill="#ffe8a3" />
+    <path d="m64 62 24-20 24 20Z" fill="#c4566a" />
+    <path d="M88 42v-8" stroke="#4d7899" strokeWidth="3" />
+    <path className="scenery-beacon" d="M100 74 440 30v90L100 76Z" fill="url(#beacon-fade)" />
+    <path d="M78 236v-24q0-10 10-10t10 10v24" fill="#14273a" />
+    <defs><linearGradient id="beacon-fade" x1="100" x2="440" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop stopColor="#ffe8a3" stopOpacity=".32" /><stop offset="1" stopColor="#ffe8a3" stopOpacity="0" /></linearGradient></defs>
+    <path className="scenery-wave" d="M0 352q28-12 56 0t56 0 56 0 56 0 56 0 56 0 56 0 52 0v38H0Z" fill="#1d4b6b" opacity=".75" />
+    <path className="scenery-wave scenery-wave-late" d="M0 370q30-10 60 0t60 0 60 0 60 0 60 0 60 0 60 0 40 0v20H0Z" fill="#256489" opacity=".7" />
+    <g stroke="#8fd0ef" strokeWidth="2" opacity=".35" strokeLinecap="round"><path d="M26 349q14-5 28 0m110 2q14-5 28 0m94-1q12-5 24 0m-180 18q12-4 24 0" /></g>
+    <g fill="#e9d7b4" opacity=".55"><ellipse cx="236" cy="381" rx="16" ry="3" /><ellipse cx="330" cy="384" rx="11" ry="2.5" /></g>
+  </svg>;
+}
+
+function TidePools() {
+  return <svg className="scenery-edge scenery-edge-right scenery-tidepools" viewBox="0 0 420 390" preserveAspectRatio="xMaxYMax meet" fill="none" aria-hidden="true" focusable="false">
+    <path d="M150 390q20-38 70-46t96-34 104-12v92Z" fill="#1a2b3f" />
+    <g stroke="#6a5a3e" strokeWidth="9" strokeLinecap="round"><path d="M332 336q-6-90 22-180" /></g>
+    <g fill="#2d6a52"><path d="M354 156q-56-14-92 20 46-10 92-20Zm0 0q-24-50-80-56 44 22 80 56Zm0 0q30-46 84-46-52 18-84 46Zm0 0q52-6 82 30-40-24-82-30Zm0 0q-6-56 26-92-14 46-26 92Z" /></g>
+    <g fill="#3f8a67" opacity=".7"><path d="M354 156q-40-6-66 8 34-2 66-8Zm0 0q22-28 56-30-30 12-56 30Z" /></g>
+    <path d="M196 390q8-40 44-48t50 8 26 40Z" fill="#24405a" />
+    <path d="m254 352 22-18 30 8" stroke="#3d6688" strokeWidth="2" opacity=".5" />
+    <g fill="#e07b8f" opacity=".75"><path d="m226 364 5-12 5 12-5-3Zm16 6 4-9 4 9-4-2Zm-30 4 3-8 3 8-3-2Z" /></g>
+    <path d="m380 374 10-7 10 7-4 9h-12Z" fill="#f2a65a" opacity=".8" />
+    <path className="scenery-wave" d="M120 366q26-10 52 0t52 0 52 0 52 0 52 0 40 0v24H120Z" fill="#1d4b6b" opacity=".75" />
+    <path className="scenery-wave scenery-wave-late" d="M80 378q28-8 56 0t56 0 56 0 56 0 56 0 60 0v12H80Z" fill="#256489" opacity=".7" />
+    <g stroke="#8fd0ef" strokeWidth="2" opacity=".35" strokeLinecap="round"><path d="M150 364q12-4 24 0m80 1q12-4 24 0m70-2q12-4 24 0" /></g>
+  </svg>;
+}
+
+function Caldera() {
+  return <svg className="scenery-edge scenery-edge-left scenery-caldera" viewBox="0 0 460 390" preserveAspectRatio="xMinYMax meet" fill="none" aria-hidden="true" focusable="false">
+    <path d="M0 390V230l64-82 40-30h52l40 34 70 110 60 74 60 54Z" fill="#2a1714" />
+    <path d="m104 118 52 0-14 20h-26Z" fill="#ff7a3c" opacity=".55" />
+    <path className="scenery-lava-glow" d="M104 118h52l-6 8h-40Z" fill="#ffc35c" />
+    <path d="m0 240 60-76 34 6-42 70-52 34Z" fill="#3a1f19" />
+    <path d="m160 150 40 30 54 92 40 62-38-20-46-80-34-40Z" fill="#371d18" />
+    <path className="scenery-lava-flow" d="m130 136 8 38-14 40 22 44-6 46 28 40 30 46" stroke="#ff6a2a" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" opacity=".7" />
+    <path d="m130 136 8 38-14 40 22 44-6 46 28 40 30 46" stroke="#ffd36b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity=".55" />
+    <g stroke="#ff8a4c" strokeWidth="2" opacity=".4"><path d="m30 270 22 10 10 22m130-44 18 6m-120 70 16 10" /></g>
+    <g className="scenery-smoke" fill="#4a3330" opacity=".5"><circle cx="122" cy="92" r="16" /><circle cx="140" cy="70" r="20" /><circle cx="118" cy="46" r="24" /></g>
+    <path d="M0 378q90-22 180-10t160 4 120 6v12H0Z" fill="#1d100d" />
+    <g fill="#3b2420" stroke="#5c3a2c" strokeWidth="2"><path d="m206 376 10-24 26-6 18 14 4 16Zm-180 2 8-16 20-2 12 18Z" /></g>
+    <g stroke="#ff7a3c" strokeWidth="2" opacity=".55"><path d="m214 368 12-8 10 2m-188 6 10-6" /></g>
+  </svg>;
+}
+
+function ObsidianSpires() {
+  return <svg className="scenery-edge scenery-edge-right scenery-spires" viewBox="0 0 420 390" preserveAspectRatio="xMaxYMax meet" fill="none" aria-hidden="true" focusable="false">
+    <path d="M150 390q40-40 100-44t170-28v72Z" fill="#241412" />
+    <g fill="#2f1a17" stroke="#4d2c22" strokeWidth="2" strokeLinejoin="round">
+      <path d="m300 352 18-200 22-26 18 30 10 196Z" />
+      <path d="m240 360 14-120 18-16 14 20 6 116Z" />
+      <path d="m364 352 8-136 16-14 14 18 18 132Z" />
+    </g>
+    <g className="scenery-lava-glow" stroke="#ff7a3c" strokeWidth="2.5" strokeLinecap="round" opacity=".7"><path d="m326 180 4 40-6 30 8 34m-62-32 2 30-4 22m120-54-4 34 6 26" /></g>
+    <path d="m318 152 22-26 18 30-20-14Z" fill="#5c3a2c" />
+    <path d="M178 390q20-26 60-28t80 0 102-10v38Z" fill="#1d100d" />
+    <path className="scenery-lava-pool" d="M206 382q40-12 88-6t60 6q-60 8-148 0Z" fill="#ff6a2a" opacity=".55" />
+    <path d="M226 380q30-6 64-2" stroke="#ffd36b" strokeWidth="2" strokeLinecap="round" opacity=".6" />
+    <g stroke="#6b4a3a" strokeWidth="3"><path d="m196 372 3-14 4 10 6-12 1 16m180-8 4-16 4 12" /></g>
+  </svg>;
+}
+
+function GreatTree() {
+  return <svg className="scenery-edge scenery-edge-left scenery-greattree" viewBox="0 0 440 390" preserveAspectRatio="xMinYMax meet" fill="none" aria-hidden="true" focusable="false">
+    <path d="M0 390V300q60-26 130-14t140 40 120 64Z" fill="#172a1c" />
+    <path d="M62 372q10-74 6-150-2-40 14-70h44q14 30 10 72-4 78 14 148Z" fill="#2c2418" />
+    <path d="M86 372q4-50 0-92-3-30 12-50" stroke="#3b301f" strokeWidth="6" strokeLinecap="round" />
+    <path d="M82 372q8-30 20-38t22 6 10 32Z" fill="#120f0a" />
+    <g fill="#1f3d27"><circle cx="40" cy="132" r="64" /><circle cx="118" cy="96" r="74" /><circle cx="196" cy="142" r="58" /><circle cx="96" cy="170" r="50" /></g>
+    <g fill="#2a5233"><circle cx="70" cy="110" r="44" /><circle cx="140" cy="76" r="48" /><circle cx="196" cy="128" r="34" /></g>
+    <g fill="#3b6e40" opacity=".6"><circle cx="128" cy="62" r="22" /><circle cx="70" cy="96" r="18" /><circle cx="196" cy="116" r="14" /></g>
+    <g stroke="#3b301f" strokeWidth="7" strokeLinecap="round"><path d="M68 360q-30 6-52 24m110-20q26 2 44 22" /></g>
+    <g fill="#d96b6b"><path d="M150 382q0-14 12-14t12 14Z" /><path d="M186 384q0-10 9-10t9 10Z" /></g>
+    <g fill="#f2e3c6"><circle cx="157" cy="375" r="2" /><circle cx="166" cy="372" r="1.6" /><circle cx="194" cy="378" r="1.5" /></g>
+    <g stroke="#e9dfc4" strokeWidth="3"><path d="M162 382v8m33-6v6" /></g>
+    <g stroke="#4f8a4a" strokeWidth="3" strokeLinecap="round"><path d="m226 384 4-20 5 14 7-18 1 24m-210 0 3-16 4 10 6-14" /></g>
+  </svg>;
+}
+
+function FlowerMeadow() {
+  return <svg className="scenery-edge scenery-edge-right scenery-meadow" viewBox="0 0 420 390" preserveAspectRatio="xMaxYMax meet" fill="none" aria-hidden="true" focusable="false">
+    <path d="M120 390q60-50 150-56t150-30v86Z" fill="#172a1c" />
+    <g fill="#1f3d27"><path d="m300 330 34-120 36 120Zm-70 20 26-90 28 90Zm150-20 20-80 20 80Z" /></g>
+    <g fill="#2a5233"><path d="m316 290 18-70 20 70Zm-74 30 14-50 16 50Z" /></g>
+    <g stroke="#3f7a44" strokeWidth="3" strokeLinecap="round">
+      <path d="M180 384q-2-30 10-52m30 52q4-26-6-46m-62 46q0-22-12-38m200 38q2-28-8-48m40 48q-2-18 8-34" />
+    </g>
+    <g fill="#4f9a52"><path d="M186 350q-18-8-24 4 14 2 24-4Zm28 6q16-12 26-2-14 6-26 2Zm154-6q-14-10-22 2 12 2 22-2Z" /></g>
+    <g className="scenery-flowers">
+      <g fill="#f2c94c"><circle cx="190" cy="330" r="6" /><circle cx="340" cy="334" r="5" /></g>
+      <g fill="#f28fb1"><circle cx="214" cy="336" r="5" /><circle cx="148" cy="344" r="4.5" /><circle cx="382" cy="348" r="4.5" /></g>
+      <g fill="#fff6e0"><circle cx="190" cy="330" r="2" /><circle cx="214" cy="336" r="1.8" /><circle cx="340" cy="334" r="1.8" /><circle cx="148" cy="344" r="1.6" /><circle cx="382" cy="348" r="1.6" /></g>
+    </g>
+    <path d="M100 390q80-20 170-16t150-8v24Z" fill="#12210f" />
+  </svg>;
+}
+
+type Scene = {
+  /** Distant layers, drawn across the full width behind the edge scenes. */
+  distance: ReactNode;
+  celestial: { glow: string; core: string; coreOpacity: string; kind: "moon" | "sun" };
+  edges: ReactNode;
+  particle: "firefly" | "dust" | "bubble" | "ember" | "leaf";
+};
+
+const SCENES: Record<PokemonTheme, Scene> = {
+  gengar: {
+    distance: <>
+      <path d="M0 669Q180 590 352 673t352 35 380-9 516-77v278H0Z" fill="#251d36" opacity=".45" />
+      <path d="M0 783Q142 720 321 769t375 20 453-8 451-42v161H0Z" fill="#32223f" opacity=".4" />
+    </>,
+    celestial: { glow: "#b9a2d9", core: "#cbbddd", coreOpacity: ".38", kind: "moon" },
+    edges: <><HauntedManor /><GhostGrove /></>,
+    particle: "firefly",
+  },
+  gible: {
+    distance: <>
+      <path d="m0 640 186-322 172 292 186-227 189 290 194-236 163 176 175-325 335 363v249H0Z" fill="#64503b" opacity=".35" />
+      <path d="m127 420 59-102 61 105-46-29-21 20-13-26Zm363 28 54-65 54 82-48-31-20 9Zm701-46 74-114 92 99-58-25-33-28-34 56Z" fill="#c8b089" opacity=".1" />
+      <path d="m0 755 116-167 154 179 217-165 209 159 231-128 255 131 194-222 224 183v175H0Z" fill="#48503b" opacity=".4" />
+      <path d="M0 831Q300 766 535 837t521-3 544-36v102H0Z" fill="#665331" opacity=".4" />
+    </>,
+    celestial: { glow: "#deb568", core: "#c49a56", coreOpacity: ".2", kind: "sun" },
+    edges: <><MountainCave /><PineGrove /></>,
+    particle: "dust",
+  },
+  piplup: {
+    distance: <>
+      <path d="M0 640h1600v260H0Z" fill="#163650" opacity=".35" />
+      <path d="M0 640q200-8 400 0t400 0 400 0 400 0" stroke="#7fc4ea" strokeWidth="2" opacity=".18" />
+      <path d="M0 700q120-18 240 0t240 0 240 0 240 0 240 0 240 0 160 0v200H0Z" fill="#1a4361" opacity=".4" />
+      <path d="M0 790q100-16 200 0t200 0 200 0 200 0 200 0 200 0 200 0 200 0v110H0Z" fill="#1f5378" opacity=".35" />
+      <path d="M560 646h480" stroke="#e7f3ff" strokeWidth="3" opacity=".08" />
+    </>,
+    celestial: { glow: "#9fd4f2", core: "#d9eefb", coreOpacity: ".34", kind: "moon" },
+    edges: <><LighthouseCove /><TidePools /></>,
+    particle: "bubble",
+  },
+  charmander: {
+    distance: <>
+      <path d="m0 650 140-180 120 120 160-230 170 220 150-140 190 210 170-260 200 240 300-130v400H0Z" fill="#3a1a14" opacity=".55" />
+      <path d="m420 360 20 30 22-10m490-100 24 34 20-14" stroke="#ff7a3c" strokeWidth="4" opacity=".25" />
+      <path d="m0 770 200-90 220 110 240-120 260 120 220-90 260 100 200-60v160H0Z" fill="#2a1410" opacity=".55" />
+      <path d="M0 860q400-40 800 0t800 0v40H0Z" fill="#ff6a2a" opacity=".08" />
+    </>,
+    celestial: { glow: "#ff8a4c", core: "#ff6a3a", coreOpacity: ".3", kind: "sun" },
+    edges: <><Caldera /><ObsidianSpires /></>,
+    particle: "ember",
+  },
+  bulbasaur: {
+    distance: <>
+      <path d="M0 640q200-80 400-30t400-20 400 10 400-40v340H0Z" fill="#1e3a24" opacity=".45" />
+      <g fill="#1a3320" opacity=".55"><path d="m180 620 24-80 26 80Zm60 6 18-60 20 60Zm900-30 26-90 28 90Zm70 10 20-64 22 64Zm-560 20 20-70 22 70Z" /></g>
+      <path d="M0 770q160-50 360-10t420-10 420 20 400-30v160H0Z" fill="#244a2b" opacity=".45" />
+      <path d="M0 850q300-30 600 0t600 0 400-10v60H0Z" fill="#2f5d33" opacity=".35" />
+    </>,
+    celestial: { glow: "#ffe6a0", core: "#fff1c4", coreOpacity: ".22", kind: "sun" },
+    edges: <><GreatTree /><FlowerMeadow /></>,
+    particle: "leaf",
+  },
+};
+
+const PARTICLES = [[4, 39], [8, 72], [13, 91], [91, 35], [95, 65], [88, 87], [35, 95], [73, 93]];
+
 export function PokemonScenery({ theme }: SceneryProps) {
-  const ghost = theme === "gengar";
+  const { distance, celestial, edges, particle } = SCENES[theme];
   return <div className={`habitat-scenery scenery-${theme}`} aria-hidden="true">
-    <svg className="scenery-distance" viewBox="0 0 1600 900" preserveAspectRatio="none" fill="none" aria-hidden="true" focusable="false">
-      {ghost ? <>
-        <path d="M0 669Q180 590 352 673t352 35 380-9 516-77v278H0Z" fill="#251d36" opacity=".45" />
-        <path d="M0 783Q142 720 321 769t375 20 453-8 451-42v161H0Z" fill="#32223f" opacity=".4" />
-      </> : <>
-        <path d="m0 640 186-322 172 292 186-227 189 290 194-236 163 176 175-325 335 363v249H0Z" fill="#64503b" opacity=".35" />
-        <path d="m127 420 59-102 61 105-46-29-21 20-13-26Zm363 28 54-65 54 82-48-31-20 9Zm701-46 74-114 92 99-58-25-33-28-34 56Z" fill="#c8b089" opacity=".1" />
-        <path d="m0 755 116-167 154 179 217-165 209 159 231-128 255 131 194-222 224 183v175H0Z" fill="#48503b" opacity=".4" />
-        <path d="M0 831Q300 766 535 837t521-3 544-36v102H0Z" fill="#665331" opacity=".4" />
-      </>}
+    <svg className="scenery-distance" viewBox="0 0 1600 900" preserveAspectRatio="none" fill="none" aria-hidden="true" focusable="false">{distance}</svg>
+    <svg className={`scenery-celestial scenery-${celestial.kind}`} viewBox="0 0 160 160" fill="none" aria-hidden="true" focusable="false">
+      <circle cx="80" cy="80" r="79" fill={celestial.glow} opacity=".035" />
+      <circle cx="80" cy="80" r="64" fill={celestial.glow} opacity=".055" />
+      <circle cx="80" cy="80" r="43" fill={celestial.core} opacity={celestial.coreOpacity} />
+      {theme === "gengar" && <g fill="#8d79a8" opacity=".28"><circle cx="65" cy="65" r="10" /><circle cx="90" cy="95" r="12" /><circle cx="95" cy="59" r="5" /></g>}
+      {theme === "piplup" && <g fill="#9cc4de" opacity=".3"><circle cx="66" cy="70" r="8" /><circle cx="94" cy="92" r="6" /></g>}
     </svg>
-    <svg className={`scenery-celestial ${ghost ? "scenery-moon" : "scenery-sun"}`} viewBox="0 0 160 160" fill="none" aria-hidden="true" focusable="false">
-      <circle cx="80" cy="80" r="79" fill={ghost ? "#b9a2d9" : "#deb568"} opacity=".035" />
-      <circle cx="80" cy="80" r="64" fill={ghost ? "#b9a2d9" : "#deb568"} opacity=".055" />
-      <circle cx="80" cy="80" r="43" fill={ghost ? "#cbbddd" : "#c49a56"} opacity={ghost ? ".38" : ".2"} />
-      {ghost && <g fill="#8d79a8" opacity=".28"><circle cx="65" cy="65" r="10" /><circle cx="90" cy="95" r="12" /><circle cx="95" cy="59" r="5" /></g>}
-    </svg>
-    {ghost ? <><HauntedManor /><GhostGrove /></> : <><MountainCave /><PineGrove /></>}
+    {edges}
     <div className="scenery-ground-line" />
     <div className="scenery-mist scenery-mist-first" /><div className="scenery-mist scenery-mist-second" />
-    {[[4, 39], [8, 72], [13, 91], [91, 35], [95, 65], [88, 87], [35, 95], [73, 93]].map(([left, top], i) => <i key={i} className={ghost ? "scenery-firefly" : "scenery-dust"} style={{ left: `${left}%`, top: `${top}%`, animationDelay: `${-i * 1.7}s`, animationDuration: `${7 + i % 4 * 2}s` }} />)}
+    {PARTICLES.map(([left, top], i) => <i key={i} className={`scenery-${particle}`} style={{ left: `${left}%`, top: `${top}%`, animationDelay: `${-i * 1.7}s`, animationDuration: `${7 + i % 4 * 2}s` }} />)}
   </div>;
 }

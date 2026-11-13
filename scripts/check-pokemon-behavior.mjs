@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { CAST_SIZE, COMPACT_CAST_SIZE, compactPatch, createCast, createPokemonRoutine, isEntranceActivity, isHiddenActivity, LEGEND_HIDDEN_MS, LEGEND_VISIBLE_MS, nextPokemonRoutine, recast, SHINY_ODDS } from "../lib/pokemon-behavior.ts";
-import { RESIDENTS, SPECIES } from "../lib/pokemon-roster.ts";
+import { CAST_SIZE, COMPACT_CAST_SIZE, compactPatch, createCast, createPokemonRoutine, isEntranceActivity, isHiddenActivity, isSpecial, LEGEND_HIDDEN_MS, LEGEND_VISIBLE_MS, nextPokemonRoutine, recast, SHINY_ODDS } from "../lib/pokemon-behavior.ts";
+import { RESIDENTS, SPECIES, THEME_ORDER, THEMES } from "../lib/pokemon-roster.ts";
+import { nextTheme, ROTATION_INTERVALS } from "../lib/theme-rotation.ts";
 
-const everyone = [...RESIDENTS.gengar, ...RESIDENTS.gible];
+const everyone = THEME_ORDER.flatMap(theme => RESIDENTS[theme]);
 function seededRandom(seed) {
   return () => {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -17,7 +18,7 @@ function run(species, slot, compact, steps, random) {
 }
 
 test("routines stay in bounds and only relocate or turn shiny while invisible", () => {
-  for (const theme of ["gengar", "gible"]) {
+  for (const theme of THEME_ORDER) {
     for (const compact of [false, true]) {
       // Every resident can take any stage slot.
       for (const [index, species] of RESIDENTS[theme].entries()) {
@@ -78,8 +79,8 @@ test("every regular performs its repertoire, then leaves and comes back", () => 
   assert.ok(!diglett.has("walk") && !diglett.has("run"), "Diglett tunnels rather than walking");
 });
 
-test("legendaries hold the stage for exactly five seconds, then stay away for five", () => {
-  for (const species of ["giratina", "groudon"]) {
+test("legendaries and mythicals hold the stage for exactly five seconds, then stay away for five", () => {
+  for (const species of everyone.filter(name => isSpecial(SPECIES[name]))) {
     const routines = run(species, 0, false, 60, seededRandom(4));
     assert.ok(isHiddenActivity(routines[0].activity), "legendaries start offstage");
     let visible = 0;
@@ -87,7 +88,7 @@ test("legendaries hold the stage for exactly five seconds, then stay away for fi
     for (const routine of routines.slice(1)) {
       if (isHiddenActivity(routine.activity)) assert.equal(routine.duration, LEGEND_HIDDEN_MS);
       if (isEntranceActivity(routine.activity)) visible = 0;
-      else if (["roar", "attack", "float", "idle"].includes(routine.activity)) visible += routine.duration;
+      else if (["roar", "smile", "attack", "float", "idle"].includes(routine.activity)) visible += routine.duration;
       else if (routine.activity === "vanish" || routine.activity === "burrow") {
         assert.equal(visible, LEGEND_VISIBLE_MS);
         checked++;
@@ -136,11 +137,24 @@ test("initial positions are stable before randomness begins", () => {
   }
 });
 
+test("mythicals greet with a smile, legendaries with a roar", () => {
+  for (const species of everyone.filter(name => isSpecial(SPECIES[name]))) {
+    const activities = new Set(run(species, 0, false, 30, seededRandom(9)).map(routine => routine.activity));
+    assert.ok(activities.has(SPECIES[species].mythical ? "smile" : "roar"), species);
+    assert.ok(!activities.has(SPECIES[species].mythical ? "roar" : "smile"), species);
+  }
+});
+
 test("each theme has ten residents of its type, at most five on stage", () => {
-  for (const theme of ["gengar", "gible"]) {
+  assert.equal(new Set(everyone).size, everyone.length, "nobody lives in two habitats");
+  for (const theme of THEME_ORDER) {
+    assert.ok(THEMES[theme].habitat);
     assert.equal(RESIDENTS[theme].length, 10);
     assert.equal(new Set(RESIDENTS[theme]).size, 10);
     assert.equal(RESIDENTS[theme].filter(species => SPECIES[species].legendary).length, 1);
+    assert.equal(RESIDENTS[theme].filter(species => SPECIES[species].mythical).length, 1);
+    assert.ok(!RESIDENTS[theme].some(species => SPECIES[species].legendary && SPECIES[species].mythical));
+    assert.equal(RESIDENTS[theme][0], theme, "the theme's partner leads its roster");
     if (theme === "gengar") assert.ok(RESIDENTS[theme].every(species => SPECIES[species].ghost), "the graveyard is all Ghost types");
     for (const compact of [false, true]) {
       const random = seededRandom(compact ? 5 : 6);
@@ -150,7 +164,7 @@ test("each theme has ten residents of its type, at most five on stage", () => {
         assert.equal(cast.length, compact ? COMPACT_CAST_SIZE : CAST_SIZE);
         assert.equal(cast[0].species, theme, "the partner never leaves");
         assert.equal(new Set(cast.map(member => member.species)).size, cast.length, "nobody is on stage twice");
-        assert.ok(cast.filter(member => SPECIES[member.species].legendary).length <= 1, "one legendary at a time");
+        assert.ok(cast.filter(member => isSpecial(SPECIES[member.species])).length <= 1, "one legendary or mythical at a time");
         for (const member of cast) assert.ok(RESIDENTS[theme].includes(member.species));
         const slot = 1 + Math.floor(random() * (cast.length - 1));
         const next = recast(cast, slot, theme, random);
@@ -165,9 +179,38 @@ test("each theme has ten residents of its type, at most five on stage", () => {
 });
 
 test("newcomers start offstage and enter on their next step", () => {
-  for (const species of [...RESIDENTS.gengar, ...RESIDENTS.gible]) {
+  for (const species of everyone) {
     const routine = createPokemonRoutine(species, 2, false, 1, true);
     assert.ok(isHiddenActivity(routine.activity));
     assert.ok(isEntranceActivity(nextPokemonRoutine(species, 2, false, routine, seededRandom(1)).activity));
   }
+});
+
+test("in-order rotation visits every habitat once per lap", () => {
+  let theme = THEME_ORDER[2];
+  const visited = [];
+  for (let step = 0; step < THEME_ORDER.length; step++) visited.push(theme = nextTheme(theme, "order"));
+  assert.deepEqual(new Set(visited), new Set(THEME_ORDER));
+  assert.equal(visited.at(-1), THEME_ORDER[2], "a full lap comes home");
+});
+
+test("shuffle always moves to a different habitat and reaches them all", () => {
+  for (const random of [() => 0, () => .5, () => .999999, seededRandom(3)]) {
+    let theme = "gengar";
+    for (let step = 0; step < 200; step++) {
+      const next = nextTheme(theme, "shuffle", random);
+      assert.notEqual(next, theme);
+      assert.ok(THEME_ORDER.includes(next));
+      theme = next;
+    }
+  }
+  const random = seededRandom(11);
+  const seen = new Set();
+  let theme = "gible";
+  for (let step = 0; step < 100; step++) seen.add(theme = nextTheme(theme, "shuffle", random));
+  assert.equal(seen.size, THEME_ORDER.length);
+});
+
+test("rotation intervals are sensible", () => {
+  for (const { ms } of ROTATION_INTERVALS) assert.ok(ms === null || ms >= 10_000);
 });

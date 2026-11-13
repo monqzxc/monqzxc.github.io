@@ -4,12 +4,14 @@ import "./glass-theme.css";
 import "./hero.css";
 import "./pokemon-theme.css";
 import "./ground-theme.css";
+import "./elemental-theme.css";
 import "./pokemon-habitat.css";
 import "./pokemon-scenery.css";
 import "./scroll-reveal.css";
 import "./project-previews.css";
 import "./games.css";
 import { PokemonThemeProvider } from "@/components/pokemon-theme";
+import { themeBootScript } from "@/lib/theme-rotation";
 
 export const metadata: Metadata = {
   title: "Mon — Anthony Cabigayan · Software Engineer",
@@ -28,7 +30,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `try{document.documentElement.dataset.pokemonTheme=localStorage.getItem("mon-pokemon-theme")==="gible"?"gible":"gengar"}catch{document.documentElement.dataset.pokemonTheme="gengar"}` }} />
+        {/* Restores the habitat (and applies a per-visit rotation) before the first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript() }} />
         <link rel="preload" href="/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>
