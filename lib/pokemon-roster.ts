@@ -43,7 +43,7 @@ export type SpeciesInfo = {
   movement: "ground" | "air";
   /** How it leaves before reappearing somewhere else. */
   exit: "fade" | "burrow";
-  /** Multiples of the 44px sprite, loosely following each species' real height; halves keep pixels whole on 2x screens. */
+  /** Desktop sprite scale loosely follows each species' real height; compactScale keeps them readable on phones. */
   scale: number;
   compactScale: number;
   /** Relative weights of what it does while visible. */
@@ -76,7 +76,7 @@ export const SPECIES: Record<PokemonSpecies, SpeciesInfo> = {
     move: "sludge-splat", moveName: "Poison Gas", reaction: "smile", cry: "Gasss~ ♥",
   },
   giratina: {
-    name: "Giratina", movement: "air", exit: "fade", ghost: true, legendary: true, scale: 4.5, compactScale: 2.5,
+    name: "Giratina", movement: "air", exit: "fade", ghost: true, legendary: true, scale: 6.5, compactScale: 2.5,
     repertoire: {}, move: "dragon-flame", moveName: "Dragon Breath", reaction: "roar", cry: "GRAAAH!",
   },
   mismagius: {
@@ -95,7 +95,7 @@ export const SPECIES: Record<PokemonSpecies, SpeciesInfo> = {
     move: "ember", moveName: "Flamethrower", reaction: "roar", cry: "Chaaan!",
   },
   dusknoir: {
-    name: "Dusknoir", movement: "ground", exit: "fade", ghost: true, scale: 3, compactScale: 2,
+    name: "Dusknoir", movement: "ground", exit: "fade", ghost: true, scale: 3.5, compactScale: 2,
     repertoire: { idle: 2, walk: 3, roar: 1, attack: 1.5 },
     move: "punch-impact", moveName: "Shadow Punch", reaction: "roar", cry: "Noooir!",
   },
@@ -115,12 +115,12 @@ export const SPECIES: Record<PokemonSpecies, SpeciesInfo> = {
     move: "bite", moveName: "Bite", reaction: "smile", cry: "Gib gib! ♥",
   },
   garchomp: {
-    name: "Garchomp", movement: "ground", exit: "burrow", scale: 3, compactScale: 2,
+    name: "Garchomp", movement: "ground", exit: "burrow", scale: 3.5, compactScale: 2,
     repertoire: { idle: 1.5, walk: 2, run: 3, jump: 1, roar: 1.5, attack: 1.5 },
     move: "dragon-plume", moveName: "Dragon Rush", reaction: "roar", cry: "Gaaarch!",
   },
   flygon: {
-    name: "Flygon", movement: "air", exit: "fade", scale: 3, compactScale: 1.5, roams: true,
+    name: "Flygon", movement: "air", exit: "fade", scale: 3.5, compactScale: 1.5, roams: true,
     repertoire: { fly: 3, float: 2, roar: 1, smile: 1, attack: 1.5 },
     move: "gust", moveName: "Gust", reaction: "smile", cry: "Flyyy~ ♥",
   },
@@ -135,7 +135,7 @@ export const SPECIES: Record<PokemonSpecies, SpeciesInfo> = {
     move: "hit", moveName: "Rollout", reaction: "roar", cry: "Phaaan!",
   },
   groudon: {
-    name: "Groudon", movement: "ground", exit: "burrow", legendary: true, scale: 4.5, compactScale: 2.5,
+    name: "Groudon", movement: "ground", exit: "burrow", legendary: true, scale: 5.5, compactScale: 2.5,
     repertoire: {}, move: "fire-plume", moveName: "Eruption", reaction: "roar", cry: "GROOOAR!",
   },
   cubone: {
@@ -149,12 +149,12 @@ export const SPECIES: Record<PokemonSpecies, SpeciesInfo> = {
     move: "claw", moveName: "Slash", reaction: "roar", cry: "Shaaash!",
   },
   hippowdon: {
-    name: "Hippowdon", movement: "ground", exit: "burrow", scale: 3, compactScale: 2,
+    name: "Hippowdon", movement: "ground", exit: "burrow", scale: 3.5, compactScale: 2,
     repertoire: { idle: 3, walk: 2, roar: 1.5, attack: 1 },
     move: "hit", moveName: "Earthquake", reaction: "roar", cry: "Hippooo!",
   },
   gliscor: {
-    name: "Gliscor", movement: "air", exit: "fade", scale: 2.5, compactScale: 1.5, roams: true,
+    name: "Gliscor", movement: "air", exit: "fade", scale: 3.5, compactScale: 1.5, roams: true,
     repertoire: { fly: 3, float: 2, smile: 1, attack: 1.5 },
     move: "air-cutter", moveName: "Air Slash", reaction: "smile", cry: "Glis glis! ♥",
   },
