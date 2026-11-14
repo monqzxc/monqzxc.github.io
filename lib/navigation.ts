@@ -1,5 +1,6 @@
 // The landing page is the trainer-card board; the full portfolio lives here.
 export const PORTFOLIO_HREF = "/portfolio/";
+export const GAMES_HREF = "https://monqzxc.github.io/raro/";
 
 export const portfolioSections = [
   { id: "about", label: "About" },

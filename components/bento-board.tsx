@@ -6,8 +6,7 @@ import { ArrowUpRight, FileText, Play, Sparkles } from "lucide-react";
 import { PixelConsole } from "@/components/pixel-console";
 import { PixelStage } from "@/components/pixel-stage";
 import { PokemonHabitat, ThemeSelector } from "@/components/pokemon-theme";
-import { GAMES_HREF, games } from "@/lib/games";
-import { PORTFOLIO_HREF } from "@/lib/navigation";
+import { GAMES_HREF, PORTFOLIO_HREF } from "@/lib/navigation";
 import { personalProjects, projects } from "@/lib/projects";
 import styles from "./bento-board.module.css";
 
@@ -152,9 +151,9 @@ export default function BentoBoard() {
             </a>
 
             <div className={`${styles.card} ${styles.split}`}>
-              <a className={`${styles.tile} ${styles.splitArt}`} href={GAMES_HREF} aria-label={`Play ${games.length} Pokémon mini-games`}>
+              <a className={`${styles.tile} ${styles.splitArt}`} href={GAMES_HREF} aria-label="Explore 10+ games on Raro">
                 <PixelConsole />
-                <span className={styles.splitTag}><Play size={11} fill="currentColor" aria-hidden="true" />{games.length} mini-games</span>
+                <span className={styles.splitTag}><ArrowUpRight size={11} aria-hidden="true" />10+ games</span>
               </a>
               <a className={`${styles.tile} ${styles.splitInfo}`} href={`${PORTFOLIO_HREF}#timeline`}>
                 <strong>2019</strong>

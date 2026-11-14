@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { BriefcaseBusiness, Compass, FileUser, Gamepad2, House, Mail, Route, X } from "lucide-react";
-import { portfolioSections } from "@/lib/navigation";
-import { GAMES_HREF } from "@/lib/games";
+import { GAMES_HREF, portfolioSections } from "@/lib/navigation";
 import styles from "./floating-menu.module.css";
 
 const sectionIcons = [House, BriefcaseBusiness, Route, Compass];

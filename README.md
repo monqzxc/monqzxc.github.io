@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# mon
-My Personal Website
-=======
 # Mon — Anthony Cabigayan
 
 A responsive portfolio with a dark Pokémon-inspired theme, Gengar purple and Gible blue accents, frosted glass surfaces, Manrope headings, DM Sans body text, custom artwork, project detail dialogs, a career timeline, and a Vue-powered interests section.
@@ -107,58 +103,6 @@ The editor does not send CV input to a server or save it to browser storage. A d
 
 After changing Mon's data, regenerate his static download with `npm run generate:cv` before building. This uses the same PDF renderer as visitor exports. No API key, account, database, or third-party document service is needed. Site sharing controls determine who can access the hosted builder.
 
-## Laser Grid Lock
+## Mini-games
 
-Play `/play/laser-grid-lock/` to guide Deoxys through five tiers of laser puzzles: mirrors, fixed steel terrain, patrolling deflectors, splitting monsters, Beam Eaters, multi-angle prism targets, and ordered nodes. Master portals move every two player shifts. Clear each level to advance and unlock the next tier; Undo restores the full previous turn. Progress saves locally after each win, and refreshing restarts the current unlocked level.
-
-See [the game rules and tier progression](docs/laser-grid-lock.md). Run `npm run test:laser` for terrain, monsters, EMP, branch tracing, targets, and generated-level solution checks.
-
-Solrock redirects light, Lunatone absorbs it, and Minior splits it. Clear levels 1–14 to reach Rayquaza. From level 15, its Delta Stream seals the portal and locks a rotating row for three phases before a one-turn opening.
-
-## Games hub
-
-Open `/play/`, or follow **Games** from the homepage, to find every game together. The homepage's grouped games section and the hub both use the shared catalog in `lib/games.ts`.
-
-Keep future games in this collection:
-
-1. Create the game route at `app/play/<slug>/page.tsx`.
-2. Add its name, description, player count, category, and artwork to `lib/games.ts`. The entry automatically appears in the homepage collection and games hub.
-3. Include an **All games** link back to `/play/` on the game page. Keep homepage game promotion in the shared collection instead of adding a separate banner for each game.
-
-## Pokémon tile puzzle
-
-Open `/play/puzzle/`, or choose **Pokémon Tile Puzzle** from the games collection. Choose Gengar, Charizard, Pikachu, Ho-Oh, Rayquaza, Bidoof, Mew, or Mewtwo and a 3×3 or 4×4 board. Every shuffle comes from legal moves, so it is solvable. Click or tap an adjacent tile, or focus the board and use arrow keys to move a tile in that direction. Numbers and the reference picture can be toggled while playing.
-
-The timer starts when playing, pauses on request or when the tab becomes hidden, and resumes without counting time away. The current board, move count, elapsed time, and latest 50 wins use the versioned `mon-tile-puzzle-v1` localStorage key. Records are separated by Pokémon and board size, with best time and fewest moves calculated from the saved wins. Refreshing restores the current board paused; a completed game does not record a duplicate win. Malformed saved data is validated before use, and blocked storage leaves the game playable with an explanatory message. Scores are local to the browser and origin; clearing browser data removes them.
-
-- `components/tile-puzzle.tsx`: game controls, timing, persistence, and scores.
-- `lib/tile-puzzle.ts`: board rules, solvable shuffles, and saved-data validation.
-- `lib/puzzle-pokemon.ts`: image choices, colors, and time formatting.
-- `app/play/puzzle.css`: responsive game layout and tile animation.
-- `public/images/puzzle/`: bundled artwork and source attribution.
-
-Run `npm run test:puzzle` for the puzzle logic and saved-data checks, and `npm run typecheck` for TypeScript. The game and artwork are included in the regular static export and need no API or game server.
->>>>>>> 419397ca94267b008887bf5def4c16038028c18b
-
-## Poké Raft
-
-Open `/play/raft/`, or choose **Poké Raft** from the games collection, for a turn-based artillery game. Play against Easy or Hard AI, take turns on the same device, or choose online play to create or join a room from separate devices. Pick Pikachu, Gengar, Charizard, or Bidoof; all four have equal stats.
-
-Adjust the angle and power, account for the wind, and fire toward the rival raft. Wind changes after both players have taken a turn, and nearby impacts can cause splash damage. Pikachu uses Electro Ball, Gengar uses Shadow Ball, Charizard uses Flame Thrower, and Bidoof uses Rock Throw. Each player starts with 100 HP, unlimited standard attacks, and three stronger charged attacks. Reduce the rival's HP to zero to win. Easy AI allows more aiming error; Hard AI calculates shots using the current wind.
-
-All four characters breathe, step in place at the start of a turn, wind up and attack, taunt, and recoil when hit. The **Taunt** button works during your turn and has a five-second cooldown. Bidoof uses a generated twenty-frame sprite sheet; the other three animate their existing transparent artwork. Each attack has its own canvas effect. Reduced-motion settings use still poses and keep essential projectile movement. See [sprite assets and generation prompts](public/images/raft/README.md).
-
-The game uses mouse, touch, and keyboard controls, existing Pokémon artwork, local fonts, and the dark purple visual theme. Each turn allows two minutes to fire; an expired turn is skipped. Local match state resets on refresh. Online rooms use PeerJS for a direct browser-to-browser connection, with the room host owning match state and a short reconnect window. No WebSocket backend or environment variable is required.
-
-See [online multiplayer setup](docs/raft-multiplayer.md) for the PeerJS flow and local checks. Keep the host tab open while a match is in progress; closing it ends that room.
-
-- `app/play/raft/page.tsx`: route and page metadata.
-- `components/raft-battle.tsx`: setup, controls, turn handoffs, and match state.
-- `components/raft-arena.tsx`: canvas arena, artwork, and shot animation.
-- `lib/raft-battle.ts`: projectile physics, damage, turns, and AI difficulty.
-- `lib/raft-online.ts`: shared room messages and online timing constants.
-- `hooks/use-raft-online.ts`: PeerJS room transport and host-authoritative online state.
-- `app/play/raft/raft.css`: responsive layout and game styling.
-- `scripts/check-raft-battle.mjs`: physics, battle rules, and AI checks.
-
-Run `npm run test:raft` for the game logic checks and `npm run typecheck` for TypeScript. Artwork sources remain documented in `public/images/puzzle/README.md`.
+The 10+ mini-games live in the separate [Raro games site](https://monqzxc.github.io/raro/). The Games links on the homepage and full portfolio open it directly.
