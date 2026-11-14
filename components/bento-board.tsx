@@ -77,16 +77,18 @@ export default function BentoBoard() {
             <div className={styles.portrait} aria-hidden="true">
               <span className={styles.portraitRing} />
               <span className={styles.portraitDisc} />
-              <span className={styles.portraitCutout}>
-                <Image
-                  className={styles.partner}
-                  src="/images/anthony-portrait-cutout.png"
-                  width={768}
-                  height={768}
-                  sizes="(max-width: 760px) 80vw, 360px"
-                  alt=""
-                  preload
-                />
+              <span className={styles.portraitShadow}>
+                <span className={styles.portraitCutout}>
+                  <Image
+                    className={styles.partner}
+                    src="/images/anthony-portrait-cutout.png"
+                    width={768}
+                    height={768}
+                    sizes="(max-width: 760px) 80vw, 360px"
+                    alt=""
+                    preload
+                  />
+                </span>
               </span>
             </div>
             <div className={styles.profileFoot}>

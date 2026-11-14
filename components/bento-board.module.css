@@ -420,6 +420,14 @@
   transition: transform .45s var(--ease-spring);
 }
 
+/* The shadow lives outside the mask: a filter on anything inside it would be
+   cut off by the mask's edges and show up as a hard box around the head. */
+.portraitShadow {
+  position: absolute;
+  inset: 0;
+  filter: drop-shadow(0 14px 16px #0006);
+}
+
 .portraitCutout {
   position: absolute;
   inset: auto 0 0;
@@ -440,7 +448,7 @@
   width: 115%;
   max-width: none;
   height: auto;
-  filter: grayscale(1) contrast(1.12) drop-shadow(0 14px 16px #0006);
+  filter: grayscale(1) contrast(1.12);
   transform-origin: 50% 100%;
   animation: portrait-float 4s ease-in-out infinite alternate;
   transition: transform .45s var(--ease-spring), filter .45s ease;
@@ -449,7 +457,7 @@
 /* Hover brings the trainer to life: full colour and a little lean-in. */
 .profile:hover .partner,
 .profile:focus-within .partner {
-  filter: grayscale(0) contrast(1.04) drop-shadow(0 14px 16px #0006);
+  filter: grayscale(0) contrast(1.04);
   transform: translateY(-6px) rotate(-2deg) scale(1.03);
 }
 
