@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { CAST_SIZE, COMPACT_CAST_SIZE, compactPatch, createCast, createPokemonRoutine, isEntranceActivity, isHiddenActivity, isSpecial, LEGEND_HIDDEN_MS, LEGEND_VISIBLE_MS, nextPokemonRoutine, recast, SHINY_ODDS } from "../lib/pokemon-behavior.ts";
+import * as pokemonBehavior from "../lib/pokemon-behavior.ts";
+import * as pokemonCollection from "../lib/pokemon-collection.ts";
+import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture } from "../lib/pokemon-collection.ts";
 import { RESIDENTS, SPECIES, THEME_ORDER, THEMES } from "../lib/pokemon-roster.ts";
 import { nextTheme, ROTATION_INTERVALS } from "../lib/theme-rotation.ts";
 
@@ -145,12 +148,32 @@ test("mythicals greet with a smile, legendaries with a roar", () => {
   }
 });
 
-test("each theme has ten residents of its type, at most five on stage", () => {
+test("special catches use a 50% roll while ordinary catches are guaranteed", () => {
+  const { rollPokemonCatch } = pokemonBehavior;
+  assert.equal(typeof rollPokemonCatch, "function");
+  let randomCalls = 0;
+  assert.equal(rollPokemonCatch(false, () => { randomCalls++; return 0.99; }), true);
+  assert.equal(randomCalls, 0, "ordinary catches do not consume randomness");
+  assert.equal(rollPokemonCatch(true, () => 0), true);
+  assert.equal(rollPokemonCatch(true, () => 0.499999), true);
+  assert.equal(rollPokemonCatch(true, () => 0.5), false);
+  assert.equal(rollPokemonCatch(true, () => 0.999999), false);
+});
+
+test("each theme has fifteen residents of its type, at most five on stage", () => {
+  const additions = {
+    gengar: ["duskull", "drifloon", "litwick", "phantump", "pumpkaboo"],
+    gible: ["sandshrew", "trapinch", "rhyhorn", "drilbur", "numel"],
+    piplup: ["mudkip", "buizel", "poliwag", "clamperl", "finneon"],
+    charmander: ["torchic", "fennekin", "litten", "fuecoco", "charcadet"],
+    bulbasaur: ["snivy", "turtwig", "seedot", "petilil", "smoliv"],
+  };
   assert.equal(new Set(everyone).size, everyone.length, "nobody lives in two habitats");
   for (const theme of THEME_ORDER) {
     assert.ok(THEMES[theme].habitat);
-    assert.equal(RESIDENTS[theme].length, 10);
-    assert.equal(new Set(RESIDENTS[theme]).size, 10);
+    assert.equal(RESIDENTS[theme].length, 15);
+    assert.deepEqual(RESIDENTS[theme].slice(-5), additions[theme], "the five new residents match their habitat");
+    assert.equal(new Set(RESIDENTS[theme]).size, 15);
     assert.equal(RESIDENTS[theme].filter(species => SPECIES[species].legendary).length, 1);
     assert.equal(RESIDENTS[theme].filter(species => SPECIES[species].mythical).length, 1);
     assert.ok(!RESIDENTS[theme].some(species => SPECIES[species].legendary && SPECIES[species].mythical));
@@ -172,7 +195,7 @@ test("each theme has ten residents of its type, at most five on stage", () => {
         cast = next;
         cast.forEach(member => seen.add(member.species));
       }
-      assert.equal(seen.size, 10, "the whole roster takes a turn");
+      assert.equal(seen.size, 15, "the whole roster takes a turn");
       assert.deepEqual(recast(cast, 0, theme, random), cast);
     }
   }
@@ -213,4 +236,110 @@ test("shuffle always moves to a different habitat and reaches them all", () => {
 
 test("rotation intervals are sensible", () => {
   for (const { ms } of ROTATION_INTERVALS) assert.ok(ms === null || ms >= 10_000);
+});
+
+test("malformed or missing collection data returns an empty collection", () => {
+  assert.deepEqual(parsePokemonCollection(null), []);
+  assert.deepEqual(parsePokemonCollection("not-json"), []);
+});
+
+test("collection data ignores unknown species and invalid shiny flags", () => {
+  assert.deepEqual(parsePokemonCollection(JSON.stringify([
+    { species: "missingno", shiny: false },
+    { species: "gengar", shiny: "yes" },
+    { species: "gengar", shiny: false },
+  ])), [{ species: "gengar", shiny: false }]);
+});
+
+test("collection data deduplicates captured forms", () => {
+  assert.deepEqual(parsePokemonCollection(JSON.stringify([
+    { species: "piplup", shiny: true },
+    { species: "piplup", shiny: true },
+  ])), [{ species: "piplup", shiny: true }]);
+});
+
+test("recording a capture persists it and keeps normal and shiny forms distinct", () => {
+  const saved = new Map();
+  const storage = { setItem: (key, value) => saved.set(key, value) };
+  const normal = recordPokemonCapture(storage, [], { species: "piplup", shiny: false });
+  const shiny = recordPokemonCapture(storage, normal.collection, { species: "piplup", shiny: true });
+
+  assert.equal(normal.result, "captured");
+  assert.equal(shiny.result, "captured");
+  assert.deepEqual(shiny.collection, [
+    { species: "piplup", shiny: false },
+    { species: "piplup", shiny: true },
+  ]);
+  assert.deepEqual(JSON.parse(saved.get(POKEMON_COLLECTION_STORAGE_KEY)), shiny.collection);
+});
+
+test("recording a duplicate capture does not write it again", () => {
+  let writes = 0;
+  const collection = [{ species: "gengar", shiny: false }];
+  const result = recordPokemonCapture({ setItem: () => { writes++; } }, collection, collection[0]);
+
+  assert.equal(result.result, "already-captured");
+  assert.equal(result.collection, collection);
+  assert.equal(writes, 0);
+});
+
+test("a failed storage write does not report or add a capture", () => {
+  const collection = [{ species: "gengar", shiny: false }];
+  const result = recordPokemonCapture({ setItem: () => { throw new Error("quota exceeded"); } }, collection, { species: "piplup", shiny: false });
+
+  assert.equal(result.result, "storage-error");
+  assert.equal(result.collection, collection);
+  assert.deepEqual(collection, [{ species: "gengar", shiny: false }]);
+});
+
+test("only successful captures animate when reduced motion is off", () => {
+  const { shouldAnimatePokemonCapture } = pokemonCollection;
+  assert.equal(typeof shouldAnimatePokemonCapture, "function");
+  assert.equal(shouldAnimatePokemonCapture("captured", false), true);
+  assert.equal(shouldAnimatePokemonCapture("captured", true), false);
+  assert.equal(shouldAnimatePokemonCapture("already-captured", false), false);
+  assert.equal(shouldAnimatePokemonCapture("storage-error", false), false);
+});
+
+test("only the capture-pull animation completes a capture", async () => {
+  const { isPokemonCaptureAnimation } = await import("../lib/pokemon-capture-animation.ts");
+  assert.equal(typeof isPokemonCaptureAnimation, "function");
+  assert.equal(isPokemonCaptureAnimation("pokemon-happy"), false);
+  assert.equal(isPokemonCaptureAnimation("pokemon-capture-pull"), true);
+});
+
+test("capture bolt connects its endpoints with two finite zig-zag points", async () => {
+  const captureAnimation = await import("../lib/pokemon-capture-animation.ts").catch(error => {
+    if (error?.code === "ERR_MODULE_NOT_FOUND") return {};
+    throw error;
+  });
+  assert.equal(typeof captureAnimation.getPokemonCaptureBoltPoints, "function");
+  const start = { x: 20, y: 30 };
+  const end = { x: 180, y: 110 };
+  const points = captureAnimation.getPokemonCaptureBoltPoints(start, end);
+  assert.deepEqual(points[0], start);
+  assert.deepEqual(points.at(-1), end);
+  assert.equal(points.length, 4);
+  assert.ok(points.slice(1, -1).every(point => Number.isFinite(point.x) && Number.isFinite(point.y)));
+  const signedOffsets = points.slice(1, -1).map(point => (end.x - start.x) * (point.y - start.y) - (end.y - start.y) * (point.x - start.x));
+  assert.ok(signedOffsets[0] * signedOffsets[1] < 0, "interior points zig-zag to opposite sides of the beam");
+
+  const equalPoints = captureAnimation.getPokemonCaptureBoltPoints(start, start);
+  assert.deepEqual(equalPoints[0], start);
+  assert.deepEqual(equalPoints.at(-1), start);
+  assert.ok(equalPoints.every(point => Number.isFinite(point.x) && Number.isFinite(point.y)));
+});
+
+test("capturing the habitat partner replaces that on-stage appearance", () => {
+  const { recastCapturedResident } = pokemonBehavior;
+  assert.equal(typeof recastCapturedResident, "function");
+  const cast = createCast("gengar", false, seededRandom(12));
+  const next = recastCapturedResident(cast, 0, "gengar", seededRandom(14));
+
+  assert.equal(next.length, cast.length);
+  assert.notEqual(next[0].species, "gengar");
+  assert.ok(RESIDENTS.gengar.includes(next[0].species));
+  assert.equal(next[0].entering, true);
+  assert.deepEqual(next.slice(1), cast.slice(1));
+  assert.equal(new Set(next.map(member => member.species)).size, next.length);
 });

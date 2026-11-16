@@ -18,6 +18,10 @@ export type PokemonRoutine = {
 type Zone = { left: number; right: number; top: number; bottom: number };
 type Random = () => number;
 
+export function rollPokemonCatch(special: boolean, random: Random = Math.random): boolean {
+  return !special || random() < 0.5;
+}
+
 export const SHINY_ODDS = 20;
 /** Legendaries and mythicals: rare visitors who make one fixed appearance, then stay away. */
 export const isSpecial = (info: SpeciesInfo) => Boolean(info.legendary || info.mythical);
@@ -107,7 +111,7 @@ export function createPokemonRoutine(species: PokemonSpecies, slot: number, comp
   return { ...base, activity: info.movement === "air" ? "float" : "idle", duration: 2200 + slot * 750, actsLeft: 3 };
 }
 
-// ── The cast: ten residents per theme, at most five on stage ────────────────
+// ── The cast: fifteen residents per theme, at most five on stage ────────────
 export const CAST_SIZE = 5;
 /** Phones get one patch per resident across a short strip. */
 export const COMPACT_CAST_SIZE = 4;
@@ -145,16 +149,25 @@ export function createCast(theme: PokemonTheme, compact: boolean, random: Random
   return cast;
 }
 
-/** Swap the resident in `slot`, who has just gone offstage, for someone from the bench. The partner stays. */
-export function recast(cast: CastMember[], slot: number, theme: PokemonTheme, random: Random = Math.random): CastMember[] {
+function replaceFromBench(cast: CastMember[], slot: number, theme: PokemonTheme, random: Random, allowPartner: boolean): CastMember[] {
   const leaving = cast[slot];
-  if (!leaving || leaving.species === theme) return cast;
+  if (!leaving || (!allowPartner && leaving.species === theme)) return cast;
   const others = cast.filter((_, index) => index !== slot);
   const movement = SPECIES[leaving.species].movement;
   const species = fromBench(theme, [...others.map(member => member.species), leaving.species], random, movement);
   if (!species) return cast;
   const home = SPECIES[species].movement === movement ? leaving.home : freeHome(others, species, random);
   return cast.map((member, index) => index === slot ? { species, home, entering: true } : member);
+}
+
+/** Swap the resident in `slot`, who has just gone offstage, for someone from the bench. The partner stays. */
+export function recast(cast: CastMember[], slot: number, theme: PokemonTheme, random: Random = Math.random): CastMember[] {
+  return replaceFromBench(cast, slot, theme, random, false);
+}
+
+/** Replace a captured on-stage resident, including the protected habitat partner. */
+export function recastCapturedResident(cast: CastMember[], slot: number, theme: PokemonTheme, random: Random = Math.random): CastMember[] {
+  return replaceFromBench(cast, slot, theme, random, true);
 }
 
 /** Choose destinations only between activities; hidden phases conceal teleportation and shiny rolls. */

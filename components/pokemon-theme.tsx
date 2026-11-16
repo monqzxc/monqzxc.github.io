@@ -5,8 +5,11 @@ import { flushSync } from "react-dom";
 import { Popover } from "radix-ui";
 import { Check, ChevronDown, Pause, Play, Repeat, Shuffle, Sparkles, Star } from "lucide-react";
 import { MoveEffect, PokemonMotion, PokemonSprite, ShinyBurst, ShinyGlow, ShinyStars } from "@/components/pokemon-sprite";
+import { PokemonCollection } from "@/components/pokemon-collection";
 import { PokemonScenery } from "@/components/pokemon-scenery";
-import { createCast, createPokemonRoutine, isEntranceActivity, isHiddenActivity, isSpecial, isTravelActivity, nextPokemonRoutine, recast, type CastMember } from "@/lib/pokemon-behavior";
+import { createCast, createPokemonRoutine, isEntranceActivity, isHiddenActivity, isSpecial, isTravelActivity, nextPokemonRoutine, recast, recastCapturedResident, rollPokemonCatch, type CastMember } from "@/lib/pokemon-behavior";
+import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture, shouldAnimatePokemonCapture, type CapturedPokemon } from "@/lib/pokemon-collection";
+import { isPokemonCaptureAnimation, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
 import { MOTION } from "@/lib/pokemon-motion";
 import { MOVES, RESIDENTS, SPECIES, SPRITE_FEET, SPRITE_SIZE, THEME_ORDER, THEMES, type PokemonSpecies, type PokemonTheme } from "@/lib/pokemon-roster";
 import { DEFAULT_ROTATION, intervalMs, nextTheme, parseRotation, parseTheme, ROTATION_INTERVALS, ROTATION_MODES, ROTATION_STORAGE_KEY, THEME_STORAGE_KEY, type Rotation, type RotationMode } from "@/lib/theme-rotation";
@@ -26,6 +29,9 @@ type ThemeState = {
   elapsed: () => number;
   paused: boolean;
   setPaused: (paused: boolean) => void;
+  capturedPokemon: CapturedPokemon[];
+  collectionError: string | null;
+  capturePokemon: (capture: CapturedPokemon) => "captured" | "already-captured" | "storage-error";
   ready: boolean;
 };
 const ThemeContext = createContext<ThemeState | null>(null);
@@ -45,6 +51,9 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [ready, setReady] = useState(false);
+  const [capturedPokemon, updateCapturedPokemon] = useState<CapturedPokemon[]>([]);
+  const capturedPokemonRef = useRef<CapturedPokemon[]>([]);
+  const [collectionError, setCollectionError] = useState<string | null>(null);
 
   useEffect(() => {
     // The pre-paint script in app/layout.tsx has already applied the saved (or per-visit) habitat.
@@ -55,6 +64,14 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
         next = parseTheme(localStorage.getItem(THEME_STORAGE_KEY) ?? next);
         saved = parseRotation(localStorage.getItem(ROTATION_STORAGE_KEY));
       } catch { /* Themes still work when browser storage is unavailable. */ }
+      try {
+        const collection = parsePokemonCollection(localStorage.getItem(POKEMON_COLLECTION_STORAGE_KEY));
+        capturedPokemonRef.current = collection;
+        updateCapturedPokemon(collection);
+        setCollectionError(null);
+      } catch {
+        setCollectionError("The Pokédex couldn't read this browser's storage.");
+      }
       document.documentElement.dataset.pokemonTheme = next;
       updateTheme(next);
       updateRotation(saved);
@@ -62,7 +79,7 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
     read();
     setReady(true);
     const sync = (event: StorageEvent) => {
-      if (event.key === THEME_STORAGE_KEY || event.key === ROTATION_STORAGE_KEY || event.key === null) read();
+      if (event.key === THEME_STORAGE_KEY || event.key === ROTATION_STORAGE_KEY || event.key === POKEMON_COLLECTION_STORAGE_KEY || event.key === null) read();
     };
     const onVisibility = () => setHidden(document.hidden);
     onVisibility();
@@ -85,6 +102,21 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
   const setRotation = useCallback((next: Rotation) => {
     updateRotation(next);
     try { localStorage.setItem(ROTATION_STORAGE_KEY, JSON.stringify(next)); } catch { /* Optional persistence. */ }
+  }, []);
+
+  const capturePokemon = useCallback((capture: CapturedPokemon) => {
+    try {
+      const result = recordPokemonCapture(localStorage, capturedPokemonRef.current, capture);
+      if (result.result === "captured") {
+        capturedPokemonRef.current = result.collection;
+        updateCapturedPokemon(result.collection);
+      }
+      setCollectionError(result.result === "storage-error" ? "The Pokédex couldn't save this capture. Check this browser's storage settings and try again." : null);
+      return result.result;
+    } catch {
+      setCollectionError("The Pokédex couldn't save this capture. Check this browser's storage settings and try again.");
+      return "storage-error";
+    }
   }, []);
 
   // Decide the next stop whenever the habitat or the rotation changes; a fresh choice restarts the countdown.
@@ -117,7 +149,7 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
     return Math.min(ms, ms - remaining + (since === null ? 0 : performance.now() - since));
   }, [cycle, ms]);
 
-  const value = useMemo<ThemeState>(() => ({ theme, setTheme: apply, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, ready }), [theme, apply, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, ready]);
+  const value = useMemo<ThemeState>(() => ({ theme, setTheme: apply, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, ready }), [theme, apply, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, ready]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
@@ -157,7 +189,7 @@ function specialsOf(theme: PokemonTheme) {
 }
 
 export function ThemeSelector() {
-  const { theme, setTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, ready } = usePokemonTheme();
+  const { theme, setTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, ready } = usePokemonTheme();
   const [open, setOpen] = useState(false);
   const rotating = rotation.mode !== "off";
   const ms = intervalMs(rotation.every);
@@ -180,7 +212,7 @@ export function ThemeSelector() {
           <Popover.Content className="theme-panel" side="bottom" align="end" sideOffset={10} collisionPadding={12} aria-label="Habitat settings">
             <div className="theme-panel-head">
               <p className="theme-panel-title">Choose a habitat</p>
-              <p className="theme-panel-sub">Ten Pokémon live in each, with a rare legendary or mythical visitor.</p>
+              <p className="theme-panel-sub">{RESIDENTS[theme].length} Pokémon live in each, with a rare legendary or mythical visitor.</p>
             </div>
 
             <div className="theme-options" role="radiogroup" aria-label="Habitat">
@@ -253,31 +285,51 @@ export function ThemeSelector() {
       <button className="habitat-pause" type="button" aria-label={paused ? "Resume Pokémon and habitat changes" : "Pause Pokémon and habitat changes"} aria-pressed={paused} title={paused ? "Resume Pokémon and habitat changes" : "Pause Pokémon and habitat changes"} onClick={() => setPaused(!paused)}>
         {paused ? <Play size={13} aria-hidden="true" /> : <Pause size={13} aria-hidden="true" />}
       </button>
+      <PokemonCollection capturedPokemon={capturedPokemon} storageError={collectionError} />
     </div>
   );
 }
 
 type HabitatBounds = { width: number; height: number };
 const GREETING_MS = 2400;
+const DODGE_MS = 320;
+const DODGE_FEEDBACK_MS = 900;
 /** Chance that a resident who goes offstage is replaced from the bench. */
 const SWAP_ODDS = .55;
 
-function PokemonResident({ species, home, entering, slot, compact, bounds, scaleFactor, groundHeight, paused, onOffstage }: {
+function PokemonResident({ species, home, entering, slot, compact, bounds, scaleFactor, groundHeight, paused, reducedMotion, onOffstage, onCaptured, capturedPokemon, capturePokemon }: {
   species: PokemonSpecies; home: number; entering: boolean; slot: number; compact: boolean; bounds: HabitatBounds; scaleFactor: number; groundHeight: number; paused: boolean;
+  reducedMotion: boolean;
   onOffstage: (slot: number) => void;
+  onCaptured: (slot: number) => void;
+  capturedPokemon: CapturedPokemon[];
+  capturePokemon: ThemeState["capturePokemon"];
 }) {
   const info = SPECIES[species];
   const air = info.movement === "air";
   const [routine, setRoutine] = useState(() => createPokemonRoutine(species, slot, compact, home, entering));
   const [happy, setHappy] = useState(false);
   const [greeting, setGreeting] = useState(0);
+  const [capturing, setCapturing] = useState(false);
+  const [captureMessage, setCaptureMessage] = useState<"captured" | "already-captured" | "storage-error" | "dodged" | "">("");
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [dodging, setDodging] = useState(false);
+  const [hoverDodgeFeedback, setHoverDodgeFeedback] = useState(false);
+  const [dodgeDirection, setDodgeDirection] = useState<1 | -1>(1);
+  const residentRef = useRef<HTMLButtonElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dodgeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activityTimer = useRef({ cycle: -1, remaining: 0 });
-  const interacting = happy || hovered || focused;
-  const stopped = paused || interacting;
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+  const alreadyCaptured = capturedPokemon.some(entry => entry.species === species && entry.shiny === routine.shiny);
+  const interacting = happy || hovered || focused || dodging || hoverDodgeFeedback;
+  const foreground = happy || dodging || hoverDodgeFeedback || capturing;
+  const stopped = paused || interacting || capturing;
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+    if (dodgeTimer.current) clearTimeout(dodgeTimer.current);
+  }, []);
+  useEffect(() => { if (reducedMotion) setCapturing(false); }, [reducedMotion]);
 
   // Pause the routine clock together with CSS, including its remaining time.
   // A greeting or a background tab must never teleport a visible resident.
@@ -309,13 +361,52 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
 
   function greet() {
     if (timer.current) clearTimeout(timer.current);
+    clearDodge();
     setHappy(true);
     setGreeting(value => value + 1);
+    setCaptureMessage("");
     timer.current = setTimeout(() => setHappy(false), GREETING_MS);
+  }
+
+  function clearDodge() {
+    if (dodgeTimer.current) clearTimeout(dodgeTimer.current);
+    dodgeTimer.current = null;
+    setDodging(false);
+    setHoverDodgeFeedback(false);
+  }
+
+  function catchResident() {
+    clearDodge();
+    if (!rollPokemonCatch(isSpecial(info))) {
+      setCaptureMessage("dodged");
+      return;
+    }
+
+    const result = capturePokemon({ species, shiny: routine.shiny });
+    setCaptureMessage(result);
+    if (result !== "captured") return;
+    if (!shouldAnimatePokemonCapture(result, reducedMotion)) {
+      onCaptured(slot);
+      return;
+    }
+
+    if (timer.current) clearTimeout(timer.current);
+    setHappy(false);
+    setCapturing(true);
+    const resident = residentRef.current?.getBoundingClientRect();
+    if (resident) {
+      const target: PokemonCapturePoint = { x: resident.left + resident.width / 2, y: resident.top + resident.height / 2 };
+      window.dispatchEvent(new CustomEvent("pokemon-capture-start", { detail: { target } }));
+    }
   }
 
   const size = Math.round(SPRITE_SIZE * (compact ? info.compactScale : info.scale) * scaleFactor);
   const shinyName = `${routine.shiny ? "Shiny " : ""}${info.name}`;
+  const captureAnnouncement = captureMessage === "captured" ? `${shinyName} was added to your Pokédex.`
+    : captureMessage === "already-captured" ? `${shinyName} is already in your Pokédex.`
+    : captureMessage === "storage-error" ? `Could not save ${shinyName}. Check this browser's storage settings and try again.`
+    : captureMessage === "dodged" ? "Dodged! Try again."
+    : "";
   const rarity = info.legendary ? "Legendary" : info.mythical ? "Mythical" : null;
   const { activity } = routine;
   const style = {
@@ -330,13 +421,14 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
     "--activity-duration": `${routine.duration}ms`,
     "--facing": routine.facing,
     "--bob-delay": `${-slot * .7}s`,
+    "--dodge-x": `${dodgeDirection * Math.round(size * .16)}px`,
   } as CSSProperties;
 
   // On the move or mid-attack it turns side-on; it faces you again to idle, react, or be greeted.
   const pose = MOTION[species] && !interacting ? (activity === "attack" ? "attack" : isTravelActivity(activity) ? "walk" : null) : null;
   const classes = [
     "pokemon-slot", air ? "is-air" : "is-ground", info.ghost && "is-ghost", info.legendary && "is-legendary", info.mythical && "is-mythical", pose && `pose-${pose}`,
-    routine.shiny && "is-shiny", interacting && "is-interacting", happy && `is-greeting reacts-${info.reaction}`,
+    routine.shiny && "is-shiny", interacting && "is-interacting", happy && `is-greeting reacts-${info.reaction}`, dodging && "is-dodging", foreground && "is-foreground", capturing && "is-catching",
   ].filter(Boolean).join(" ");
 
   return (
@@ -349,13 +441,31 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
         <div className="pokemon-presence">
           {!air && <span className="pokemon-shadow" aria-hidden="true" />}
           {routine.shiny && <ShinyGlow />}
-          <button type="button" className="pokemon-resident" onClick={greet} aria-label={`Say hello to ${shinyName}`}
-            onPointerEnter={event => { if (event.pointerType === "mouse") setHovered(true); }}
+          <button ref={residentRef} type="button" className="pokemon-resident" onClick={greet} aria-label={`Say hello to ${shinyName}`}
+            onPointerEnter={event => {
+              if (event.pointerType !== "mouse") return;
+              setHovered(true);
+              if (!isSpecial(info) || alreadyCaptured) return;
+              if (dodgeTimer.current) clearTimeout(dodgeTimer.current);
+              const rect = event.currentTarget.getBoundingClientRect();
+              setDodgeDirection(event.clientX < rect.left + rect.width / 2 ? 1 : -1);
+              setDodging(!reducedMotion);
+              setHoverDodgeFeedback(reducedMotion);
+              dodgeTimer.current = setTimeout(() => {
+                setDodging(false);
+                setHoverDodgeFeedback(false);
+                dodgeTimer.current = null;
+              }, reducedMotion ? DODGE_FEEDBACK_MS : DODGE_MS);
+            }}
             onPointerLeave={() => setHovered(false)}
             onPointerDown={() => setFocused(false)}
             onFocus={event => setFocused(event.currentTarget.matches(":focus-visible"))}
             onBlur={() => setFocused(false)}>
-            <span className="pokemon-window"><span className="pokemon-emerge"><span className="pokemon-facing"><span className="pokemon-body">
+            <span className="pokemon-window"><span className="pokemon-emerge"><span className="pokemon-facing"><span className="pokemon-body" onAnimationEnd={event => {
+              if (event.target !== event.currentTarget || !isPokemonCaptureAnimation(event.animationName)) return;
+              setCapturing(false);
+              onCaptured(slot);
+            }}>
               <PokemonSprite species={species} shiny={routine.shiny} className="pokemon-character" />
               <PokemonMotion species={species} shiny={routine.shiny} />
             </span></span></span></span>
@@ -370,13 +480,20 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
           </span>
           {routine.shiny && <ShinyStars />}
           {activity === "attack" && !happy && <span key={`call-${routine.cycle}`} className="pokemon-callout" aria-hidden="true">{info.moveName}!</span>}
-          {(hovered || focused) && !happy && (
+          {(hovered || focused) && !happy && !dodging && !hoverDodgeFeedback && (
             <span className="pokemon-hover-hello" aria-hidden="true">
               <PokemonSprite species={species} shiny={routine.shiny} className="pokemon-hover-sprite" />
               <span>Hi!</span>
             </span>
           )}
-          {happy && <span key={greeting} className="pokemon-hello" aria-hidden="true">{routine.shiny && <span>✦</span>}{info.cry}</span>}
+          {hoverDodgeFeedback && <span className="pokemon-dodge-callout" aria-hidden="true">Dodged!</span>}
+          {happy && <div key={greeting} className="pokemon-hello" role="group" aria-label={`${shinyName} says hello`}>
+            <span className="pokemon-hello-cry" aria-hidden="true">{routine.shiny && <span>✦</span>}{info.cry}</span>
+            {captureMessage === "dodged" && <span className="pokemon-catch-status" aria-hidden="true">Dodged! Try again.</span>}
+            <button type="button" className="pokemon-catch-button" aria-label={alreadyCaptured ? `${shinyName} is already caught` : `Catch ${shinyName}`} disabled={alreadyCaptured} onClick={catchResident}>
+              {alreadyCaptured ? "Caught" : "Catch"}
+            </button>
+          </div>}
         </div>
         {/* Outside the fading layer so the sparkle reads while the Pokémon is still materialising. */}
         {routine.shiny && isEntranceActivity(activity) && <>
@@ -385,13 +502,13 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
         </>}
         {rarity && !routine.shiny && isEntranceActivity(activity) && <span key={`rare-${routine.cycle}`} className={`pokemon-callout is-rarity-callout is-${rarity.toLowerCase()}`} aria-hidden="true">{info.mythical ? "✦" : "★"} {rarity}!</span>}
       </div>
-      <span className="sr-only" role="status">{happy ? `${shinyName} ${info.reaction === "roar" ? "lets out a mighty roar" : "smiles and waves hello"}!` : ""}</span>
+      <span className="sr-only" role="status">{hoverDodgeFeedback ? "Dodged!" : captureAnnouncement || (happy ? `${shinyName} ${info.reaction === "roar" ? "lets out a mighty roar" : "smiles and waves hello"}!` : "")}</span>
     </div>
   );
 }
 
 export function PokemonHabitat() {
-  const { theme, paused, ready } = usePokemonTheme();
+  const { theme, paused, ready, capturedPokemon, capturePokemon } = usePokemonTheme();
   const habitatRef = useRef<HTMLElement>(null);
   const [bounds, setBounds] = useState<HabitatBounds>({ width: 0, height: 0 });
   const [hidden, setHidden] = useState(false);
@@ -418,7 +535,7 @@ export function PokemonHabitat() {
   // Tablets get slightly smaller residents so the edge zones stay clear of the content.
   const scaleFactor = compact || bounds.width >= 1100 ? 1 : .8;
   const groundHeight = compact ? 24 : 38;
-  const stopped = paused || hidden || reducedMotion;
+  const stopped = paused || hidden;
   // Ten residents per theme, five on stage; whoever goes offstage may hand over to the bench.
   const [cast, setCast] = useState<CastMember[]>([]);
   useEffect(() => {
@@ -427,10 +544,13 @@ export function PokemonHabitat() {
   const onOffstage = useCallback((slot: number) => {
     if (Math.random() < SWAP_ODDS) setCast(current => recast(current, slot, theme));
   }, [theme]);
+  const onCaptured = useCallback((slot: number) => {
+    setCast(current => recastCapturedResident(current, slot, theme));
+  }, [theme]);
   return (
     <aside ref={habitatRef} className={`pokemon-habitat habitat-${theme} ${stopped ? "is-paused" : ""}`} data-ready={ready} aria-hidden={!ready || undefined} aria-label={`Pokémon ${THEMES[theme].habitat.toLowerCase()}`} style={{ "--habitat-ground-height": `${groundHeight}px` } as CSSProperties}>
       <PokemonScenery theme={theme} />
-      {ready && bounds.width > 0 && cast.map(({ species, home, entering }, slot) => <PokemonResident key={`${theme}-${species}-${compact}-${reducedMotion}`} species={species} home={home} entering={entering} onOffstage={onOffstage} slot={slot} compact={compact} bounds={bounds} scaleFactor={scaleFactor} groundHeight={groundHeight} paused={stopped} />)}
+      {ready && bounds.width > 0 && cast.map(({ species, home, entering }, slot) => <PokemonResident key={`${theme}-${species}-${compact}-${reducedMotion}`} species={species} home={home} entering={entering} onOffstage={onOffstage} onCaptured={onCaptured} slot={slot} compact={compact} bounds={bounds} scaleFactor={scaleFactor} groundHeight={groundHeight} paused={stopped} reducedMotion={reducedMotion} capturedPokemon={capturedPokemon} capturePokemon={capturePokemon} />)}
     </aside>
   );
 }
