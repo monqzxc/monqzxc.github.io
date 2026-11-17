@@ -242,16 +242,12 @@ export function ThemeSelector() {
                 const info = THEMES[option];
                 const selected = option === theme;
                 return (
-                  <label key={option} className={`theme-option ${selected ? "is-selected" : ""}`} style={{ "--swatch": info.swatch } as CSSProperties}>
-                    <input className="sr-only" type="radio" name="pokemon-habitat" value={option} checked={selected} onChange={() => setTheme(option)} />
+                  // Just the partner: its sprite and name. The type stays in the accessible name.
+                  <label key={option} className={`theme-option ${selected ? "is-selected" : ""}`} style={{ "--swatch": info.swatch } as CSSProperties} title={`${SPECIES[option].name} · ${info.type}`}>
+                    <input className="sr-only" type="radio" name="pokemon-habitat" value={option} checked={selected} onChange={() => setTheme(option)} aria-label={`${SPECIES[option].name}, ${info.type} type`} />
                     <span className="theme-option-stage" aria-hidden="true"><PokemonSprite species={option} className="theme-option-sprite" /></span>
-                    <span className="theme-option-text">
-                      <span className="theme-option-name">{SPECIES[option].name}<span className="theme-option-type">{info.type}</span></span>
-                      <span className="theme-option-meta">
-                        <span className="theme-option-habitat">{info.habitat}</span>
-                      </span>
-                    </span>
-                    <span className="theme-option-check" aria-hidden="true"><Check size={14} strokeWidth={3} /></span>
+                    <span className="theme-option-name" aria-hidden="true">{SPECIES[option].name}</span>
+                    <span className="theme-option-check" aria-hidden="true"><Check size={10} strokeWidth={3.5} /></span>
                   </label>
                 );
               })}
@@ -282,7 +278,7 @@ export function ThemeSelector() {
             </fieldset>
 
             <p className="theme-next" aria-live="polite">
-              {!rotating ? <>Stays on <strong>{THEMES[theme].habitat}</strong> until you pick another.</>
+              {!rotating ? <>Stays with <strong>{SPECIES[theme].name}</strong> until you pick another.</>
                 : !timed ? <>{rotation.mode === "order" ? "Moves to the next habitat" : "Picks a surprise habitat"} each time you visit.</>
                 : !upcoming ? null
                 : <>

@@ -67,8 +67,9 @@
 .theme-panel-title { margin: 0; font-family: var(--font-display, inherit); font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
 .theme-panel-sub { margin: 2px 0 0; color: var(--muted-foreground); font-size: 12px; line-height: 1.5; }
 
-.theme-options { display: grid; gap: 5px; }
-.theme-option { --swatch: var(--primary); position: relative; display: grid; grid-template-columns: 42px 1fr 22px; align-items: center; gap: 10px; padding: 5px 10px 5px 5px; border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--foreground) 3%, transparent); cursor: pointer; transition: background .2s, border-color .2s, transform .2s; }
+/* Five partner tiles in a row: sprite and name only. */
+.theme-options { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; container-type: inline-size; }
+.theme-option { --swatch: var(--primary); position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; padding: 6px 0 5px; border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--foreground) 3%, transparent); cursor: pointer; transition: background .2s, border-color .2s, transform .2s; }
 .theme-option:hover { border-color: color-mix(in srgb, var(--swatch) 40%, transparent); background: color-mix(in srgb, var(--swatch) 8%, transparent); }
 .theme-option:active { transform: scale(.985); }
 .theme-option.is-selected { border-color: color-mix(in srgb, var(--swatch) 70%, transparent); background: linear-gradient(110deg, color-mix(in srgb, var(--swatch) 20%, transparent), color-mix(in srgb, var(--swatch) 6%, transparent)); }
@@ -78,13 +79,9 @@
 .theme-option:not(.is-selected):not(:hover) .theme-option-sprite { filter: saturate(.7) brightness(.92); }
 .theme-option:not(.is-selected):not(:hover) .pokemon-sprite-sheet { animation-play-state: paused; }
 .theme-option:hover .theme-option-sprite { animation: theme-sprite-hop .42s cubic-bezier(.3, .7, .4, 1); }
-.theme-option-text { display: grid; gap: 0; min-width: 0; }
-/* Habitat and visitors share a line to keep each row short. */
-.theme-option-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
-.theme-option-name { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; }
-.theme-option-type { padding: 1px 7px; border-radius: 100px; background: color-mix(in srgb, var(--swatch) 22%, transparent); color: color-mix(in srgb, var(--swatch) 55%, var(--foreground)); font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
-.theme-option-habitat { color: var(--muted-foreground); font-size: 12px; }
-.theme-option-check { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--swatch); color: #10101a; opacity: 0; transform: scale(.4); transition: opacity .18s, transform .25s cubic-bezier(.3, 1.5, .5, 1); }
+/* Sized to the row, so "Charmander" fits from a 320px phone up: about 9.5px on desktop, 8px at the narrowest. */
+.theme-option-name { max-width: 100%; overflow: hidden; font-size: clamp(8px, calc(3.2cqi - 1px), 10px); letter-spacing: -.01em; font-weight: 700; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.theme-option-check { position: absolute; top: 4px; right: 4px; display: grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; background: var(--swatch); color: #10101a; opacity: 0; transform: scale(.4); transition: opacity .18s, transform .25s cubic-bezier(.3, 1.5, .5, 1); }
 .theme-option.is-selected .theme-option-check { opacity: 1; transform: none; }
 
 .theme-setting { margin: 12px 0 0; padding: 0; border: 0; min-width: 0; }
