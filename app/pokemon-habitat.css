@@ -295,7 +295,6 @@
 /* A hovered Pokémon stops to look at you but keeps breathing. */
 .pokemon-habitat:not(.is-paused) .pokemon-slot.is-interacting :is(.pokemon-sprite-sheet, .shiny-stars i, .shiny-glow, .pokemon-hover-hello, .pokemon-hover-sprite) { animation-play-state: running !important; }
 .pokemon-slot.is-interacting .pokemon-presence { opacity: 1 !important; visibility: visible; }
-.pokemon-slot.is-dodging .pokemon-presence { animation: pokemon-dodge 320ms cubic-bezier(.16, 1, .3, 1) both; animation-play-state: running !important; }
 .pokemon-slot.is-interacting .pokemon-emerge { transform: none !important; }
 .pokemon-slot.is-interacting .pokemon-window { clip-path: none; }
 .pokemon-slot.is-greeting.reacts-smile .pokemon-body { animation: pokemon-happy .4s ease-in-out 3; }
@@ -328,6 +327,17 @@
 .pokemon-slot.is-dashing { --stride: .35; animation: pokemon-dash var(--activity-duration) cubic-bezier(.2, .75, .3, 1) both; }
 .pokemon-slot.is-dashing :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(-7px 0 0 #ffffff2e) drop-shadow(-14px 0 0 #ffffff14); }
 
+/* Legendaries and mythicals slip the cursor. A teleport squeezes to a sliver of light and opens
+   back up somewhere else; a phase leaves it a flickering, colour-split ghost the cursor passes through. */
+.pokemon-slot.is-evading { z-index: 50; }
+.pokemon-slot.is-evading .pokemon-resident { pointer-events: none; }
+.pokemon-slot.is-teleport-out .pokemon-presence { animation: legend-blink-out var(--blink-out-ms) cubic-bezier(.6, 0, .9, .4) both !important; }
+.pokemon-slot.is-teleport-in .pokemon-presence { animation: legend-blink-in var(--blink-in-ms) cubic-bezier(.2, .8, .3, 1.2) both !important; }
+.pokemon-slot:is(.is-teleport-out, .is-teleport-in) .pokemon-portal { animation: ghost-portal var(--blink-in-ms) ease-in-out both; }
+.pokemon-slot:is(.is-teleport-out, .is-teleport-in) :is(.pokemon-callout, .fx-move, .pokemon-dust) { visibility: hidden; }
+.pokemon-slot.is-phase .pokemon-presence { animation: legend-phase var(--phase-ms) linear both !important; }
+.pokemon-slot.is-phase :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(3px 0 0 #ff4fd8a0) drop-shadow(-3px 0 0 #4fd8ffa0); }
+
 /* Cursor layer, portalled to <body> above everything, including the capture beam. */
 html[data-cursor-ko], html[data-cursor-ko] * { cursor: none !important; }
 .cursor-ambush-layer { position: fixed; inset: 0; z-index: 10001; overflow: hidden; pointer-events: none; }
@@ -341,18 +351,78 @@ html[data-cursor-ko], html[data-cursor-ko] * { cursor: none !important; }
 .cursor-impact { position: absolute; width: 0; height: 0; }
 .cursor-impact-move { left: -30px; top: -30px; width: 60px; animation: cursor-impact .55s ease-out both; }
 .cursor-impact.is-miss .cursor-impact-move { left: -20px; top: -20px; width: 40px; opacity: .7; }
+/* On a hit the flash is quick and small, so the status effect underneath can be read. */
+.cursor-impact.is-hit .cursor-impact-move { left: -22px; top: -22px; width: 44px; animation-duration: .32s; }
 .cursor-impact-move.is-strip .move-strip { --move-ms: 420ms; }
-.cursor-impact-text { position: absolute; left: 0; top: 24px; padding: 2px 8px; border: 1px solid color-mix(in srgb, var(--primary) 38%, transparent); border-radius: 8px; background: color-mix(in srgb, var(--background) 90%, transparent); color: var(--muted-foreground); font-size: 10px; font-weight: 700; letter-spacing: .03em; line-height: 1.5; white-space: nowrap; translate: -50% 0; animation: pokemon-callout .65s ease-out both; }
-.cursor-impact.is-hit .cursor-impact-text { color: #ffd23f; border-color: #ffd23f80; }
+.cursor-impact-text { position: absolute; left: 0; top: 26px; display: flex; flex-direction: column; align-items: center; padding: 2px 8px; border: 1px solid color-mix(in srgb, var(--primary) 38%, transparent); border-radius: 8px; background: color-mix(in srgb, var(--background) 90%, transparent); color: var(--muted-foreground); font-size: 10px; font-weight: 700; letter-spacing: .03em; line-height: 1.5; white-space: nowrap; translate: -50% 0; animation: pokemon-callout .95s ease-out both; }
+.cursor-impact.is-hit .cursor-impact-text { color: var(--foreground); border-color: #ffd23f80; }
+.cursor-impact-text b { color: #ffd23f; font-size: 9px; }
 /* The arrow, cut into five shards: thrown apart where it was hit, pulled back together where the pointer is now. */
-.cursor-shatter, .cursor-reform { position: absolute; left: 0; top: 0; }
+.cursor-shatter, .cursor-reform, .cursor-status, .cursor-ice-shards { position: absolute; left: 0; top: 0; }
 .cursor-shard { position: absolute; left: 0; top: 0; width: 12px; height: 19px; transform-origin: 30% 40%; }
 .cursor-shard svg { display: block; overflow: visible; }
-.cursor-shard path { fill: #fff; stroke: #000; stroke-width: 1; stroke-linejoin: round; }
+.cursor-shard path, .cursor-arrow path { fill: #fff; stroke: #000; stroke-width: 1; stroke-linejoin: round; }
+.cursor-arrow { position: absolute; left: 0; top: 0; display: block; overflow: visible; transform-origin: 6px 9px; }
 .cursor-shatter .cursor-shard { animation: cursor-shatter .42s cubic-bezier(.15, .8, .3, 1) both; }
 .cursor-shatter .cursor-shard path { fill: color-mix(in srgb, var(--tint) 72%, #fff); }
 .cursor-reform .cursor-shard { animation: cursor-reform var(--ko-ms) cubic-bezier(.3, 0, .2, 1) both; }
-.cursor-reform .cursor-shard svg { filter: drop-shadow(0 0 3px #fff8); }
+.cursor-reform .cursor-shard svg { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--tint, #fff) 70%, #fff)); }
+
+/* Status effects, one per element. Particles are <i>s that know their index as --i. */
+.cursor-status i { position: absolute; display: block; font-style: normal; }
+.cursor-status .move-effect { position: absolute; }
+/* Burned: catches fire, chars, and crumbles to ash. */
+.is-burn .cursor-arrow { animation: cursor-burn var(--ko-ms) ease-in both; }
+.cursor-flame { left: calc(var(--i) * 5px - 4px); top: calc(9px - var(--i) * 3px); width: 14px; animation: cursor-flame calc(var(--ko-ms) * .85) ease-out calc(var(--i) * 40ms) both; }
+.cursor-flame.is-strip .move-strip { --move-ms: 240ms; animation-iteration-count: infinite; }
+.cursor-ash { left: calc(1px + var(--i) * 2px); top: 13px; width: 2px; height: 2px; background: #6b6460; animation: cursor-ash 850ms ease-out calc(var(--ko-ms) * .45 + var(--i) * 25ms) both; }
+/* Soaked: wobbles like jelly, drips, and slides away into a puddle. */
+.is-soak .cursor-arrow { animation: cursor-soak var(--ko-ms) ease-in-out both; }
+.is-soak .cursor-arrow path { animation: cursor-fill-soak var(--ko-ms) both; }
+.cursor-drop { left: calc(1px + var(--i) * 2.5px); top: 12px; width: 3px; height: 4px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: var(--tint); animation: cursor-drop 520ms cubic-bezier(.5, 0, 1, .5) calc(var(--i) * 70ms) both; }
+.cursor-puddle { left: -6px; top: 22px; width: 24px; height: 5px; border-radius: 50%; background: color-mix(in srgb, var(--tint) 55%, transparent); animation: cursor-puddle 950ms ease-out both; }
+/* Frozen solid: an ice block forms round it, cracks, and the arrow falls apart with it. */
+.cursor-ice { left: -5px; top: -4px; width: 22px; height: 27px; border: 1px solid #e8fbffcc; border-radius: 3px; background: linear-gradient(135deg, #e6fbffaa, #8fdcff55 45%, #bfefff88); box-shadow: inset 2px 2px 0 #ffffff99, 0 0 8px #8fdcff88; animation: cursor-ice var(--ko-ms) both; }
+.cursor-ice::after { content: ""; position: absolute; inset: 2px; background: linear-gradient(118deg, transparent 47%, #fff 48% 52%, transparent 53%), linear-gradient(62deg, transparent 60%, #ffffffcc 61% 64%, transparent 65%); opacity: 0; animation: cursor-crack var(--ko-ms) steps(1) both; }
+.cursor-ice-shards .cursor-shard { animation: cursor-shatter .34s cubic-bezier(.15, .8, .3, 1) calc(var(--ko-ms) * .6) both; }
+.cursor-ice-shards .cursor-shard path { fill: #d6f6ff; stroke: #2a6f8f; }
+/* Tangled: vines wind round it and drag it under. */
+.is-tangle .cursor-arrow, .cursor-vines { animation: cursor-tangle var(--ko-ms) ease-in both; }
+.is-tangle .cursor-arrow path { animation: cursor-fill-tangle var(--ko-ms) both; }
+.cursor-vines { position: absolute; left: -6px; top: -4px; overflow: visible; transform-origin: 12px 14px; }
+.cursor-vines path { fill: none; stroke: #3f9a4a; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: cursor-vine calc(var(--ko-ms) * .45) ease-out both; }
+.cursor-vines path:nth-child(2) { stroke: #2f7a3a; animation-delay: 60ms; }
+.cursor-vines path:nth-child(3) { animation-delay: 120ms; }
+.cursor-leaf { left: calc(var(--i) * 5px - 4px); top: calc(16px - var(--i) * 5px); width: 6px; height: 4px; border-radius: 0 100%; background: #62c96c; animation: cursor-leaf 800ms ease-out calc(80ms + var(--i) * 50ms) both; }
+/* Badly poisoned: melts down into a bubbling puddle. */
+.is-melt .cursor-arrow { transform-origin: 6px 19px; animation: cursor-melt var(--ko-ms) cubic-bezier(.5, 0, .8, .6) both; }
+.is-melt .cursor-arrow path { animation: cursor-fill-melt var(--ko-ms) both; }
+.is-melt .cursor-puddle { top: 17px; animation-delay: calc(var(--ko-ms) * .2); }
+.cursor-bubble { left: calc(var(--i) * 5px - 3px); top: 15px; width: 4px; height: 4px; border: 1px solid #e3a6ff; border-radius: 50%; animation: cursor-bubble 380ms ease-out calc(var(--ko-ms) * .4 + var(--i) * 90ms) both; }
+/* Possessed: shudders, goes dark, and its spirit drifts off in two. */
+.is-possess .cursor-arrow:first-child { animation: cursor-possess var(--ko-ms) linear both; }
+.is-possess .cursor-arrow:first-child path { animation: cursor-fill-possess var(--ko-ms) both; }
+.cursor-ghost { --gx: -12px; opacity: 0; filter: blur(.4px); animation: cursor-ghost 700ms ease-out calc(var(--ko-ms) * .3) both; }
+.cursor-ghost:nth-of-type(3) { --gx: 12px; }
+.cursor-ghost path { fill: #c9a6ff; stroke: #4a2a73; }
+.cursor-smoke { left: calc(var(--i) * 4px - 6px); top: calc(4px + var(--i) * 3px); width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle, #7a4fb099, transparent 70%); animation: cursor-smoke 700ms ease-out calc(var(--i) * 60ms) both; }
+/* Confused: spins round with stars circling it. */
+.is-confuse .cursor-arrow { animation: cursor-confuse var(--ko-ms) ease-in both; }
+.cursor-dizzy { left: 6px; top: -3px; width: 0; height: 0; scale: 1 .45; animation: cursor-orbit 600ms linear calc(var(--i) * -200ms) infinite, cursor-fade 950ms ease-in both; }
+.cursor-dizzy::before { content: "✦"; position: absolute; left: 9px; top: -6px; color: #ffd23f; font-size: 10px; line-height: 1; text-shadow: 0 0 2px #965a00; }
+/* Blown away: tumbles off down the wind. */
+.is-blow .cursor-arrow { animation: cursor-blow var(--ko-ms) cubic-bezier(.3, 0, .8, .6) both; }
+.cursor-gusts { position: absolute; left: 6px; top: 9px; rotate: var(--ba); }
+.cursor-gust { left: -16px; top: calc(var(--i) * 7px - 8px); width: 24px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, transparent, #e8f8ffd0); animation: cursor-gust 420ms ease-out calc(var(--i) * 60ms) both; }
+/* Crushed: a rock drops on it and flattens it. */
+.is-crush .cursor-arrow { transform-origin: 6px 19px; animation: cursor-crush var(--ko-ms) linear both; }
+.cursor-rock { left: -6px; top: -30px; width: 24px; animation: cursor-rock var(--ko-ms) linear both; }
+.cursor-dust { left: calc(var(--i) * 7px - 8px); top: 14px; width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle, #c8a46ac0, transparent 70%); animation: cursor-smoke 600ms ease-out calc(var(--ko-ms) * .28) both; }
+/* Fell in love: its heart pounds, then it floats off on a cloud of hearts. */
+.is-charm .cursor-arrow { animation: cursor-charm var(--ko-ms) ease-in-out both; }
+.is-charm .cursor-arrow path { animation: cursor-fill-charm var(--ko-ms) both; }
+.cursor-heart { left: calc(var(--i) * 7px - 6px); top: 2px; width: 12px; animation: cursor-heart 900ms ease-out calc(var(--i) * 90ms) both; }
+.cursor-heart.is-strip .move-strip { --move-ms: 420ms; }
 
 /* Capture beam, portalled to <body>. All parts share one 1.3s clock (POKEMON_CAPTURE_MS):
    0–20% the beam fires from the Pokédex, 20% it strikes, 50% the energy breaks free,
@@ -423,16 +493,48 @@ html[data-cursor-ko], html[data-cursor-ko] * { cursor: none !important; }
 @keyframes sprite-frames { to { transform: translateX(-100%); } }
 @keyframes move-frames { from { transform: translateX(0); } to { transform: translateX(calc(100% / var(--frames) - 100%)); } }
 @keyframes pokemon-travel { from { transform: translate(0, 0); } to { transform: translate(var(--travel-x), var(--travel-y)); } }
+@keyframes legend-blink-out { 0% { transform: none; filter: none; } 35% { transform: scale(1.12, .88); filter: brightness(1.8); } 100% { transform: scale(.04, 1.7); opacity: 0; filter: brightness(3); } }
+@keyframes legend-blink-in { 0% { transform: scale(.04, 1.7); opacity: 0; filter: brightness(3); } 55% { transform: scale(1.12, .9); opacity: 1; filter: brightness(1.6); } 100% { transform: none; filter: none; } }
+@keyframes legend-phase { 0% { opacity: var(--presence-opacity); } 8% { opacity: .15; } 14% { opacity: .35; } 20%, 46%, 72% { opacity: .12; } 33%, 59% { opacity: .3; } 86% { opacity: .2; } 100% { opacity: var(--presence-opacity); } }
 @keyframes pokemon-ambush-windup { 0% { transform: none; } 55% { transform: translateX(-10%) scale(.92, 1.08); } 80% { transform: translateX(-12%) scale(.9, 1.1) rotate(-4deg); } 100% { transform: translateX(10%) scale(1.08, .94); } }
 @keyframes pokemon-ambush-shake { 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
 @keyframes pokemon-dash { from { transform: translate(0, 0); } to { transform: translate(var(--travel-x), var(--travel-y)); } }
+@keyframes cursor-burn { 0% { filter: none; } 15%, 35% { filter: drop-shadow(0 0 4px #ff7a2a) sepia(1) saturate(6) hue-rotate(-25deg); } 60% { opacity: 1; scale: 1; translate: 0 0; filter: brightness(.25) sepia(1); } 100% { opacity: 0; scale: 1 .2; translate: 0 8px; filter: brightness(.15); } }
+@keyframes cursor-flame { 0% { opacity: 0; scale: .4; } 15%, 70% { opacity: 1; scale: 1; } 100% { opacity: 0; translate: 0 -6px; } }
+@keyframes cursor-ash { 0% { opacity: 0; } 15% { opacity: .9; } 100% { opacity: 0; translate: calc((var(--i) - 2.5) * 5px) -22px; } }
+@keyframes cursor-soak { 0% { transform: none; } 15% { transform: scale(1.15, .85); } 30% { transform: skewX(10deg) scale(.95, 1.05); } 45% { transform: skewX(-8deg); } 60% { transform: none; opacity: 1; } 100% { transform: translateY(10px) scale(1, .6); opacity: 0; } }
+@keyframes cursor-fill-soak { 12%, 100% { fill: #8fd2ff; } }
+@keyframes cursor-drop { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; translate: 0 14px; } }
+@keyframes cursor-puddle { 0% { opacity: 0; scale: 0 1; } 40% { opacity: .9; scale: 1; } 75% { opacity: .7; } 100% { opacity: 0; scale: 1.2 1; } }
+@keyframes cursor-ice { 0% { opacity: 0; scale: 1.5; } 12%, 58% { opacity: 1; scale: 1; } 62%, 100% { opacity: 0; scale: 1.1; } }
+@keyframes cursor-crack { 0%, 40% { opacity: 0; } 41%, 60% { opacity: 1; } 61%, 100% { opacity: 0; } }
+@keyframes cursor-tangle { 0%, 15% { transform: none; opacity: 1; } 25% { transform: rotate(-6deg); } 35% { transform: rotate(5deg); } 50% { transform: scale(.9); opacity: 1; } 100% { transform: translateY(14px) scale(.4); opacity: 0; } }
+@keyframes cursor-fill-tangle { 15%, 100% { fill: #b9ecb0; } }
+@keyframes cursor-vine { to { stroke-dashoffset: 0; } }
+@keyframes cursor-leaf { 0% { opacity: 0; scale: 0; } 25%, 70% { opacity: 1; scale: 1; } 100% { opacity: 0; rotate: 90deg; translate: 0 8px; } }
+@keyframes cursor-melt { 0%, 10% { transform: none; opacity: 1; } 60% { transform: scale(1.3, .45) skewX(-6deg); opacity: 1; } 100% { transform: scale(1.7, .05); opacity: 0; } }
+@keyframes cursor-fill-melt { 10%, 100% { fill: #c983ec; } }
+@keyframes cursor-bubble { 0% { opacity: 0; scale: .3; } 60% { opacity: 1; scale: 1; translate: 0 -4px; } 100% { opacity: 0; scale: 1.4; translate: 0 -6px; } }
+@keyframes cursor-possess { 0% { transform: none; opacity: 1; } 10% { transform: translate(-1.5px, 1px) rotate(-6deg); } 20% { transform: translate(1.5px, -1px) rotate(5deg); } 30% { transform: translate(-1px, -1px) rotate(-4deg); } 40% { transform: translate(1px, 1px) rotate(6deg); } 50% { transform: translate(-1.5px, 0) rotate(-5deg); opacity: 1; } 100% { transform: scale(.7); opacity: 0; } }
+@keyframes cursor-fill-possess { 12%, 100% { fill: #5a2d86; } }
+@keyframes cursor-ghost { 0% { opacity: 0; translate: 0 0; } 25% { opacity: .75; } 100% { opacity: 0; translate: var(--gx) -22px; } }
+@keyframes cursor-smoke { 0% { opacity: 0; scale: .3; } 30% { opacity: 1; } 100% { opacity: 0; scale: 1.8; translate: 0 -6px; } }
+@keyframes cursor-confuse { 0% { transform: none; opacity: 1; } 25% { transform: translate(4px, -2px) rotate(200deg); } 50% { transform: translate(-3px, 3px) rotate(400deg); } 75% { transform: translate(2px, 2px) rotate(560deg) scale(.8); opacity: 1; } 100% { transform: rotate(720deg) scale(.2); opacity: 0; } }
+@keyframes cursor-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes cursor-fade { 0% { opacity: 0; } 12%, 70% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes cursor-blow { 0% { transform: none; opacity: 1; } 15% { transform: scale(1.12); } 100% { transform: translate(var(--bx), var(--by)) rotate(540deg) scale(.4); opacity: 0; } }
+@keyframes cursor-gust { 0% { opacity: 0; translate: -10px 0; } 30% { opacity: 1; } 100% { opacity: 0; translate: 40px 0; } }
+@keyframes cursor-rock { 0% { opacity: 0; translate: 0 -18px; } 10% { opacity: 1; } 28% { translate: 0 22px; rotate: 0deg; } 40% { translate: 0 16px; rotate: 10deg; } 55%, 75% { opacity: 1; translate: 0 21px; rotate: 6deg; } 100% { opacity: 0; translate: 0 21px; rotate: 6deg; } }
+@keyframes cursor-crush { 0%, 26% { transform: none; opacity: 1; } 32% { transform: scale(1.55, .18); } 40% { transform: scale(1.4, .26); } 75% { transform: scale(1.5, .2); opacity: 1; } 100% { transform: scale(1.5, .2); opacity: 0; } }
+@keyframes cursor-charm { 0% { transform: none; opacity: 1; } 15% { transform: scale(1.25); } 28% { transform: scale(1); } 42% { transform: scale(1.25); } 58% { transform: scale(1); opacity: 1; } 100% { transform: translateY(-14px) scale(.6); opacity: 0; } }
+@keyframes cursor-fill-charm { 12%, 100% { fill: #ffa8e4; } }
+@keyframes cursor-heart { 0% { opacity: 0; scale: .4; } 20% { opacity: 1; scale: 1; } 100% { opacity: 0; translate: calc((var(--i) - 1) * 6px) -30px; } }
 @keyframes cursor-taunt { 0% { opacity: 0; scale: .7; } 14%, 75% { opacity: 1; scale: 1; } 100% { opacity: 0; } }
 @keyframes cursor-lock { from { opacity: 0; scale: 2.2; rotate: 0deg; } 30% { opacity: .9; } to { opacity: .9; scale: .6; rotate: 90deg; } }
 @keyframes cursor-shot { from { translate: 0 0; } to { translate: var(--dx) var(--dy); } }
 @keyframes cursor-impact { 0% { opacity: 0; scale: .4; } 15% { opacity: 1; scale: 1; } 75% { opacity: 1; } 100% { opacity: 0; scale: 1.15; } }
 @keyframes cursor-shatter { 0% { opacity: 1; translate: 0 0; rotate: 0deg; } 100% { opacity: 0; translate: var(--sx) var(--sy); rotate: var(--sr); } }
-@keyframes cursor-reform { 0%, 40% { opacity: 0; translate: calc(var(--sx) * 1.2) calc(var(--sy) * 1.2); rotate: var(--sr); } 100% { opacity: 1; translate: 0 0; rotate: 0deg; } }
-@keyframes pokemon-dodge { 0%, 100% { transform: translateX(0) scale(1); } 42% { transform: translateX(var(--dodge-x)) scale(.94); } 70% { transform: translateX(var(--dodge-x)) scale(.97); } }
+@keyframes cursor-reform { 0%, 55% { opacity: 0; translate: calc(var(--sx) * 1.2) calc(var(--sy) * 1.2); rotate: var(--sr); } 100% { opacity: 1; translate: 0 0; rotate: 0deg; } }
 @keyframes pokemon-breathe { from { transform: scale(1, 1); } to { transform: scale(.985, 1.035); } }
 /* Dash offset 1 → 0 draws the beam out from the Pokédex; 0 → 1 reels it back in. */
 @keyframes pokemon-capture-beam {

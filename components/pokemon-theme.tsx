@@ -8,7 +8,7 @@ import { MoveEffect, PokemonMotion, PokemonSprite, ShinyBurst, ShinyGlow, ShinyS
 import { PokemonCollection } from "@/components/pokemon-collection";
 import { PokemonScenery } from "@/components/pokemon-scenery";
 import { CursorAmbushLayer } from "@/components/cursor-ambush";
-import { createCast, createPokemonRoutine, dashPokemonRoutine, isEntranceActivity, isHiddenActivity, isSpecial, isTravelActivity, nextPokemonRoutine, recast, recastCapturedResident, rollPokemonCatch, type CastMember } from "@/lib/pokemon-behavior";
+import { createCast, createPokemonRoutine, dashPokemonRoutine, LEGEND_PHASE_MS, LEGEND_TELEPORT_IN_MS, LEGEND_TELEPORT_OUT_MS, pickLegendEvasion, rollLegendStamina, teleportPokemonRoutine, type LegendEvasion, isEntranceActivity, isHiddenActivity, isSpecial, isTravelActivity, nextPokemonRoutine, recast, recastCapturedResident, rollPokemonCatch, type CastMember } from "@/lib/pokemon-behavior";
 import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture, releaseAllPokemonCaptures, releasePokemonCapture, shouldAnimatePokemonCapture, type CapturedPokemon, type PokemonReleaseResult } from "@/lib/pokemon-collection";
 import { isPokemonCaptureAnimation, POKEMON_CAPTURE_END_EVENT, POKEMON_CAPTURE_MS, POKEMON_CAPTURE_START_EVENT, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
 import { MOTION } from "@/lib/pokemon-motion";
@@ -314,8 +314,11 @@ export function ThemeSelector() {
 
 type HabitatBounds = { width: number; height: number };
 const GREETING_MS = 2400;
-const DODGE_MS = 320;
+/** With reduced motion a legendary doesn't teleport; it just says so. */
 const DODGE_FEEDBACK_MS = 900;
+const TELEPORT_TAUNTS = ["Too slow!", "Over here!", "Catch me if you can!"];
+const PHASE_TAUNTS = ["Can't touch this!", "Missed me!", "Right through you!"];
+const pickTaunt = (taunts: string[]) => taunts[Math.floor(Math.random() * taunts.length)];
 /** Chance that a resident who goes offstage is replaced from the bench. */
 const SWAP_ODDS = .55;
 /** Shared by every resident, so only one of them picks a fight at a time. */
@@ -339,9 +342,11 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   const [captureMessage, setCaptureMessage] = useState<"captured" | "already-captured" | "storage-error" | "dodged" | "">("");
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [dodging, setDodging] = useState(false);
   const [hoverDodgeFeedback, setHoverDodgeFeedback] = useState(false);
-  const [dodgeDirection, setDodgeDirection] = useState<1 | -1>(1);
+  // Legendaries and mythicals slip the cursor a few times per visit: blinking elsewhere, or going intangible.
+  const [evasion, setEvasion] = useState<"teleport-out" | "teleport-in" | "phase" | null>(null);
+  const evadeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stamina = useRef(0);
   // Not every Pokémon wants to be bothered: a hover can earn a move to the cursor and a getaway dash.
   const [ambush, setAmbush] = useState<{ facing: 1 | -1 } | null>(null);
   const [dashCycle, setDashCycle] = useState(-1);
@@ -354,9 +359,10 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   const dodgeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activityTimer = useRef({ cycle: -1, remaining: 0 });
   const alreadyCaptured = capturedPokemon.some(entry => entry.species === species && entry.shiny === routine.shiny);
-  const interacting = happy || hovered || focused || dodging || hoverDodgeFeedback;
-  const foreground = happy || dodging || hoverDodgeFeedback || capturing;
-  const stopped = paused || interacting || capturing || ambush !== null;
+  const interacting = happy || hovered || focused || hoverDodgeFeedback;
+  const foreground = happy || hoverDodgeFeedback || capturing;
+  const teleporting = evasion === "teleport-out" || evasion === "teleport-in";
+  const stopped = paused || interacting || capturing || ambush !== null || teleporting;
   // Hovered, greeted or being caught: lift it above the page and dim everything else.
   const spotlight = interacting || foreground;
   const spotlightChange = useRef(onSpotlight);
@@ -370,6 +376,7 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
     if (timer.current) clearTimeout(timer.current);
     if (dodgeTimer.current) clearTimeout(dodgeTimer.current);
     if (ambushTimer.current) clearTimeout(ambushTimer.current);
+    if (evadeTimer.current) clearTimeout(evadeTimer.current);
   }, []);
   useEffect(() => { if (reducedMotion) setCapturing(false); }, [reducedMotion]);
   // Keep aiming at the cursor while winding up; the shot leaves toward wherever it is then.
@@ -401,6 +408,14 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
     };
   }, [routine, species, slot, compact, stopped]);
 
+  // Each visit a legendary or mythical arrives rested; going offstage ends any phasing.
+  useEffect(() => {
+    if (isSpecial(info) && isEntranceActivity(routine.activity)) stamina.current = rollLegendStamina(routine.shiny);
+    if (routine.activity === "vanish" || routine.activity === "burrow" || isHiddenActivity(routine.activity)) {
+      setEvasion(current => current === "phase" ? null : current);
+    }
+  }, [routine, info]);
+
   // Once it is out of sight, the habitat may swap it for someone on the bench.
   const offstage = useRef(onOffstage);
   offstage.current = onOffstage;
@@ -409,7 +424,7 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   }, [routine, slot]);
 
   function greet() {
-    if (ambush || dashing) return;
+    if (ambush || dashing || evasion) return;
     if (timer.current) clearTimeout(timer.current);
     clearDodge();
     setHappy(true);
@@ -421,11 +436,48 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   function clearDodge() {
     if (dodgeTimer.current) clearTimeout(dodgeTimer.current);
     dodgeTimer.current = null;
-    setDodging(false);
     setHoverDodgeFeedback(false);
   }
 
-  /** Regulars only, fully on stage and minding their own business. Legendaries dodge instead. */
+  function taunt(at: AmbushPoint, text: string) {
+    window.dispatchEvent(new CustomEvent<PokemonAmbushTaunt>(POKEMON_AMBUSH_TAUNT_EVENT, { detail: { at, text } }));
+  }
+
+  /** Legendaries and mythicals, fully on stage and not already busy with you. */
+  function canEvade() {
+    const { activity } = routine;
+    return !paused && !happy && !capturing && evasion === null
+      && !isHiddenActivity(activity) && !isEntranceActivity(activity) && activity !== "vanish" && activity !== "burrow";
+  }
+
+  /** Blink out and back in elsewhere, or go intangible so the cursor passes straight through. */
+  function evade(kind: LegendEvasion, text: string) {
+    if (timer.current) clearTimeout(timer.current);
+    if (evadeTimer.current) clearTimeout(evadeTimer.current);
+    clearDodge();
+    setHappy(false);
+    setHovered(false);
+    const resident = residentRef.current?.getBoundingClientRect();
+    if (kind === "phase") {
+      if (resident) taunt({ x: resident.left + resident.width / 2, y: resident.top + resident.height * .12 }, text);
+      setEvasion("phase");
+      evadeTimer.current = setTimeout(() => { evadeTimer.current = null; setEvasion(null); }, LEGEND_PHASE_MS);
+      return;
+    }
+    setEvasion("teleport-out");
+    evadeTimer.current = setTimeout(() => {
+      // Keeps whatever was left of this part of its visit, so a teleport never shortens the chase.
+      const next = teleportPokemonRoutine(species, slot, compact, routine, activityTimer.current.remaining);
+      setRoutine(next);
+      setEvasion("teleport-in");
+      // The habitat covers the viewport, so its coordinates are the viewport's.
+      const top = air ? (bounds.height - size) * next.to.y / 100 : Math.max(0, bounds.height - groundHeight - size * SPRITE_FEET + 4);
+      taunt({ x: (bounds.width - size) * next.to.x / 100 + size / 2, y: top + size * .12 }, text);
+      evadeTimer.current = setTimeout(() => { evadeTimer.current = null; setEvasion(null); }, LEGEND_TELEPORT_IN_MS);
+    }, LEGEND_TELEPORT_OUT_MS);
+  }
+
+  /** Regulars only, fully on stage and minding their own business. Legendaries slip away instead. */
   function canAmbush() {
     const { activity } = routine;
     return !reducedMotion && !paused && !isSpecial(info) && !happy && !capturing && !ambush && !dashing
@@ -467,6 +519,8 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
     clearDodge();
     if (!rollPokemonCatch(isSpecial(info))) {
       setCaptureMessage("dodged");
+      // It breaks free and gets away, so you have to chase it down again.
+      if (!reducedMotion) evade(pickLegendEvasion(info), "Broke free!");
       return;
     }
 
@@ -493,7 +547,7 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   const captureAnnouncement = captureMessage === "captured" ? `${shinyName} was added to your Pokédex.`
     : captureMessage === "already-captured" ? `${shinyName} is already in your Pokédex.`
     : captureMessage === "storage-error" ? `Could not save ${shinyName}. Check this browser's storage settings and try again.`
-    : captureMessage === "dodged" ? "Dodged! Try again."
+    : captureMessage === "dodged" ? `${shinyName} broke free! Try again.`
     : "";
   const rarity = info.legendary ? "Legendary" : info.mythical ? "Mythical" : null;
   const { activity } = routine;
@@ -510,15 +564,17 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
     "--facing": ambush?.facing ?? routine.facing,
     "--ambush-ms": `${AMBUSH_WINDUP_MS}ms`,
     "--bob-delay": `${-slot * .7}s`,
-    "--dodge-x": `${dodgeDirection * Math.round(size * .16)}px`,
+    "--blink-out-ms": `${LEGEND_TELEPORT_OUT_MS}ms`,
+    "--blink-in-ms": `${LEGEND_TELEPORT_IN_MS}ms`,
+    "--phase-ms": `${LEGEND_PHASE_MS}ms`,
   } as CSSProperties;
 
   // On the move or mid-attack it turns side-on; it faces you again to idle, react, or be greeted.
   const pose = MOTION[species] && !interacting ? (ambush || activity === "attack" ? "attack" : isTravelActivity(activity) ? "walk" : null) : null;
   const classes = [
     "pokemon-slot", air ? "is-air" : "is-ground", info.ghost && "is-ghost", info.legendary && "is-legendary", info.mythical && "is-mythical", pose && `pose-${pose}`,
-    routine.shiny && "is-shiny", interacting && "is-interacting", happy && `is-greeting reacts-${info.reaction}`, dodging && "is-dodging", foreground && "is-foreground", spotlight && "is-spotlight", capturing && "is-catching",
-    ambush && "is-ambushing", dashing && "is-dashing",
+    routine.shiny && "is-shiny", interacting && "is-interacting", happy && `is-greeting reacts-${info.reaction}`, foreground && "is-foreground", spotlight && "is-spotlight", capturing && "is-catching",
+    ambush && "is-ambushing", dashing && "is-dashing", evasion && `is-evading is-${evasion}`,
   ].filter(Boolean).join(" ");
 
   return (
@@ -539,18 +595,22 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
                 startAmbush({ x: event.clientX, y: event.clientY }, event.clientX < rect.left + rect.width / 2 ? -1 : 1, rect);
                 return;
               }
+              // A legendary or mythical you haven't caught slips away until it tires.
+              const slips = isSpecial(info) && !alreadyCaptured && canEvade() && stamina.current > 0;
+              if (slips) stamina.current -= 1;
+              if (slips && !reducedMotion) {
+                const kind = pickLegendEvasion(info);
+                evade(kind, pickTaunt(kind === "phase" ? PHASE_TAUNTS : TELEPORT_TAUNTS));
+                return;
+              }
               setHovered(true);
-              if (!isSpecial(info) || alreadyCaptured) return;
+              if (!slips) return;
               if (dodgeTimer.current) clearTimeout(dodgeTimer.current);
-              const rect = event.currentTarget.getBoundingClientRect();
-              setDodgeDirection(event.clientX < rect.left + rect.width / 2 ? 1 : -1);
-              setDodging(!reducedMotion);
-              setHoverDodgeFeedback(reducedMotion);
+              setHoverDodgeFeedback(true);
               dodgeTimer.current = setTimeout(() => {
-                setDodging(false);
                 setHoverDodgeFeedback(false);
                 dodgeTimer.current = null;
-              }, reducedMotion ? DODGE_FEEDBACK_MS : DODGE_MS);
+              }, DODGE_FEEDBACK_MS);
             }}
             onPointerLeave={() => setHovered(false)}
             onPointerDown={() => setFocused(false)}
@@ -575,7 +635,7 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
           </span>
           {routine.shiny && <ShinyStars />}
           {activity === "attack" && !happy && !ambush && <span key={`call-${routine.cycle}`} className="pokemon-callout" aria-hidden="true">{info.moveName}!</span>}
-          {(hovered || focused) && !happy && !dodging && !hoverDodgeFeedback && (
+          {(hovered || focused) && !happy && !hoverDodgeFeedback && (
             <span className="pokemon-hover-hello" aria-hidden="true">
               <PokemonSprite species={species} shiny={routine.shiny} className="pokemon-hover-sprite" />
               <span>Hi!</span>
@@ -584,7 +644,7 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
           {hoverDodgeFeedback && <span className="pokemon-dodge-callout" aria-hidden="true">Dodged!</span>}
           {happy && <div key={greeting} className="pokemon-hello" role="group" aria-label={`${shinyName} says hello`}>
             <span className="pokemon-hello-cry" aria-hidden="true">{routine.shiny && <span>✦</span>}{info.cry}</span>
-            {captureMessage === "dodged" && <span className="pokemon-catch-status" aria-hidden="true">Dodged! Try again.</span>}
+            {captureMessage === "dodged" && <span className="pokemon-catch-status" aria-hidden="true">Broke free! Try again.</span>}
             <button type="button" className="pokemon-catch-button" aria-label={alreadyCaptured ? `${shinyName} is already caught` : `Catch ${shinyName}`} disabled={alreadyCaptured} onClick={catchResident}>
               {alreadyCaptured ? "Caught" : "Catch"}
             </button>

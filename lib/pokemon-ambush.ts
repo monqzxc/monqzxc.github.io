@@ -49,6 +49,33 @@ export function isCursorHit(target: AmbushPoint, pointer: AmbushPoint | null, ra
   return pointer !== null && Math.hypot(pointer.x - target.x, pointer.y - target.y) <= radius;
 }
 
+/**
+ * What a hit does to the cursor, by the element of the move. The cursor is out for CURSOR_KO_MS
+ * whatever happens to it; the leftovers (ash, a puddle, hearts) may linger a little longer.
+ */
+export type CursorStatus = "shatter" | "burn" | "soak" | "freeze" | "tangle" | "melt" | "possess" | "confuse" | "blow" | "crush" | "charm";
+
+export const MOVE_STATUS: Record<MoveId, CursorStatus> = {
+  "punch-impact": "shatter", claw: "shatter", bite: "shatter", hit: "shatter", swift: "shatter",
+  "small-ember": "burn", ember: "burn", "fire-plume": "burn", "dragon-flame": "burn", "dragon-plume": "burn",
+  "water-gun": "soak", "water-splash": "soak",
+  "ice-chunk": "freeze",
+  "razor-leaf": "tangle", growth: "tangle",
+  sludge: "melt", "sludge-splat": "melt",
+  "shadow-ball": "possess",
+  spiral: "confuse",
+  gust: "blow", "air-cutter": "blow",
+  rock: "crush", mound: "crush",
+  "fairy-sparkle": "charm", heart: "charm", ring: "charm",
+};
+
+/** Battle-text for each status, finishing "Your cursor …". */
+export const STATUS_TEXT: Record<CursorStatus, string> = {
+  shatter: "fainted!", burn: "was burned!", soak: "got soaked!", freeze: "was frozen solid!",
+  tangle: "got tangled up!", melt: "was badly poisoned!", possess: "was possessed!", confuse: "became confused!",
+  blow: "was blown away!", crush: "was crushed!", charm: "fell in love!",
+};
+
 /** What the knocked-out cursor's shards are tinted with, by the element of the move that hit it. */
 export const MOVE_TINT: Record<MoveId, string> = {
   "shadow-ball": "#9b6cf0", spiral: "#9b6cf0",

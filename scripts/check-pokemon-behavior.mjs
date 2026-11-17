@@ -434,3 +434,57 @@ test("ambush odds, cooldown, shot timing and hit detection", async () => {
   assert.equal(ambush.isCursorHit({ x: 100, y: 100 }, null), false, "leaving the window dodges");
   for (const move of Object.keys(pokemonRoster.MOVES)) assert.match(ambush.MOVE_TINT[move], /^#[0-9a-f]{6}$/);
 });
+
+test("every move does something to the cursor, with battle text to match", async () => {
+  const ambush = await import("../lib/pokemon-ambush.ts");
+  for (const move of Object.keys(pokemonRoster.MOVES)) {
+    const status = ambush.MOVE_STATUS[move];
+    assert.ok(status, `${move} has a cursor status`);
+    assert.ok(ambush.STATUS_TEXT[status].endsWith("!"));
+  }
+  // Every status is actually reachable from a regular's move.
+  const used = new Set(everyone.filter(species => !isSpecial(SPECIES[species])).map(species => ambush.MOVE_STATUS[SPECIES[species].move]));
+  assert.deepEqual([...used].sort(), Object.keys(ambush.STATUS_TEXT).sort());
+});
+
+test("legendaries and mythicals teleport somewhere else and tire after a few escapes", () => {
+  const { teleportPokemonRoutine, rollLegendStamina, pickLegendEvasion, LEGEND_TELEPORT_HOLD_MS } = pokemonBehavior;
+  const specials = everyone.filter(species => isSpecial(SPECIES[species]));
+  assert.ok(specials.length > 0);
+  for (const species of specials) {
+    for (const compact of [false, true]) {
+      const slot = compact ? 2 : 1;
+      const random = seededRandom(species.length * 7 + (compact ? 1 : 0));
+      // Walk it on stage first.
+      let current = createPokemonRoutine(species, slot, compact);
+      while (!isEntranceActivity(current.activity)) current = nextPokemonRoutine(species, slot, compact, current, random);
+      current = nextPokemonRoutine(species, slot, compact, current, random);
+      for (let jump = 0; jump < 20; jump++) {
+        const next = teleportPokemonRoutine(species, slot, compact, current, 300, random);
+        assert.deepEqual(next.from, next.to, "a teleport is instant: it holds still where it lands");
+        assert.ok(next.to.x >= 0 && next.to.x <= 100 && next.to.y >= 0 && next.to.y <= 100);
+        assert.ok(next.duration >= LEGEND_TELEPORT_HOLD_MS, "it lingers long enough to chase");
+        assert.equal(next.shiny, current.shiny);
+        assert.equal(next.cycle, current.cycle + 1);
+        if (compact) {
+          const patch = compactPatch(slot, SPECIES[species].movement === "air");
+          assert.ok(next.to.x >= patch.left && next.to.x <= patch.right);
+          assert.notEqual(next.to.x < (patch.left + patch.right) / 2, current.to.x < (patch.left + patch.right) / 2, "lands on the far half of its patch");
+        } else {
+          assert.notEqual(next.zone, current.zone, "lands in another part of the habitat");
+        }
+        // Afterwards its visit carries on (and ends) as usual.
+        const after = nextPokemonRoutine(species, slot, compact, next, random);
+        assert.ok(after.activity === "vanish" || after.activity === "burrow");
+        current = next;
+      }
+    }
+  }
+  for (let seed = 0; seed < 50; seed++) {
+    const plain = rollLegendStamina(false, seededRandom(seed));
+    assert.ok(plain >= 1 && plain <= 3);
+    assert.equal(rollLegendStamina(true, seededRandom(seed)), plain + 1, "a shiny has one more escape in it");
+  }
+  assert.equal(pickLegendEvasion(SPECIES.giratina, () => .5), "phase", "ghosts phase");
+  assert.equal(pickLegendEvasion(SPECIES.groudon, () => .5), "teleport");
+});
