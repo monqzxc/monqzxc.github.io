@@ -3,7 +3,7 @@ import test from "node:test";
 import { CAST_SIZE, COMPACT_CAST_SIZE, compactPatch, createCast, createPokemonRoutine, isEntranceActivity, isHiddenActivity, isSpecial, LEGEND_HIDDEN_MS, LEGEND_VISIBLE_MS, nextPokemonRoutine, recast, SHINY_ODDS } from "../lib/pokemon-behavior.ts";
 import * as pokemonBehavior from "../lib/pokemon-behavior.ts";
 import * as pokemonCollection from "../lib/pokemon-collection.ts";
-import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture, releasePokemonCapture } from "../lib/pokemon-collection.ts";
+import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture, releaseAllPokemonCaptures, releasePokemonCapture } from "../lib/pokemon-collection.ts";
 import { RESIDENTS, SPECIES, THEME_ORDER, THEMES } from "../lib/pokemon-roster.ts";
 import { nextTheme, ROTATION_INTERVALS } from "../lib/theme-rotation.ts";
 
@@ -365,6 +365,21 @@ test("releasing an uncaught form or failing to save leaves the collection unchan
   assert.equal(writes, 0);
 
   const failed = releasePokemonCapture({ setItem: () => { throw new Error("quota exceeded"); } }, collection, collection[0]);
+  assert.equal(failed.result, "storage-error");
+  assert.equal(failed.collection, collection);
+});
+
+test("releasing all empties the saved Pokédex, and keeps it on a failed write", () => {
+  const saved = new Map();
+  const storage = { setItem: (key, value) => saved.set(key, value) };
+  const collection = [{ species: "piplup", shiny: false }, { species: "gengar", shiny: true }];
+  const result = releaseAllPokemonCaptures(storage, collection);
+  assert.equal(result.result, "released");
+  assert.deepEqual(result.collection, []);
+  assert.deepEqual(JSON.parse(saved.get(POKEMON_COLLECTION_STORAGE_KEY)), []);
+
+  assert.equal(releaseAllPokemonCaptures(storage, []).result, "not-captured");
+  const failed = releaseAllPokemonCaptures({ setItem: () => { throw new Error("quota exceeded"); } }, collection);
   assert.equal(failed.result, "storage-error");
   assert.equal(failed.collection, collection);
 });

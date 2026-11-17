@@ -8,7 +8,7 @@ import { MoveEffect, PokemonMotion, PokemonSprite, ShinyBurst, ShinyGlow, ShinyS
 import { PokemonCollection } from "@/components/pokemon-collection";
 import { PokemonScenery } from "@/components/pokemon-scenery";
 import { createCast, createPokemonRoutine, isEntranceActivity, isHiddenActivity, isSpecial, isTravelActivity, nextPokemonRoutine, recast, recastCapturedResident, rollPokemonCatch, type CastMember } from "@/lib/pokemon-behavior";
-import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture, releasePokemonCapture, shouldAnimatePokemonCapture, type CapturedPokemon, type PokemonReleaseResult } from "@/lib/pokemon-collection";
+import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture, releaseAllPokemonCaptures, releasePokemonCapture, shouldAnimatePokemonCapture, type CapturedPokemon, type PokemonReleaseResult } from "@/lib/pokemon-collection";
 import { isPokemonCaptureAnimation, POKEMON_CAPTURE_END_EVENT, POKEMON_CAPTURE_MS, POKEMON_CAPTURE_START_EVENT, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
 import { MOTION } from "@/lib/pokemon-motion";
 import { MOVES, RESIDENTS, SPECIES, SPRITE_FEET, SPRITE_SIZE, THEME_ORDER, THEMES, type PokemonSpecies, type PokemonTheme } from "@/lib/pokemon-roster";
@@ -33,6 +33,7 @@ type ThemeState = {
   collectionError: string | null;
   capturePokemon: (capture: CapturedPokemon) => "captured" | "already-captured" | "storage-error";
   releasePokemon: (release: CapturedPokemon) => PokemonReleaseResult;
+  releaseAllPokemon: () => PokemonReleaseResult;
   ready: boolean;
 };
 const ThemeContext = createContext<ThemeState | null>(null);
@@ -120,10 +121,10 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const releasePokemon = useCallback((release: CapturedPokemon): PokemonReleaseResult => {
+  const updateRelease = useCallback((release: (collection: CapturedPokemon[]) => { collection: CapturedPokemon[]; result: PokemonReleaseResult }): PokemonReleaseResult => {
     const failed = "The Pokédex couldn't release this Pokémon. Check this browser's storage settings and try again.";
     try {
-      const result = releasePokemonCapture(localStorage, capturedPokemonRef.current, release);
+      const result = release(capturedPokemonRef.current);
       if (result.result === "released") {
         capturedPokemonRef.current = result.collection;
         updateCapturedPokemon(result.collection);
@@ -135,6 +136,8 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
       return "storage-error";
     }
   }, []);
+  const releasePokemon = useCallback((release: CapturedPokemon) => updateRelease(collection => releasePokemonCapture(localStorage, collection, release)), [updateRelease]);
+  const releaseAllPokemon = useCallback(() => updateRelease(collection => releaseAllPokemonCaptures(localStorage, collection)), [updateRelease]);
 
   // Decide the next stop whenever the habitat or the rotation changes; a fresh choice restarts the countdown.
   const { mode, every } = rotation;
@@ -166,7 +169,7 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
     return Math.min(ms, ms - remaining + (since === null ? 0 : performance.now() - since));
   }, [cycle, ms]);
 
-  const value = useMemo<ThemeState>(() => ({ theme, setTheme: apply, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, ready }), [theme, apply, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, ready]);
+  const value = useMemo<ThemeState>(() => ({ theme, setTheme: apply, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready }), [theme, apply, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
@@ -206,7 +209,7 @@ function specialsOf(theme: PokemonTheme) {
 }
 
 export function ThemeSelector() {
-  const { theme, setTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, releasePokemon, ready } = usePokemonTheme();
+  const { theme, setTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, releasePokemon, releaseAllPokemon, ready } = usePokemonTheme();
   const [open, setOpen] = useState(false);
   const rotating = rotation.mode !== "off";
   const ms = intervalMs(rotation.every);
@@ -302,7 +305,7 @@ export function ThemeSelector() {
       <button className="habitat-pause" type="button" aria-label={paused ? "Resume Pokémon and habitat changes" : "Pause Pokémon and habitat changes"} aria-pressed={paused} title={paused ? "Resume Pokémon and habitat changes" : "Pause Pokémon and habitat changes"} onClick={() => setPaused(!paused)}>
         {paused ? <Play size={13} aria-hidden="true" /> : <Pause size={13} aria-hidden="true" />}
       </button>
-      <PokemonCollection capturedPokemon={capturedPokemon} storageError={collectionError} onRelease={releasePokemon} />
+      <PokemonCollection capturedPokemon={capturedPokemon} storageError={collectionError} onRelease={releasePokemon} onReleaseAll={releaseAllPokemon} />
     </div>
   );
 }

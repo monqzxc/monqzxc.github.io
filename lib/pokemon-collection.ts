@@ -71,3 +71,17 @@ export function releasePokemonCapture(
   }
   return { collection: next, result: "released" };
 }
+
+/** Frees the whole Pokédex at once. */
+export function releaseAllPokemonCaptures(
+  storage: Pick<Storage, "setItem">,
+  collection: CapturedPokemon[],
+): { collection: CapturedPokemon[]; result: PokemonReleaseResult } {
+  if (collection.length === 0) return { collection, result: "not-captured" };
+  try {
+    storage.setItem(POKEMON_COLLECTION_STORAGE_KEY, JSON.stringify([]));
+  } catch {
+    return { collection, result: "storage-error" };
+  }
+  return { collection: [], result: "released" };
+}
