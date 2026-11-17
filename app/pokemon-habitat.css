@@ -126,9 +126,21 @@
 /* ── Residents ───────────────────────────────────────────────────────────── */
 .pokemon-habitat { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
 .pokemon-habitat[data-ready=false] { visibility: hidden; }
-.pokemon-habitat:has(.pokemon-slot.is-foreground) { z-index: 20; overflow: visible; }
-.pokemon-habitat:has(.pokemon-slot.is-foreground) .habitat-scenery,
-.pokemon-habitat:has(.pokemon-slot.is-foreground) .pokemon-slot:not(.is-foreground) { visibility: hidden; }
+/* Spotlight: a hovered, greeted or captured Pokémon rises above the cards and header (30)
+   and floating menu (40); everything else fades back so nothing can hide it. */
+.pokemon-habitat { --spotlight-dim: .18; }
+.pokemon-habitat.has-spotlight { z-index: 45; overflow: visible; }
+.pokemon-habitat :is(.habitat-scenery, .pokemon-slot) { transition: opacity .25s ease; }
+.pokemon-habitat.has-spotlight :is(.habitat-scenery, .pokemon-slot:not(.is-spotlight)) { opacity: var(--spotlight-dim); transition: opacity .3s ease .08s; }
+/* The page fades rather than the Pokémon rising over a scrim, so cards stay crisp, just quiet.
+   :where keeps any transition a page child already has. */
+:where([data-pokemon-stage]) > :where(:not(.pokemon-habitat, .skip-link)),
+:where([data-pokemon-stage]) > .site-header :where(.nav > *, .theme-controls > *) { transition: opacity .25s ease; }
+[data-pokemon-spotlight] > :not(.pokemon-habitat, .skip-link, .site-header),
+[data-pokemon-spotlight="hover"] > .site-header,
+/* While capturing, the Pokédex the beam fires from stays lit. */
+[data-pokemon-spotlight="capture"] > .site-header .nav > :not(.theme-controls),
+[data-pokemon-spotlight="capture"] > .site-header .theme-controls > :not(.pokemon-collection-trigger) { opacity: .18; transition: opacity .3s ease .08s; }
 .pokemon-slot { position: absolute; z-index: var(--z, 5); --frame-ms: 900ms; --presence-opacity: .92; }
 .pokemon-slot.is-ghost { --presence-opacity: .8; }
 .pokemon-slot.is-interacting { z-index: 30; }
@@ -292,11 +304,24 @@
 .pokemon-catch-button:disabled { cursor: default; opacity: .7; }
 .pokemon-slot.is-catching { z-index: 40; }
 .pokemon-slot.is-foreground { z-index: 50; }
-.pokemon-slot.is-catching .pokemon-body { animation: pokemon-capture-pull .62s cubic-bezier(.55, 0, .9, .45) .18s both !important; }
+.pokemon-slot.is-catching .pokemon-body { transform-origin: 50% 52%; animation: pokemon-capture-pull 455ms cubic-bezier(.5, 0, .9, .4) 260ms both !important; }
 .pokemon-slot.is-catching .pokemon-motion { visibility: hidden; }
-.pokemon-slot.is-catching .pokemon-hello { visibility: hidden; }
-.pokemon-capture-overlay { position: fixed; inset: 0; z-index: 10000; width: 100vw; height: 100dvh; overflow: visible; pointer-events: none; }
-.pokemon-capture-bolt { fill: none; stroke: #ff3948; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px #ff3948); stroke-dasharray: 1; stroke-dashoffset: 1; animation: pokemon-capture-strike .58s ease-out both; }
+.pokemon-slot.is-catching :is(.pokemon-hello, .pokemon-hover-hello, .pokemon-callout) { visibility: hidden; }
+.pokemon-slot.is-catching :is(.pokemon-shadow, .shiny-glow, .shiny-stars) { opacity: 0 !important; transition: opacity .3s ease .3s; }
+
+/* Capture beam, portalled to <body>. All parts share one 1.3s clock (POKEMON_CAPTURE_MS):
+   0–20% the beam fires from the Pokédex, 20% it strikes, 50% the energy breaks free,
+   80% it lands in the Pokédex, then everything fades. */
+.pokemon-capture-layer { position: fixed; inset: 0; z-index: 10000; pointer-events: none; --capture-ms: 1300ms; --capture-red: #ff3948; }
+.pokemon-capture-overlay { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.pokemon-capture-beam { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 1; stroke-dashoffset: 1; animation: pokemon-capture-beam var(--capture-ms) linear both; }
+.pokemon-capture-beam.is-glow { stroke: var(--capture-red); stroke-width: 16; stroke-opacity: .4; filter: blur(6px); animation-name: pokemon-capture-beam, pokemon-capture-flicker; animation-duration: var(--capture-ms), 90ms; animation-timing-function: linear, steps(2); animation-iteration-count: 1, 12; }
+.pokemon-capture-beam.is-ray { stroke: var(--capture-red); stroke-width: 6; filter: drop-shadow(0 0 6px var(--capture-red)); }
+.pokemon-capture-beam.is-core { stroke: #fff4f2; stroke-width: 2; }
+.pokemon-capture-beacon, .pokemon-capture-impact, .pokemon-capture-orb { position: absolute; border-radius: 50%; translate: -50% -50%; }
+.pokemon-capture-beacon { left: var(--origin-x); top: var(--origin-y); width: 30px; height: 30px; background: radial-gradient(circle, #fff 0 18%, var(--capture-red) 42%, transparent 70%); box-shadow: 0 0 22px 6px color-mix(in srgb, var(--capture-red) 55%, transparent); animation: pokemon-capture-beacon var(--capture-ms) ease-out both; }
+.pokemon-capture-impact { left: var(--target-x); top: var(--target-y); width: 96px; height: 96px; border: 3px solid var(--capture-red); background: radial-gradient(circle, #fff 0 12%, color-mix(in srgb, var(--capture-red) 60%, transparent) 30%, transparent 62%); box-shadow: 0 0 26px var(--capture-red), inset 0 0 18px var(--capture-red); animation: pokemon-capture-impact var(--capture-ms) ease-out both; }
+.pokemon-capture-orb { left: var(--target-x); top: var(--target-y); width: 22px; height: 22px; background: radial-gradient(circle, #fff 0 25%, #ff8a92 45%, var(--capture-red) 70%); box-shadow: 0 0 14px 4px var(--capture-red), 0 0 32px 10px color-mix(in srgb, var(--capture-red) 45%, transparent); animation: pokemon-capture-orb var(--capture-ms) linear both; }
 .pokemon-collection-ping { position: absolute; inset: -4px; border: 2px solid #ff3948; border-radius: inherit; pointer-events: none; animation: pokemon-pokedex-ping .72s ease-out both; }
 .pokemon-collection-count.is-pinging { animation: pokemon-pokedex-count .72s ease-out both; }
 
@@ -305,11 +330,39 @@
 @keyframes pokemon-travel { from { transform: translate(0, 0); } to { transform: translate(var(--travel-x), var(--travel-y)); } }
 @keyframes pokemon-dodge { 0%, 100% { transform: translateX(0) scale(1); } 42% { transform: translateX(var(--dodge-x)) scale(.94); } 70% { transform: translateX(var(--dodge-x)) scale(.97); } }
 @keyframes pokemon-breathe { from { transform: scale(1, 1); } to { transform: scale(.985, 1.035); } }
-@keyframes pokemon-capture-strike { 0% { opacity: 0; stroke-dashoffset: 1; } 12% { opacity: 1; } 82% { opacity: 1; stroke-dashoffset: 0; } 100% { opacity: 0; stroke-dashoffset: 0; } }
+/* Dash offset 1 → 0 draws the beam out from the Pokédex; 0 → 1 reels it back in. */
+@keyframes pokemon-capture-beam {
+  0% { opacity: 1; stroke-dashoffset: 1; animation-timing-function: cubic-bezier(.2, .7, .3, 1); }
+  20%, 50% { opacity: 1; stroke-dashoffset: 0; animation-timing-function: cubic-bezier(.55, 0, .75, .3); }
+  80% { opacity: 1; stroke-dashoffset: 1; }
+  100% { opacity: 0; stroke-dashoffset: 1; }
+}
+@keyframes pokemon-capture-flicker { 50% { stroke-opacity: .15; } }
+@keyframes pokemon-capture-beacon {
+  0% { opacity: 0; scale: .4; }
+  8%, 76% { opacity: 1; scale: 1; }
+  84% { opacity: 1; scale: 1.7; }
+  100% { opacity: 0; scale: 1.1; }
+}
+@keyframes pokemon-capture-impact {
+  0%, 18% { opacity: 0; scale: .2; }
+  24% { opacity: 1; scale: .7; }
+  48% { opacity: 0; scale: 1.25; }
+  100% { opacity: 0; scale: 1.25; }
+}
+/* Same ease-in as the retracting beam, so the energy rides its tip home. */
+@keyframes pokemon-capture-orb {
+  0%, 46% { opacity: 0; scale: 0; translate: -50% -50%; }
+  52% { opacity: 1; scale: 1.25; translate: -50% -50%; animation-timing-function: cubic-bezier(.55, 0, .75, .3); }
+  80% { opacity: 1; scale: .7; translate: calc(-50% + var(--return-x)) calc(-50% + var(--return-y)); }
+  100% { opacity: 0; scale: .2; translate: calc(-50% + var(--return-x)) calc(-50% + var(--return-y)); }
+}
 @keyframes pokemon-capture-pull {
-  0%, 25% { opacity: 1; filter: none; transform: translateY(0) scale(1); }
-  48% { opacity: 1; filter: brightness(0) saturate(100%) invert(19%) sepia(89%) saturate(5840%) hue-rotate(348deg) brightness(101%) contrast(110%); transform: translateY(-4%) scale(.72); }
-  100% { opacity: 0; filter: brightness(0) saturate(100%) invert(19%) sepia(89%) saturate(5840%) hue-rotate(348deg) brightness(101%) contrast(110%); transform: translateY(-16%) scale(.015); }
+  0% { opacity: 1; filter: none; transform: scale(1); }
+  /* Struck: it flares into a red silhouette... */
+  22% { opacity: 1; filter: brightness(0) saturate(100%) invert(19%) sepia(89%) saturate(5840%) hue-rotate(348deg) brightness(101%) contrast(110%) drop-shadow(0 0 10px #ff3948); transform: scale(1.08); }
+  /* ...then collapses into the energy the orb carries away. */
+  100% { opacity: 0; filter: brightness(0) saturate(100%) invert(19%) sepia(89%) saturate(5840%) hue-rotate(348deg) brightness(101%) contrast(110%) drop-shadow(0 0 10px #ff3948); transform: scale(.03); }
 }
 @keyframes pokemon-pokedex-ping { 0% { opacity: 0; transform: scale(.88); } 25% { opacity: 1; } 100% { opacity: 0; transform: scale(1.16); } }
 @keyframes pokemon-pokedex-count { 0%, 100% { transform: scale(1); } 35% { transform: scale(1.32); } 68% { transform: scale(.94); } }
@@ -429,7 +482,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .pokemon-habitat *, .pokemon-habitat *::before, .pokemon-habitat *::after, .theme-trigger *, .theme-option * { animation: none !important; transition: none !important; }
-  .pokemon-capture-overlay, .pokemon-capture-bolt, .pokemon-collection-ping, .pokemon-collection-count.is-pinging { animation: none !important; }
+  .pokemon-capture-layer, .pokemon-capture-layer *, .pokemon-collection-ping, .pokemon-collection-count.is-pinging { animation: none !important; }
   .theme-panel, .theme-panel[data-state="closed"] { animation: none; }
   /* The countdown still shows, as a static amount rather than a moving one. */
   .theme-rotation-badge circle, .theme-next-bar i { animation: none !important; }
