@@ -9,7 +9,7 @@ import { PokemonCollection } from "@/components/pokemon-collection";
 import { PokemonScenery } from "@/components/pokemon-scenery";
 import { createCast, createPokemonRoutine, isEntranceActivity, isHiddenActivity, isSpecial, isTravelActivity, nextPokemonRoutine, recast, recastCapturedResident, rollPokemonCatch, type CastMember } from "@/lib/pokemon-behavior";
 import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture, shouldAnimatePokemonCapture, type CapturedPokemon } from "@/lib/pokemon-collection";
-import { isPokemonCaptureAnimation, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
+import { isPokemonCaptureAnimation, POKEMON_CAPTURE_END_EVENT, POKEMON_CAPTURE_MS, POKEMON_CAPTURE_START_EVENT, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
 import { MOTION } from "@/lib/pokemon-motion";
 import { MOVES, RESIDENTS, SPECIES, SPRITE_FEET, SPRITE_SIZE, THEME_ORDER, THEMES, type PokemonSpecies, type PokemonTheme } from "@/lib/pokemon-roster";
 import { DEFAULT_ROTATION, intervalMs, nextTheme, parseRotation, parseTheme, ROTATION_INTERVALS, ROTATION_MODES, ROTATION_STORAGE_KEY, THEME_STORAGE_KEY, type Rotation, type RotationMode } from "@/lib/theme-rotation";
@@ -297,11 +297,12 @@ const DODGE_FEEDBACK_MS = 900;
 /** Chance that a resident who goes offstage is replaced from the bench. */
 const SWAP_ODDS = .55;
 
-function PokemonResident({ species, home, entering, slot, compact, bounds, scaleFactor, groundHeight, paused, reducedMotion, onOffstage, onCaptured, capturedPokemon, capturePokemon }: {
+function PokemonResident({ species, home, entering, slot, compact, bounds, scaleFactor, groundHeight, paused, reducedMotion, onOffstage, onCaptured, onSpotlight, capturedPokemon, capturePokemon }: {
   species: PokemonSpecies; home: number; entering: boolean; slot: number; compact: boolean; bounds: HabitatBounds; scaleFactor: number; groundHeight: number; paused: boolean;
   reducedMotion: boolean;
   onOffstage: (slot: number) => void;
   onCaptured: (slot: number) => void;
+  onSpotlight: (slot: number, active: boolean) => void;
   capturedPokemon: CapturedPokemon[];
   capturePokemon: ThemeState["capturePokemon"];
 }) {
@@ -325,6 +326,15 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   const interacting = happy || hovered || focused || dodging || hoverDodgeFeedback;
   const foreground = happy || dodging || hoverDodgeFeedback || capturing;
   const stopped = paused || interacting || capturing;
+  // Hovered, greeted or being caught: lift it above the page and dim everything else.
+  const spotlight = interacting || foreground;
+  const spotlightChange = useRef(onSpotlight);
+  spotlightChange.current = onSpotlight;
+  useEffect(() => {
+    if (!spotlight) return;
+    spotlightChange.current(slot, true);
+    return () => spotlightChange.current(slot, false);
+  }, [spotlight, slot]);
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
     if (dodgeTimer.current) clearTimeout(dodgeTimer.current);
@@ -396,7 +406,7 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
     const resident = residentRef.current?.getBoundingClientRect();
     if (resident) {
       const target: PokemonCapturePoint = { x: resident.left + resident.width / 2, y: resident.top + resident.height / 2 };
-      window.dispatchEvent(new CustomEvent("pokemon-capture-start", { detail: { target } }));
+      window.dispatchEvent(new CustomEvent(POKEMON_CAPTURE_START_EVENT, { detail: { target } }));
     }
   }
 
@@ -428,7 +438,7 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   const pose = MOTION[species] && !interacting ? (activity === "attack" ? "attack" : isTravelActivity(activity) ? "walk" : null) : null;
   const classes = [
     "pokemon-slot", air ? "is-air" : "is-ground", info.ghost && "is-ghost", info.legendary && "is-legendary", info.mythical && "is-mythical", pose && `pose-${pose}`,
-    routine.shiny && "is-shiny", interacting && "is-interacting", happy && `is-greeting reacts-${info.reaction}`, dodging && "is-dodging", foreground && "is-foreground", capturing && "is-catching",
+    routine.shiny && "is-shiny", interacting && "is-interacting", happy && `is-greeting reacts-${info.reaction}`, dodging && "is-dodging", foreground && "is-foreground", spotlight && "is-spotlight", capturing && "is-catching",
   ].filter(Boolean).join(" ");
 
   return (
@@ -547,10 +557,53 @@ export function PokemonHabitat() {
   const onCaptured = useCallback((slot: number) => {
     setCast(current => recastCapturedResident(current, slot, theme));
   }, [theme]);
+
+  // Spotlight: residents report hover/greeting; a capture holds it until the Pokédex has
+  // pulled the energy in (the resident itself is replaced halfway through the beam).
+  const spotlightSlots = useRef(new Set<number>());
+  const [residentSpotlight, setResidentSpotlight] = useState(false);
+  const [captureSpotlight, setCaptureSpotlight] = useState(false);
+  const onSpotlight = useCallback((slot: number, active: boolean) => {
+    if (active) spotlightSlots.current.add(slot);
+    else spotlightSlots.current.delete(slot);
+    setResidentSpotlight(spotlightSlots.current.size > 0);
+  }, []);
+  useEffect(() => {
+    let fallback: ReturnType<typeof setTimeout> | undefined;
+    const end = () => {
+      clearTimeout(fallback);
+      setCaptureSpotlight(false);
+    };
+    const start = () => {
+      clearTimeout(fallback);
+      setCaptureSpotlight(true);
+      fallback = setTimeout(end, POKEMON_CAPTURE_MS + 600);
+    };
+    window.addEventListener(POKEMON_CAPTURE_START_EVENT, start);
+    window.addEventListener(POKEMON_CAPTURE_END_EVENT, end);
+    return () => {
+      clearTimeout(fallback);
+      window.removeEventListener(POKEMON_CAPTURE_START_EVENT, start);
+      window.removeEventListener(POKEMON_CAPTURE_END_EVENT, end);
+    };
+  }, []);
+  const spotlight = captureSpotlight ? "capture" : residentSpotlight ? "hover" : null;
+  // The dimming lives on the page wrapper so it works on every page that hosts a habitat.
+  useEffect(() => {
+    const page = habitatRef.current?.parentElement;
+    if (!page) return;
+    page.dataset.pokemonStage = "";
+    if (spotlight) page.dataset.pokemonSpotlight = spotlight;
+    else delete page.dataset.pokemonSpotlight;
+  }, [spotlight]);
+  useEffect(() => {
+    const page = habitatRef.current?.parentElement;
+    return () => { if (page) delete page.dataset.pokemonSpotlight; };
+  }, []);
   return (
-    <aside ref={habitatRef} className={`pokemon-habitat habitat-${theme} ${stopped ? "is-paused" : ""}`} data-ready={ready} aria-hidden={!ready || undefined} aria-label={`Pokémon ${THEMES[theme].habitat.toLowerCase()}`} style={{ "--habitat-ground-height": `${groundHeight}px` } as CSSProperties}>
+    <aside ref={habitatRef} className={`pokemon-habitat habitat-${theme} ${stopped ? "is-paused" : ""} ${spotlight ? "has-spotlight" : ""}`} data-ready={ready} aria-hidden={!ready || undefined} aria-label={`Pokémon ${THEMES[theme].habitat.toLowerCase()}`} style={{ "--habitat-ground-height": `${groundHeight}px` } as CSSProperties}>
       <PokemonScenery theme={theme} />
-      {ready && bounds.width > 0 && cast.map(({ species, home, entering }, slot) => <PokemonResident key={`${theme}-${species}-${compact}-${reducedMotion}`} species={species} home={home} entering={entering} onOffstage={onOffstage} onCaptured={onCaptured} slot={slot} compact={compact} bounds={bounds} scaleFactor={scaleFactor} groundHeight={groundHeight} paused={stopped} reducedMotion={reducedMotion} capturedPokemon={capturedPokemon} capturePokemon={capturePokemon} />)}
+      {ready && bounds.width > 0 && cast.map(({ species, home, entering }, slot) => <PokemonResident key={`${theme}-${species}-${compact}-${reducedMotion}`} species={species} home={home} entering={entering} onOffstage={onOffstage} onCaptured={onCaptured} onSpotlight={onSpotlight} slot={slot} compact={compact} bounds={bounds} scaleFactor={scaleFactor} groundHeight={groundHeight} paused={stopped} reducedMotion={reducedMotion} capturedPokemon={capturedPokemon} capturePokemon={capturePokemon} />)}
     </aside>
   );
 }

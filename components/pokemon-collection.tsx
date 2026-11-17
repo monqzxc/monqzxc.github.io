@@ -1,38 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import { BookOpen } from "lucide-react";
 import { PokemonSprite } from "@/components/pokemon-sprite";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RESIDENTS, SPECIES, THEME_ORDER, THEMES, type PokemonTheme } from "@/lib/pokemon-roster";
 import type { CapturedPokemon } from "@/lib/pokemon-collection";
-import { getPokemonCaptureBoltPoints, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
+import { clampPokemonCapturePoint, getPokemonCaptureBoltPoints, POKEMON_CAPTURE_END_EVENT, POKEMON_CAPTURE_START_EVENT, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
+
+type CaptureBeam = { id: number; origin: PokemonCapturePoint; target: PokemonCapturePoint; points: PokemonCapturePoint[] };
 
 export function PokemonCollection({ capturedPokemon, storageError }: { capturedPokemon: CapturedPokemon[]; storageError: string | null }) {
   const count = capturedPokemon.length;
   const triggerRef = useRef<HTMLButtonElement>(null);
   const captureId = useRef(0);
   const [ping, setPing] = useState(0);
-  const [bolt, setBolt] = useState<{ id: number; points: PokemonCapturePoint[]; width: number; height: number } | null>(null);
+  const [beam, setBeam] = useState<CaptureBeam | null>(null);
 
   useEffect(() => {
     const onCapture = (event: Event) => {
       const { target } = (event as CustomEvent<{ target: PokemonCapturePoint }>).detail;
       const trigger = triggerRef.current?.getBoundingClientRect();
-      if (!trigger) return;
+      // A hidden Pokédex has no box to fire from; the habitat's fallback timer ends the capture.
+      if (!trigger || trigger.width === 0) return;
 
-      const id = ++captureId.current;
-      const start = { x: trigger.left + trigger.width / 2, y: trigger.top + trigger.height / 2 };
-      setPing(id);
-      setBolt({
-        id,
-        points: getPokemonCaptureBoltPoints(start, target),
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
+      const origin = clampPokemonCapturePoint({ x: trigger.left + trigger.width / 2, y: trigger.top + trigger.height / 2 }, window.innerWidth, window.innerHeight);
+      setBeam({ id: ++captureId.current, origin, target, points: getPokemonCaptureBoltPoints(origin, target) });
     };
-    window.addEventListener("pokemon-capture-start", onCapture);
-    return () => window.removeEventListener("pokemon-capture-start", onCapture);
+    window.addEventListener(POKEMON_CAPTURE_START_EVENT, onCapture);
+    return () => window.removeEventListener(POKEMON_CAPTURE_START_EVENT, onCapture);
   }, []);
 
   return (
@@ -69,19 +66,51 @@ export function PokemonCollection({ capturedPokemon, storageError }: { capturedP
           )}
         </DialogContent>
       </Dialog>
-      {bolt && <svg className="pokemon-capture-overlay" viewBox={`0 0 ${bolt.width} ${bolt.height}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <polyline
-          key={bolt.id}
-          className="pokemon-capture-bolt"
-          points={bolt.points.map(point => `${point.x},${point.y}`).join(" ")}
-          pathLength="1"
-          onAnimationEnd={event => {
-            if (event.target !== event.currentTarget) return;
-            setBolt(current => current?.id === bolt.id ? null : current);
+      {/* Portalled to <body>: the sticky header's backdrop-filter would otherwise become the
+          containing block for this fixed layer and shift the beam away from the Pokémon. */}
+      {beam && createPortal(
+        <PokemonCaptureBeam
+          key={beam.id}
+          beam={beam}
+          onArrive={() => setPing(beam.id)}
+          onDone={() => {
+            setBeam(current => current?.id === beam.id ? null : current);
+            window.dispatchEvent(new Event(POKEMON_CAPTURE_END_EVENT));
           }}
-        />
-      </svg>}
+        />,
+        document.body,
+      )}
     </>
+  );
+}
+
+/**
+ * Pokédex → Pokémon recall beam: the beam strikes, the Pokémon dissolves into red energy,
+ * and that energy rides the retracting beam back into the Pokédex. One shared duration keeps
+ * the keyframe percentages of every part in sync.
+ */
+function PokemonCaptureBeam({ beam, onArrive, onDone }: { beam: CaptureBeam; onArrive: () => void; onDone: () => void }) {
+  const { origin, target, points } = beam;
+  const polyline = points.map(point => `${point.x},${point.y}`).join(" ");
+  const style = {
+    "--origin-x": `${origin.x}px`,
+    "--origin-y": `${origin.y}px`,
+    "--target-x": `${target.x}px`,
+    "--target-y": `${target.y}px`,
+    "--return-x": `${origin.x - target.x}px`,
+    "--return-y": `${origin.y - target.y}px`,
+  } as CSSProperties;
+  return (
+    <div className="pokemon-capture-layer" style={style} aria-hidden="true">
+      <svg className="pokemon-capture-overlay" focusable="false">
+        <polyline className="pokemon-capture-beam is-glow" points={polyline} pathLength="1" />
+        <polyline className="pokemon-capture-beam is-ray" points={polyline} pathLength="1" />
+        <polyline className="pokemon-capture-beam is-core" points={polyline} pathLength="1" onAnimationEnd={event => { if (event.target === event.currentTarget) onDone(); }} />
+      </svg>
+      <span className="pokemon-capture-beacon" />
+      <span className="pokemon-capture-impact" />
+      <span className="pokemon-capture-orb" onAnimationEnd={event => { if (event.target === event.currentTarget) onArrive(); }} />
+    </div>
   );
 }
 
