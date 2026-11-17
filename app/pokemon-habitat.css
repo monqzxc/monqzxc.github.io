@@ -20,11 +20,18 @@
 .pokemon-collection-empty { margin: 8px 0 4px; color: var(--muted-foreground); line-height: 1.6; }
 .pokemon-collection-groups { display: grid; gap: 20px; padding-top: 4px; }
 .pokemon-collection-group h3 { margin: 0 0 8px; color: var(--foreground); font-size: 15px; font-weight: 700; }
-.pokemon-collection-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.pokemon-collection-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
 .pokemon-collection-entry { display: flex; align-items: center; gap: 9px; min-width: 0; min-height: 58px; padding: 6px 10px; border: 1px solid color-mix(in srgb, var(--collection-accent) 32%, var(--border)); border-radius: 12px; background: color-mix(in srgb, var(--collection-accent) 8%, var(--background)); color: var(--foreground); }
 .pokemon-collection-sprite { width: 42px; height: 42px; flex: 0 0 42px; }
-.pokemon-collection-entry-name { overflow: hidden; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.pokemon-collection-shiny { margin-left: auto; color: #ffd23f; font-size: 10px; font-weight: 700; }
+.pokemon-collection-entry-name { min-width: 0; overflow: hidden; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.pokemon-collection-sprite-wrap { display: block; flex: 0 0 42px; }
+.pokemon-collection-shiny { color: #ffd23f; font-size: 10px; font-weight: 700; }
+.pokemon-collection-release { flex-shrink: 0; min-width: 64px; min-height: 32px; margin-left: auto; padding: 0 9px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--muted-foreground); font: inherit; font-size: 11px; font-weight: 600; cursor: pointer; transition: color .15s, background .15s, border-color .15s; }
+.pokemon-collection-release:hover { color: var(--foreground); border-color: color-mix(in srgb, var(--collection-accent) 55%, var(--border)); }
+.pokemon-collection-release.is-confirming { border-color: #ff6b74; background: color-mix(in srgb, #ff3948 16%, transparent); color: var(--foreground); }
+.pokemon-collection-toolbar { display: flex; justify-content: flex-end; margin-top: -4px; }
+.pokemon-collection-release.is-all { min-height: 34px; padding-inline: 12px; }
+.pokemon-collection-release:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .pokemon-collection-trigger:focus-visible { outline-offset: 2px; }
 .site-header .menu-toggle { order: 3; flex-shrink: 0; }
 /* Only the active theme's partner shows; all are in the markup so the first paint is already right. */
@@ -325,6 +332,56 @@
 .pokemon-collection-ping { position: absolute; inset: -4px; border: 2px solid #ff3948; border-radius: inherit; pointer-events: none; animation: pokemon-pokedex-ping .72s ease-out both; }
 .pokemon-collection-count.is-pinging { animation: pokemon-pokedex-count .72s ease-out both; }
 
+/* Release: above the Pokédex dialog (z 50) so the freed Pokémon visibly scatter over the page. */
+.pokemon-release-layer { position: fixed; inset: 0; z-index: 10000; pointer-events: none; }
+.pokemon-release-flash, .pokemon-release-sprite { position: absolute; left: var(--origin-x); top: var(--origin-y); translate: -50% -50%; }
+.pokemon-release-flash { width: 72px; height: 72px; border-radius: 50%; border: 2px solid #fff; background: radial-gradient(circle, #ffffffcc 0 15%, color-mix(in srgb, var(--primary) 40%, transparent) 40%, transparent 70%); box-shadow: 0 0 22px color-mix(in srgb, var(--primary) 70%, transparent); animation: pokemon-release-flash .55s ease-out both; }
+.pokemon-release-sprite { width: 30px; filter: drop-shadow(0 2px 6px #0007); animation: pokemon-release-scatter var(--release-ms) cubic-bezier(.2, .8, .3, 1) var(--delay) both; }
+.pokemon-release-sprite .pokemon-sprite-sheet { --frame-ms: 260ms; }
+@keyframes pokemon-release-flash { 0% { opacity: 0; scale: .3; } 25% { opacity: 1; } 100% { opacity: 0; scale: 1.6; } }
+/* Out across the page with a little hop on landing, then gone. */
+@keyframes pokemon-release-scatter {
+  0% { opacity: 0; scale: .2; translate: -50% -50%; }
+  12% { opacity: 1; scale: 1; }
+  62% { opacity: 1; scale: 1; translate: calc(-50% + var(--dx)) calc(-50% + var(--dy)); }
+  74% { opacity: 1; translate: calc(-50% + var(--dx)) calc(-50% + var(--dy) - 12px); }
+  86% { opacity: .8; translate: calc(-50% + var(--dx)) calc(-50% + var(--dy)); }
+  100% { opacity: 0; scale: .85; translate: calc(-50% + var(--dx)) calc(-50% + var(--dy) - 4px); }
+}
+
+/* Release all: a short farewell over the page. 0–12% they pop into a line-up, 15–45% they
+   hop with a heart, 50–85% they run off in every direction, then the stage clears. */
+.pokemon-farewell { position: fixed; inset: 0; z-index: 10000; pointer-events: none; background: color-mix(in srgb, var(--background) 62%, transparent); animation: pokemon-farewell-stage var(--farewell-ms) ease both; }
+.pokemon-farewell-caption { position: absolute; left: 50%; top: calc(50% - 64px); translate: -50% -100%; margin: 0; padding: 8px 14px; border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent); border-radius: 999px; background: var(--background); color: var(--foreground); box-shadow: 0 8px 28px #0006; font-size: 14px; font-weight: 700; white-space: nowrap; animation: pokemon-farewell-caption var(--farewell-ms) ease both; }
+.pokemon-farewell-mon { position: absolute; width: 40px; translate: -50% -50%; animation: pokemon-farewell-move var(--farewell-ms) linear var(--delay) both; }
+.pokemon-farewell-body { display: block; filter: drop-shadow(0 3px 6px #0008); animation: pokemon-farewell-hop var(--farewell-ms) linear var(--delay) both; }
+.pokemon-farewell-body .pokemon-sprite-sheet { --frame-ms: 240ms; }
+.pokemon-farewell-heart { position: absolute; left: 50%; bottom: 100%; translate: -50% 0; font-size: 16px; line-height: 1; animation: pokemon-farewell-heart var(--farewell-ms) ease-out var(--delay) both; }
+@keyframes pokemon-farewell-stage { 0% { opacity: 0; } 8%, 70% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes pokemon-farewell-caption { 0%, 6% { opacity: 0; scale: .8; } 14%, 52% { opacity: 1; scale: 1; } 62%, 100% { opacity: 0; scale: .95; } }
+@keyframes pokemon-farewell-move {
+  0% { opacity: 0; scale: 0; translate: -50% -50%; }
+  10% { opacity: 1; scale: 1.15; }
+  14% { scale: 1; }
+  50% { opacity: 1; translate: -50% -50%; animation-timing-function: cubic-bezier(.5, 0, .8, .4); }
+  86% { opacity: 1; translate: calc(-50% + var(--dx)) calc(-50% + var(--dy)); }
+  100% { opacity: 0; scale: 1; translate: calc(-50% + var(--dx)) calc(-50% + var(--dy)); }
+}
+/* Two happy hops in place, then a quick bounce while running off. */
+@keyframes pokemon-farewell-hop {
+  0%, 16%, 24%, 32%, 40%, 50% { transform: translateY(0) scale(1); }
+  20%, 36% { transform: translateY(-16px) scale(.95, 1.06); }
+  58%, 74% { transform: translateY(-6px); }
+  66%, 82%, 100% { transform: translateY(0); }
+}
+@keyframes pokemon-farewell-heart {
+  0%, 17% { opacity: 0; scale: 0; translate: -50% 0; }
+  22% { opacity: 1; scale: 1.35; }
+  27% { scale: 1; }
+  44% { opacity: 1; translate: -50% -10px; }
+  52%, 100% { opacity: 0; scale: .8; translate: -50% -20px; }
+}
+
 @keyframes sprite-frames { to { transform: translateX(-100%); } }
 @keyframes move-frames { from { transform: translateX(0); } to { transform: translateX(calc(100% / var(--frames) - 100%)); } }
 @keyframes pokemon-travel { from { transform: translate(0, 0); } to { transform: translate(var(--travel-x), var(--travel-y)); } }
@@ -482,7 +539,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .pokemon-habitat *, .pokemon-habitat *::before, .pokemon-habitat *::after, .theme-trigger *, .theme-option * { animation: none !important; transition: none !important; }
-  .pokemon-capture-layer, .pokemon-capture-layer *, .pokemon-collection-ping, .pokemon-collection-count.is-pinging { animation: none !important; }
+  .pokemon-capture-layer, .pokemon-capture-layer *, .pokemon-release-layer *, .pokemon-farewell, .pokemon-farewell *, .pokemon-collection-ping, .pokemon-collection-count.is-pinging { animation: none !important; }
   .theme-panel, .theme-panel[data-state="closed"] { animation: none; }
   /* The countdown still shows, as a static amount rather than a moving one. */
   .theme-rotation-badge circle, .theme-next-bar i { animation: none !important; }

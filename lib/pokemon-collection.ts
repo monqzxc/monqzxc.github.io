@@ -53,3 +53,35 @@ export function recordPokemonCapture(
   }
   return { collection: next, result: "captured" };
 }
+
+export type PokemonReleaseResult = "released" | "not-captured" | "storage-error";
+
+/** Frees one captured form (normal and shiny are separate entries) so it can be caught again. */
+export function releasePokemonCapture(
+  storage: Pick<Storage, "setItem">,
+  collection: CapturedPokemon[],
+  release: CapturedPokemon,
+): { collection: CapturedPokemon[]; result: PokemonReleaseResult } {
+  const next = collection.filter(entry => entry.species !== release.species || entry.shiny !== release.shiny);
+  if (next.length === collection.length) return { collection, result: "not-captured" };
+  try {
+    storage.setItem(POKEMON_COLLECTION_STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    return { collection, result: "storage-error" };
+  }
+  return { collection: next, result: "released" };
+}
+
+/** Frees the whole Pokédex at once. */
+export function releaseAllPokemonCaptures(
+  storage: Pick<Storage, "setItem">,
+  collection: CapturedPokemon[],
+): { collection: CapturedPokemon[]; result: PokemonReleaseResult } {
+  if (collection.length === 0) return { collection, result: "not-captured" };
+  try {
+    storage.setItem(POKEMON_COLLECTION_STORAGE_KEY, JSON.stringify([]));
+  } catch {
+    return { collection, result: "storage-error" };
+  }
+  return { collection: [], result: "released" };
+}

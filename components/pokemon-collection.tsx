@@ -6,17 +6,111 @@ import { BookOpen } from "lucide-react";
 import { PokemonSprite } from "@/components/pokemon-sprite";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RESIDENTS, SPECIES, THEME_ORDER, THEMES, type PokemonTheme } from "@/lib/pokemon-roster";
-import type { CapturedPokemon } from "@/lib/pokemon-collection";
+import type { CapturedPokemon, PokemonReleaseResult } from "@/lib/pokemon-collection";
 import { clampPokemonCapturePoint, getPokemonCaptureBoltPoints, POKEMON_CAPTURE_END_EVENT, POKEMON_CAPTURE_START_EVENT, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
 
 type CaptureBeam = { id: number; origin: PokemonCapturePoint; target: PokemonCapturePoint; points: PokemonCapturePoint[] };
+type ReleaseBurst = { id: number; species: CapturedPokemon["species"]; shiny: boolean; origin: PokemonCapturePoint; sprites: { dx: number; dy: number; delay: number }[] };
 
-export function PokemonCollection({ capturedPokemon, storageError }: { capturedPokemon: CapturedPokemon[]; storageError: string | null }) {
+const RELEASE_SPRITES = 9;
+const RELEASE_MS = 1200;
+const RELEASE_CONFIRM_MS = 3000;
+/** Farewell cut scene: line up, hop with a heart, then run off in every direction. */
+const FAREWELL_MS = 2600;
+const FAREWELL_STAGGER_MS = 35;
+const FAREWELL_MAX = 30;
+
+type Farewell = { id: number; total: number; pokemon: { species: CapturedPokemon["species"]; shiny: boolean; x: number; y: number; dx: number; dy: number; delay: number }[] };
+
+/** Rows of up to eight, centred on screen; each one runs off in its own direction. */
+function lineUpFarewell(captures: CapturedPokemon[], width: number, height: number): Farewell["pokemon"] {
+  const shown = captures.slice(0, FAREWELL_MAX);
+  const perRow = Math.max(1, Math.min(8, Math.floor((width - 32) / 52)));
+  const rows = Math.ceil(shown.length / perRow);
+  const reach = Math.max(width, height) * .6;
+  return shown.map((capture, index) => {
+    const row = Math.floor(index / perRow);
+    const inRow = row === rows - 1 ? shown.length - row * perRow : perRow;
+    const x = width / 2 + (index % perRow - (inRow - 1) / 2) * 52;
+    const y = height / 2 + 24 + (row - (rows - 1) / 2) * 60;
+    // Evenly round the circle, interleaved so neighbours in the line-up split up.
+    const slot = (index * 7) % Math.max(shown.length, 1);
+    const angle = (slot / shown.length) * Math.PI * 2 + (Math.random() - .5) * .4;
+    return { ...capture, x, y, dx: Math.cos(angle) * reach, dy: Math.sin(angle) * reach, delay: index * FAREWELL_STAGGER_MS };
+  });
+}
+
+/** Two taps for anything you'd hate to lose by accident; resets after a pause or on blur. */
+function useConfirmTap() {
+  const [confirming, setConfirming] = useState(false);
+  useEffect(() => {
+    if (!confirming) return;
+    const timeout = window.setTimeout(() => setConfirming(false), RELEASE_CONFIRM_MS);
+    return () => window.clearTimeout(timeout);
+  }, [confirming]);
+  return { confirming, arm: () => setConfirming(true), reset: () => setConfirming(false) };
+}
+
+/** Small copies scatter evenly around the circle, each landing somewhere on screen. */
+function scatterRelease(origin: PokemonCapturePoint, width: number, height: number): ReleaseBurst["sprites"] {
+  const reach = Math.max(width, height);
+  return Array.from({ length: RELEASE_SPRITES }, (_, index) => {
+    const angle = (index / RELEASE_SPRITES) * Math.PI * 2 + (Math.random() - .5) * .5;
+    const distance = reach * (.22 + Math.random() * .2);
+    const x = Math.min(width - 24, Math.max(24, origin.x + Math.cos(angle) * distance));
+    const y = Math.min(height - 24, Math.max(24, origin.y + Math.sin(angle) * distance));
+    return { dx: x - origin.x, dy: y - origin.y, delay: index * 22 };
+  });
+}
+
+export function PokemonCollection({ capturedPokemon, storageError, onRelease, onReleaseAll }: {
+  capturedPokemon: CapturedPokemon[];
+  storageError: string | null;
+  onRelease: (release: CapturedPokemon) => PokemonReleaseResult;
+  onReleaseAll: () => PokemonReleaseResult;
+}) {
   const count = capturedPokemon.length;
   const triggerRef = useRef<HTMLButtonElement>(null);
   const captureId = useRef(0);
   const [ping, setPing] = useState(0);
   const [beam, setBeam] = useState<CaptureBeam | null>(null);
+  const [bursts, setBursts] = useState<ReleaseBurst[]>([]);
+  const [releaseNote, setReleaseNote] = useState("");
+  const listRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const [farewell, setFarewell] = useState<Farewell | null>(null);
+  const [farewellNote, setFarewellNote] = useState("");
+  const releaseAllTap = useConfirmTap();
+
+  function releaseAll() {
+    const captures = capturedPokemon;
+    if (onReleaseAll() !== "released") return;
+    // Close the Pokédex so the cut scene plays over the page; Radix returns focus to the trigger.
+    setOpen(false);
+    setFarewellNote(`All ${captures.length} Pokémon were released and can be caught again.`);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = ++captureId.current;
+    const pokemon = lineUpFarewell(captures, window.innerWidth, window.innerHeight);
+    setFarewell({ id, total: captures.length, pokemon });
+    window.setTimeout(() => setFarewell(current => current?.id === id ? null : current), FAREWELL_MS + pokemon.length * FAREWELL_STAGGER_MS + 100);
+  }
+
+  function release(capture: CapturedPokemon, from: HTMLElement) {
+    const rect = from.getBoundingClientRect();
+    if (onRelease(capture) !== "released") return;
+    setReleaseNote(`${capture.shiny ? "Shiny " : ""}${SPECIES[capture.species].name} was released and can be caught again.`);
+    // The released row unmounts with its button; keep keyboard focus inside the Pokédex.
+    requestAnimationFrame(() => {
+      const next = listRef.current?.querySelector<HTMLElement>(".pokemon-collection-release") ?? dialogRef.current;
+      next?.focus({ preventScroll: true });
+    });
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const origin = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    const burst = { id: ++captureId.current, ...capture, origin, sprites: scatterRelease(origin, window.innerWidth, window.innerHeight) };
+    setBursts(current => [...current, burst]);
+    window.setTimeout(() => setBursts(current => current.filter(entry => entry.id !== burst.id)), RELEASE_MS + RELEASE_SPRITES * 22 + 100);
+  }
 
   useEffect(() => {
     const onCapture = (event: Event) => {
@@ -35,7 +129,8 @@ export function PokemonCollection({ capturedPokemon, storageError }: { capturedP
   return (
     <>
       {storageError && <p className="pokemon-collection-error" role="alert">{storageError}</p>}
-      <Dialog>
+      <p className="sr-only" role="status">{farewellNote}</p>
+      <Dialog open={open} onOpenChange={next => { setOpen(next); if (next) setFarewellNote(""); }}>
         <DialogTrigger asChild>
           <button ref={triggerRef} type="button" className="pokemon-collection-trigger">
             <BookOpen size={16} aria-hidden="true" />
@@ -44,12 +139,21 @@ export function PokemonCollection({ capturedPokemon, storageError }: { capturedP
             {ping > 0 && <span key={`ping-${ping}`} className="pokemon-collection-ping" aria-hidden="true" />}
           </button>
         </DialogTrigger>
-        <DialogContent className="pokemon-collection-dialog">
+        <DialogContent ref={dialogRef} className="pokemon-collection-dialog">
           <DialogTitle>Pokédex</DialogTitle>
           <DialogDescription>Your captures are saved in this browser and stay on this device.</DialogDescription>
           {storageError && <p className="pokemon-collection-dialog-error" role="alert">{storageError}</p>}
+          <p className="sr-only" role="status">{releaseNote}</p>
+          {count > 1 && <div className="pokemon-collection-toolbar">
+            <button type="button" className={`pokemon-collection-release is-all ${releaseAllTap.confirming ? "is-confirming" : ""}`}
+              aria-label={releaseAllTap.confirming ? `Confirm releasing all ${count} Pokémon` : `Release all ${count} Pokémon`}
+              onClick={() => { if (releaseAllTap.confirming) releaseAll(); else releaseAllTap.arm(); }}
+              onBlur={releaseAllTap.reset}>
+              {releaseAllTap.confirming ? `Release all ${count}?` : "Release all"}
+            </button>
+          </div>}
           {count === 0 ? <p className="pokemon-collection-empty">No Pokémon captured yet. Say hello to a visitor and choose Catch!</p> : (
-            <div className="pokemon-collection-groups">
+            <div ref={listRef} className="pokemon-collection-groups">
               {THEME_ORDER.map(theme => {
                 const captures = capturedPokemon.filter(({ species }) => RESIDENTS[theme].includes(species));
                 if (captures.length === 0) return null;
@@ -57,7 +161,7 @@ export function PokemonCollection({ capturedPokemon, storageError }: { capturedP
                   <section key={theme} className="pokemon-collection-group" aria-labelledby={`pokedex-${theme}`}>
                     <h3 id={`pokedex-${theme}`}>{THEMES[theme].habitat}</h3>
                     <ul className="pokemon-collection-list">
-                      {captures.map(({ species, shiny }) => <CapturedEntry key={`${species}-${shiny}`} species={species} shiny={shiny} theme={theme} />)}
+                      {captures.map(({ species, shiny }) => <CapturedEntry key={`${species}-${shiny}`} species={species} shiny={shiny} theme={theme} onRelease={from => release({ species, shiny }, from)} />)}
                     </ul>
                   </section>
                 );
@@ -80,6 +184,8 @@ export function PokemonCollection({ capturedPokemon, storageError }: { capturedP
         />,
         document.body,
       )}
+      {farewell && createPortal(<PokemonFarewell key={farewell.id} farewell={farewell} />, document.body)}
+      {bursts.length > 0 && createPortal(bursts.map(burst => <PokemonReleaseBurst key={burst.id} burst={burst} />), document.body)}
     </>
   );
 }
@@ -114,12 +220,54 @@ function PokemonCaptureBeam({ beam, onArrive, onDone }: { beam: CaptureBeam; onA
   );
 }
 
-function CapturedEntry({ species, shiny, theme }: { species: CapturedPokemon["species"]; shiny: boolean; theme: PokemonTheme }) {
+/** Freed: small copies hop out across the page and fade, as if heading home. */
+function PokemonReleaseBurst({ burst }: { burst: ReleaseBurst }) {
+  return (
+    <div className="pokemon-release-layer" style={{ "--origin-x": `${burst.origin.x}px`, "--origin-y": `${burst.origin.y}px` } as CSSProperties} aria-hidden="true">
+      <span className="pokemon-release-flash" />
+      {burst.sprites.map(({ dx, dy, delay }, index) => (
+        <span key={index} className="pokemon-release-sprite" style={{ "--dx": `${dx}px`, "--dy": `${dy}px`, "--delay": `${delay}ms`, "--release-ms": `${RELEASE_MS}ms` } as CSSProperties}>
+          <PokemonSprite species={burst.species} shiny={burst.shiny} />
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function PokemonFarewell({ farewell }: { farewell: Farewell }) {
+  const extra = farewell.total - farewell.pokemon.length;
+  return (
+    <div className="pokemon-farewell" style={{ "--farewell-ms": `${FAREWELL_MS}ms` } as CSSProperties} aria-hidden="true">
+      <p className="pokemon-farewell-caption">Free again! Thank you, Trainer{extra > 0 ? ` · +${extra} more` : ""}</p>
+      {farewell.pokemon.map(({ species, shiny, x, y, dx, dy, delay }, index) => (
+        <span key={index} className="pokemon-farewell-mon" style={{ left: x, top: y, "--dx": `${dx}px`, "--dy": `${dy}px`, "--delay": `${delay}ms` } as CSSProperties}>
+          <span className="pokemon-farewell-heart">❤️</span>
+          <span className="pokemon-farewell-body"><PokemonSprite species={species} shiny={shiny} /></span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function CapturedEntry({ species, shiny, theme, onRelease }: { species: CapturedPokemon["species"]; shiny: boolean; theme: PokemonTheme; onRelease: (from: HTMLElement) => void }) {
+  const name = `${shiny ? "Shiny " : ""}${SPECIES[species].name}`;
+  const spriteRef = useRef<HTMLSpanElement>(null);
+  const { confirming, arm, reset } = useConfirmTap();
   return (
     <li className="pokemon-collection-entry" style={{ "--collection-accent": THEMES[theme].swatch } as React.CSSProperties}>
-      <PokemonSprite species={species} shiny={shiny} className="pokemon-collection-sprite" />
-      <span className="pokemon-collection-entry-name">{shiny ? "Shiny " : ""}{SPECIES[species].name}</span>
+      <span ref={spriteRef} className="pokemon-collection-sprite-wrap"><PokemonSprite species={species} shiny={shiny} className="pokemon-collection-sprite" /></span>
+      <span className="pokemon-collection-entry-name">{SPECIES[species].name}</span>
       {shiny && <span className="pokemon-collection-shiny">Shiny</span>}
+      {/* Two taps, so a rare shiny isn't lost to a stray click. */}
+      <button type="button" className={`pokemon-collection-release ${confirming ? "is-confirming" : ""}`}
+        aria-label={confirming ? `Confirm releasing ${name}` : `Release ${name}`}
+        onClick={event => {
+          if (!confirming) { arm(); return; }
+          onRelease(spriteRef.current ?? event.currentTarget);
+        }}
+        onBlur={reset}>
+        {confirming ? "Release?" : "Release"}
+      </button>
     </li>
   );
 }
