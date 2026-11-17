@@ -488,3 +488,23 @@ test("legendaries and mythicals teleport somewhere else and tire after a few esc
   assert.equal(pickLegendEvasion(SPECIES.giratina, () => .5), "phase", "ghosts phase");
   assert.equal(pickLegendEvasion(SPECIES.groudon, () => .5), "teleport");
 });
+
+test("an afflicted cursor is pinned, follows, trails or mirrors the pointer by status", async () => {
+  const ambush = await import("../lib/pokemon-ambush.ts");
+  assert.ok(ambush.CURSOR_KO_MS >= 1500, "long enough to see the status");
+  const hit = { x: 100, y: 100 };
+  const pointer = { x: 200, y: 140 };
+  const bounds = { width: 800, height: 600 };
+  for (const status of ["shatter", "freeze", "crush", "tangle", "melt"]) assert.deepEqual(ambush.afflictedStep(status, hit, hit, pointer, bounds), hit, `${status} pins it`);
+  assert.deepEqual(ambush.afflictedStep("burn", hit, hit, pointer, bounds), pointer, "a burning cursor sticks to the pointer");
+  const soaked = ambush.afflictedStep("soak", hit, hit, pointer, bounds);
+  assert.ok(soaked.x > hit.x && soaked.x < pointer.x, "a soaked cursor trails behind");
+  const confused = ambush.afflictedStep("confuse", hit, hit, pointer, bounds);
+  assert.ok(confused.x < hit.x && confused.y < hit.y, "a confused cursor goes the other way");
+  assert.deepEqual(ambush.afflictedStep("burn", hit, hit, null, bounds), hit, "holds still once the pointer has left");
+  // Mirroring never sends it off-screen.
+  let at = hit;
+  for (let frame = 0; frame < 200; frame++) at = ambush.afflictedStep("confuse", at, { x: 10, y: 10 }, { x: 790, y: 590 }, bounds);
+  assert.ok(at.x >= 0 && at.y >= 0);
+  for (const status of Object.keys(ambush.STATUS_TEXT)) assert.ok(ambush.STATUS_MOTION[status], `${status} has a motion`);
+});

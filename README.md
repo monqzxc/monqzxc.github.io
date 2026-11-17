@@ -83,11 +83,11 @@ Not every resident wants to be bothered. Hovering a regular with a mouse has a 1
 | Crushed | Rock | Flattened by a falling rock |
 | Fell in love | Fairy Sparkle | Heart pounds, floats off in hearts |
 
-Whatever the status, the real cursor is hidden for 0.5 s and then reassembles wherever the pointer has moved; leftovers like ash or a puddle fade shortly after. The mapping is `MOVE_STATUS` in `lib/pokemon-ambush.ts`.
+The status lasts 1.6 s, with the affected cursor drawn at twice its size while the real one is hidden. Frozen, crushed, tangled, melted and shattered cursors are pinned where they were hit; a burning cursor sticks to the pointer, soaked, possessed and charmed ones trail sluggishly behind it, a blown-away one tumbles off and drifts back, and a confused one moves the opposite way. Then it reassembles wherever the pointer is. The mappings are `MOVE_STATUS` and `STATUS_MOTION` in `lib/pokemon-ambush.ts`.
 
 Legendaries and mythicals are harder to catch. Each visit they slip the cursor 1–3 times (a shiny one more) before tiring enough to let you say hello: most teleport, squeezing to a sliver of light and reappearing in another part of the habitat with a taunt, while Ghost types usually phase instead, flickering intangibly so the cursor passes through them for 1.5 s. A failed catch (50%) makes them break free and get away again. With reduced motion they say “Dodged!” instead of moving.
 
-Only one ambush can happen every 7 seconds across the whole habitat. Ambushes are off for touch input, while the habitat is paused, and when reduced motion is preferred. To tune it, change `AMBUSH_ODDS`, `AMBUSH_COOLDOWN_MS`, `CURSOR_KO_MS` and `CURSOR_HIT_RADIUS` in `lib/pokemon-ambush.ts`.
+Only one ambush can happen every 7 seconds across the whole habitat. Ambushes are off for touch input, while the habitat is paused, and when reduced motion is preferred. To tune it, change `AMBUSH_ODDS`, `AMBUSH_COOLDOWN_MS`, `CURSOR_KO_MS` (1.6 s) and `CURSOR_HIT_RADIUS` in `lib/pokemon-ambush.ts`.
 
 ## Scroll reveal
 
