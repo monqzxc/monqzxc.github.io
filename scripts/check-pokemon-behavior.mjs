@@ -5,6 +5,7 @@ import * as pokemonBehavior from "../lib/pokemon-behavior.ts";
 import * as pokemonCollection from "../lib/pokemon-collection.ts";
 import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture, releaseAllPokemonCaptures, releasePokemonCapture } from "../lib/pokemon-collection.ts";
 import { RESIDENTS, SPECIES, THEME_ORDER, THEMES } from "../lib/pokemon-roster.ts";
+import * as pokemonRoster from "../lib/pokemon-roster.ts";
 import { nextTheme, ROTATION_INTERVALS } from "../lib/theme-rotation.ts";
 
 const everyone = THEME_ORDER.flatMap(theme => RESIDENTS[theme]);
@@ -382,4 +383,108 @@ test("releasing all empties the saved Pokédex, and keeps it on a failed write",
   const failed = releaseAllPokemonCaptures({ setItem: () => { throw new Error("quota exceeded"); } }, collection);
   assert.equal(failed.result, "storage-error");
   assert.equal(failed.collection, collection);
+});
+
+test("a grumpy resident dashes away from the cursor, from where it stood, and carries on", async () => {
+  const { dashPokemonRoutine } = pokemonBehavior;
+  for (const theme of THEME_ORDER) {
+    for (const compact of [false, true]) {
+      for (const [index, species] of RESIDENTS[theme].entries()) {
+        if (isSpecial(SPECIES[species])) continue;
+        const slot = index % (compact ? COMPACT_CAST_SIZE : CAST_SIZE);
+        const random = seededRandom(index + 3);
+        const current = run(species, slot, compact, 6, random).at(-1);
+        for (const away of [1, -1]) {
+          const position = { x: (current.from.x + current.to.x) / 2, y: (current.from.y + current.to.y) / 2 };
+          const dash = dashPokemonRoutine(species, slot, compact, current, position, away, random);
+          assert.deepEqual(dash.from, position, `${species} dashes from its measured spot`);
+          assert.ok(dash.to.x >= 0 && dash.to.x <= 100 && dash.to.y >= 0 && dash.to.y <= 100);
+          assert.equal(dash.activity, SPECIES[species].movement === "air" ? "fly" : "run");
+          assert.equal(dash.cycle, current.cycle + 1);
+          assert.equal(dash.shiny, current.shiny, "no shiny change while visible");
+          assert.ok(dash.duration >= 420 && Number.isFinite(dash.duration));
+          if (dash.to.x !== dash.from.x) assert.equal(dash.facing, dash.to.x > dash.from.x ? 1 : -1);
+          const next = nextPokemonRoutine(species, slot, compact, dash, random);
+          if (!isHiddenActivity(next.activity)) assert.deepEqual(next.from, dash.to, "routine resumes from the dash's end");
+        }
+      }
+    }
+  }
+  // With room to run, it runs away from the cursor.
+  const start = createPokemonRoutine("gengar", 0, false, 1);
+  const middle = { x: 38, y: start.from.y };
+  assert.ok(dashPokemonRoutine("gengar", 0, false, start, middle, 1, () => .5).to.x > middle.x);
+  assert.ok(dashPokemonRoutine("gengar", 0, false, start, middle, -1, () => .5).to.x < middle.x);
+  // Cornered against its patch edge, it bolts the other way instead of standing still.
+  const cornered = { x: 46, y: start.from.y };
+  assert.ok(dashPokemonRoutine("gengar", 0, false, start, cornered, 1, () => .5).to.x < cornered.x);
+});
+
+test("ambush odds, cooldown, shot timing and hit detection", async () => {
+  const ambush = await import("../lib/pokemon-ambush.ts");
+  assert.equal(ambush.rollAmbush(10_000, -Infinity, () => 0), true);
+  assert.equal(ambush.rollAmbush(10_000, -Infinity, () => .99), false);
+  assert.equal(ambush.rollAmbush(10_000, 10_000 - ambush.AMBUSH_COOLDOWN_MS + 1, () => 0), false, "cooldown holds");
+  const origin = { x: 0, y: 0 };
+  assert.ok(ambush.shotDuration(origin, origin) > 0);
+  assert.ok(ambush.shotDuration(origin, { x: 5000, y: 0 }) <= 340);
+  assert.ok(ambush.shotDuration(origin, { x: 300, y: 0 }) > ambush.shotDuration(origin, { x: 100, y: 0 }) || ambush.shotDuration(origin, { x: 100, y: 0 }) === 170);
+  assert.equal(ambush.isCursorHit({ x: 100, y: 100 }, { x: 110, y: 110 }), true);
+  assert.equal(ambush.isCursorHit({ x: 100, y: 100 }, { x: 160, y: 100 }), false, "a flick dodges");
+  assert.equal(ambush.isCursorHit({ x: 100, y: 100 }, null), false, "leaving the window dodges");
+  for (const move of Object.keys(pokemonRoster.MOVES)) assert.match(ambush.MOVE_TINT[move], /^#[0-9a-f]{6}$/);
+});
+
+test("every move does something to the cursor, with battle text to match", async () => {
+  const ambush = await import("../lib/pokemon-ambush.ts");
+  for (const move of Object.keys(pokemonRoster.MOVES)) {
+    const status = ambush.MOVE_STATUS[move];
+    assert.ok(status, `${move} has a cursor status`);
+    assert.ok(ambush.STATUS_TEXT[status].endsWith("!"));
+  }
+  // Every status is actually reachable from a regular's move.
+  const used = new Set(everyone.filter(species => !isSpecial(SPECIES[species])).map(species => ambush.MOVE_STATUS[SPECIES[species].move]));
+  assert.deepEqual([...used].sort(), Object.keys(ambush.STATUS_TEXT).sort());
+});
+
+test("legendaries and mythicals teleport somewhere else and tire after a few escapes", () => {
+  const { teleportPokemonRoutine, rollLegendStamina, pickLegendEvasion, LEGEND_TELEPORT_HOLD_MS } = pokemonBehavior;
+  const specials = everyone.filter(species => isSpecial(SPECIES[species]));
+  assert.ok(specials.length > 0);
+  for (const species of specials) {
+    for (const compact of [false, true]) {
+      const slot = compact ? 2 : 1;
+      const random = seededRandom(species.length * 7 + (compact ? 1 : 0));
+      // Walk it on stage first.
+      let current = createPokemonRoutine(species, slot, compact);
+      while (!isEntranceActivity(current.activity)) current = nextPokemonRoutine(species, slot, compact, current, random);
+      current = nextPokemonRoutine(species, slot, compact, current, random);
+      for (let jump = 0; jump < 20; jump++) {
+        const next = teleportPokemonRoutine(species, slot, compact, current, 300, random);
+        assert.deepEqual(next.from, next.to, "a teleport is instant: it holds still where it lands");
+        assert.ok(next.to.x >= 0 && next.to.x <= 100 && next.to.y >= 0 && next.to.y <= 100);
+        assert.ok(next.duration >= LEGEND_TELEPORT_HOLD_MS, "it lingers long enough to chase");
+        assert.equal(next.shiny, current.shiny);
+        assert.equal(next.cycle, current.cycle + 1);
+        if (compact) {
+          const patch = compactPatch(slot, SPECIES[species].movement === "air");
+          assert.ok(next.to.x >= patch.left && next.to.x <= patch.right);
+          assert.notEqual(next.to.x < (patch.left + patch.right) / 2, current.to.x < (patch.left + patch.right) / 2, "lands on the far half of its patch");
+        } else {
+          assert.notEqual(next.zone, current.zone, "lands in another part of the habitat");
+        }
+        // Afterwards its visit carries on (and ends) as usual.
+        const after = nextPokemonRoutine(species, slot, compact, next, random);
+        assert.ok(after.activity === "vanish" || after.activity === "burrow");
+        current = next;
+      }
+    }
+  }
+  for (let seed = 0; seed < 50; seed++) {
+    const plain = rollLegendStamina(false, seededRandom(seed));
+    assert.ok(plain >= 1 && plain <= 3);
+    assert.equal(rollLegendStamina(true, seededRandom(seed)), plain + 1, "a shiny has one more escape in it");
+  }
+  assert.equal(pickLegendEvasion(SPECIES.giratina, () => .5), "phase", "ghosts phase");
+  assert.equal(pickLegendEvasion(SPECIES.groudon, () => .5), "teleport");
 });

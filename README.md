@@ -49,6 +49,7 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | Habitat rosters, legendaries and mythicals, and theme metadata | `lib/pokemon-roster.ts` |
 | Automatic habitat changes (in order or shuffled, on a timer or each visit) | `lib/theme-rotation.ts` |
 | Side-view sprite download from PMD SpriteCollab | `scripts/fetch-habitat-motion.mjs` |
+| Grumpy residents: odds, cooldown, shot timing, cursor knock-out | `lib/pokemon-ambush.ts`, `components/cursor-ambush.tsx` |
 | Self-hosted fonts and their OFL licenses | `public/fonts/` |
 | Vue interests and tab behavior | `components/craft-app.ts` |
 | React/Vue lifecycle boundary | `components/vue-craft.tsx` |
@@ -63,6 +64,30 @@ The walkthroughs are bundled under `public/project-previews/` so GitHub Pages ex
 The hero pairs bold name typography with the supplied MON, Gengar, and Gible artwork. The original image is used unchanged, with a soft purple-and-blue glow behind the characters.
 
 The hero keeps the professional name, role, and work link prominent, with the personality line “Serious about systems. Soft spot for Pokémon.” The purple and blue theme continues through navigation, project previews, badges, the career timeline, interest tabs, and the contact panel. `app/pokemon-theme.css` loads after the base glass and hero styles.
+
+## Grumpy Pokémon
+
+Not every resident wants to be bothered. Hovering a regular with a mouse has a 1 in 5 chance of an ambush: it turns to face the cursor, says “Hmph!”, and fires its signature move at the pointer, then dashes away from where it stood and goes back to roaming. A lock-on ring shows where the shot will land. A quick flick dodges the shot (“It missed!”). If the cursor is still there, the move's element decides what happens to it:
+
+| Status | Moves | What happens to the cursor |
+| --- | --- | --- |
+| Fainted | Claw, Bite, Hit, Punch, Swift | Shatters into shards |
+| Burned | Ember, Fire Plume, Dragon Flame/Plume | Catches fire, chars, crumbles to ash |
+| Soaked | Water Gun, Water Splash | Wobbles, drips, slides into a puddle |
+| Frozen solid | Ice Chunk | Encased in ice that cracks and breaks |
+| Tangled up | Razor Leaf, Growth | Vines wrap it and drag it down |
+| Badly poisoned | Sludge | Melts into a bubbling puddle |
+| Possessed | Shadow Ball | Shudders, darkens, its spirit drifts off |
+| Confused | Spiral | Spins with stars circling it |
+| Blown away | Gust, Air Cutter | Tumbles off downwind |
+| Crushed | Rock | Flattened by a falling rock |
+| Fell in love | Fairy Sparkle | Heart pounds, floats off in hearts |
+
+Whatever the status, the real cursor is hidden for 0.5 s and then reassembles wherever the pointer has moved; leftovers like ash or a puddle fade shortly after. The mapping is `MOVE_STATUS` in `lib/pokemon-ambush.ts`.
+
+Legendaries and mythicals are harder to catch. Each visit they slip the cursor 1–3 times (a shiny one more) before tiring enough to let you say hello: most teleport, squeezing to a sliver of light and reappearing in another part of the habitat with a taunt, while Ghost types usually phase instead, flickering intangibly so the cursor passes through them for 1.5 s. A failed catch (50%) makes them break free and get away again. With reduced motion they say “Dodged!” instead of moving.
+
+Only one ambush can happen every 7 seconds across the whole habitat. Ambushes are off for touch input, while the habitat is paused, and when reduced motion is preferred. To tune it, change `AMBUSH_ODDS`, `AMBUSH_COOLDOWN_MS`, `CURSOR_KO_MS` and `CURSOR_HIT_RADIUS` in `lib/pokemon-ambush.ts`.
 
 ## Scroll reveal
 

@@ -170,6 +170,77 @@ export function recastCapturedResident(cast: CastMember[], slot: number, theme: 
   return replaceFromBench(cast, slot, theme, random, true);
 }
 
+// ── Legendaries and mythicals don't sit still for a cursor ───────────────────
+export type LegendEvasion = "teleport" | "phase";
+/** Blink out, then back in somewhere else. */
+export const LEGEND_TELEPORT_OUT_MS = 200;
+export const LEGEND_TELEPORT_IN_MS = 340;
+/** Gone intangible: the cursor passes straight through. */
+export const LEGEND_PHASE_MS = 1500;
+/** After a teleport it lingers at least this long before leaving, so there is still a chance. */
+export const LEGEND_TELEPORT_HOLD_MS = 1800;
+
+/** Slips the cursor 1–3 times per visit before it tires and lets you say hello; a shiny has one more. */
+export function rollLegendStamina(shiny: boolean, random: Random = Math.random): number {
+  return 1 + Math.floor(between(0, 3, random)) + (shiny ? 1 : 0);
+}
+
+/** Ghosts would rather phase through you; everyone else would rather be somewhere else. */
+export function pickLegendEvasion(info: SpeciesInfo, random: Random = Math.random): LegendEvasion {
+  return random() < (info.ghost ? .7 : .3) ? "phase" : "teleport";
+}
+
+/**
+ * Where a legendary or mythical reappears after blinking out: another part of the sky or trail on
+ * desktop, the far half of its patch on a phone. It holds still there for at least `hold` ms.
+ */
+export function teleportPokemonRoutine(species: PokemonSpecies, slot: number, compact: boolean, current: PokemonRoutine, hold = LEGEND_TELEPORT_HOLD_MS, random: Random = Math.random): PokemonRoutine {
+  const info = SPECIES[species];
+  const air = info.movement === "air";
+  let zone = current.zone;
+  let area = zoneFor(info, slot, compact, zone);
+  if (compact) {
+    const middle = (area.left + area.right) / 2;
+    area = current.to.x < middle ? { ...area, left: Math.min(area.right, middle + .5) } : { ...area, right: Math.max(area.left, middle - .5) };
+  } else {
+    zone = otherZone(current.zone, zonesFor(info).length, random);
+    area = zoneFor(info, slot, compact, zone);
+  }
+  const to = pointIn(area, random);
+  return {
+    activity: air ? "float" : "idle", from: to, to, duration: Math.round(Math.max(LEGEND_TELEPORT_HOLD_MS, hold)),
+    facing: to.x > 50 ? -1 : 1, cycle: current.cycle + 1, zone, shiny: current.shiny, actsLeft: current.actsLeft,
+  };
+}
+
+/** Shortest dash worth making, in % of the habitat; a cornered resident bolts the other way instead. */
+const MIN_DASH = 4;
+
+/**
+ * A grumpy resident that has just fired at the cursor bolts away, starting from wherever it really
+ * stood (`position`, measured mid-stride) so nothing teleports. `away` is the direction away from the
+ * cursor. It keeps its zone and remaining acts, so its routine carries on as normal afterwards.
+ */
+export function dashPokemonRoutine(species: PokemonSpecies, slot: number, compact: boolean, current: PokemonRoutine, position: HabitatPoint, away: 1 | -1, random: Random = Math.random): PokemonRoutine {
+  const info = SPECIES[species];
+  const air = info.movement === "air";
+  const area = zoneFor(info, slot, compact, current.zone);
+  const clamp = (value: number) => Math.min(100, Math.max(0, value));
+  const from = { x: clamp(position.x), y: clamp(position.y) };
+  const ahead = away > 0 ? area.right : area.left;
+  const behind = away > 0 ? area.left : area.right;
+  const edge = (ahead - from.x) * away >= MIN_DASH ? ahead : behind;
+  // Stop a little short of the edge so repeated dashes don't all pile onto the same pixel.
+  const x = clamp(edge - (edge - from.x) * between(0, .2, random));
+  const y = air ? between(area.top, area.bottom, random) : area.top;
+  const distance = Math.hypot(x - from.x, air ? y - from.y : 0);
+  return {
+    activity: air ? "fly" : "run", from, to: { x, y }, duration: Math.round(Math.max(420, distance * 38)),
+    facing: x === from.x ? current.facing : x > from.x ? 1 : -1,
+    cycle: current.cycle + 1, zone: current.zone, shiny: current.shiny, actsLeft: current.actsLeft,
+  };
+}
+
 /** Choose destinations only between activities; hidden phases conceal teleportation and shiny rolls. */
 export function nextPokemonRoutine(species: PokemonSpecies, slot: number, compact: boolean, current: PokemonRoutine, random: Random = Math.random): PokemonRoutine {
   const info = SPECIES[species];
