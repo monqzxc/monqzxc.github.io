@@ -49,6 +49,7 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | Habitat rosters, legendaries and mythicals, and theme metadata | `lib/pokemon-roster.ts` |
 | Automatic habitat changes (in order or shuffled, on a timer or each visit) | `lib/theme-rotation.ts` |
 | Side-view sprite download from PMD SpriteCollab | `scripts/fetch-habitat-motion.mjs` |
+| Grumpy residents: odds, cooldown, shot timing, cursor knock-out | `lib/pokemon-ambush.ts`, `components/cursor-ambush.tsx` |
 | Self-hosted fonts and their OFL licenses | `public/fonts/` |
 | Vue interests and tab behavior | `components/craft-app.ts` |
 | React/Vue lifecycle boundary | `components/vue-craft.tsx` |
@@ -63,6 +64,12 @@ The walkthroughs are bundled under `public/project-previews/` so GitHub Pages ex
 The hero pairs bold name typography with the supplied MON, Gengar, and Gible artwork. The original image is used unchanged, with a soft purple-and-blue glow behind the characters.
 
 The hero keeps the professional name, role, and work link prominent, with the personality line “Serious about systems. Soft spot for Pokémon.” The purple and blue theme continues through navigation, project previews, badges, the career timeline, interest tabs, and the contact panel. `app/pokemon-theme.css` loads after the base glass and hero styles.
+
+## Grumpy Pokémon
+
+Not every resident wants to be bothered. Hovering a regular (not a legendary or mythical, which dodge instead) with a mouse has a 1 in 5 chance of an ambush: it turns to face the cursor, says “Hmph!”, and fires its signature move at the pointer, then dashes away from where it stood and goes back to roaming. A lock-on ring shows where the shot will land. If the cursor is still there, it shatters into shards tinted by the move's element, disappears for 0.5 s, and reassembles wherever the pointer has moved. A quick flick dodges the shot (“It missed!”).
+
+Only one ambush can happen every 7 seconds across the whole habitat. Ambushes are off for touch input, while the habitat is paused, and when reduced motion is preferred. To tune it, change `AMBUSH_ODDS`, `AMBUSH_COOLDOWN_MS`, `CURSOR_KO_MS` and `CURSOR_HIT_RADIUS` in `lib/pokemon-ambush.ts`.
 
 ## Scroll reveal
 

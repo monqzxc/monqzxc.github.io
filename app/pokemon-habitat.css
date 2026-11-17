@@ -316,6 +316,44 @@
 .pokemon-slot.is-catching :is(.pokemon-hello, .pokemon-hover-hello, .pokemon-callout) { visibility: hidden; }
 .pokemon-slot.is-catching :is(.pokemon-shadow, .shiny-glow, .shiny-stars) { opacity: 0 !important; transition: opacity .3s ease .3s; }
 
+/* ── Grumpy residents: an occasional hover earns a move at the cursor and a getaway dash ──
+   Wind-up freezes travel on the slot only (its body keeps moving) for --ambush-ms. */
+.pokemon-slot.is-ambushing { z-index: 50; animation-play-state: paused !important; }
+.pokemon-slot:is(.is-ambushing, .is-dashing) .pokemon-resident { pointer-events: none; }
+.pokemon-slot.is-ambushing .pokemon-body { animation: pokemon-ambush-windup var(--ambush-ms) cubic-bezier(.3, 0, .2, 1) both !important; }
+.pokemon-slot.is-ambushing.pose-attack .is-attack .pokemon-motion-strip { animation: move-frames var(--ambush-ms) steps(var(--frames), jump-none) both !important; }
+.pokemon-slot.is-ambushing :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(0 0 5px #ff3b3bb0); }
+.pokemon-slot.is-ambushing :is(.fx-move, .pokemon-dust, .pokemon-callout) { visibility: hidden; }
+/* The getaway: a fresh animation name so the dash starts from where it was frozen, with an afterimage. */
+.pokemon-slot.is-dashing { --stride: .35; animation: pokemon-dash var(--activity-duration) cubic-bezier(.2, .75, .3, 1) both; }
+.pokemon-slot.is-dashing :is(.pokemon-character, .pokemon-motion) { filter: drop-shadow(-7px 0 0 #ffffff2e) drop-shadow(-14px 0 0 #ffffff14); }
+
+/* Cursor layer, portalled to <body> above everything, including the capture beam. */
+html[data-cursor-ko], html[data-cursor-ko] * { cursor: none !important; }
+.cursor-ambush-layer { position: fixed; inset: 0; z-index: 10001; overflow: hidden; pointer-events: none; }
+.cursor-taunt { position: absolute; padding: 2px 8px; border: 1px solid #ff6b6b80; border-radius: 8px 8px 8px 3px; background: color-mix(in srgb, var(--background) 90%, transparent); color: #ff9a9a; font-size: 10px; font-weight: 700; letter-spacing: .03em; line-height: 1.5; white-space: nowrap; translate: -50% -100%; animation: cursor-taunt .9s ease-out both, pokemon-ambush-shake .1s linear .12s 3; }
+.cursor-lock { position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px; border: 2px dashed var(--tint); border-radius: 50%; box-shadow: 0 0 10px color-mix(in srgb, var(--tint) 60%, transparent); animation: cursor-lock var(--shot-ms) cubic-bezier(.5, 0, .75, 0) both; }
+.cursor-shot { position: absolute; width: 0; height: 0; animation: cursor-shot var(--shot-ms) linear both; }
+.cursor-shot-aim { position: absolute; left: -18px; top: -18px; width: 36px; height: 36px; }
+.cursor-shot-move { inset: 0; width: 100%; filter: drop-shadow(0 0 4px var(--tint)); }
+.cursor-shot-move.is-strip .move-strip { --move-ms: 300ms; animation-iteration-count: infinite; }
+.cursor-shot-move.move-shadow-ball .move-strip { animation: fx-spin .5s linear infinite; }
+.cursor-impact { position: absolute; width: 0; height: 0; }
+.cursor-impact-move { left: -30px; top: -30px; width: 60px; animation: cursor-impact .55s ease-out both; }
+.cursor-impact.is-miss .cursor-impact-move { left: -20px; top: -20px; width: 40px; opacity: .7; }
+.cursor-impact-move.is-strip .move-strip { --move-ms: 420ms; }
+.cursor-impact-text { position: absolute; left: 0; top: 24px; padding: 2px 8px; border: 1px solid color-mix(in srgb, var(--primary) 38%, transparent); border-radius: 8px; background: color-mix(in srgb, var(--background) 90%, transparent); color: var(--muted-foreground); font-size: 10px; font-weight: 700; letter-spacing: .03em; line-height: 1.5; white-space: nowrap; translate: -50% 0; animation: pokemon-callout .65s ease-out both; }
+.cursor-impact.is-hit .cursor-impact-text { color: #ffd23f; border-color: #ffd23f80; }
+/* The arrow, cut into five shards: thrown apart where it was hit, pulled back together where the pointer is now. */
+.cursor-shatter, .cursor-reform { position: absolute; left: 0; top: 0; }
+.cursor-shard { position: absolute; left: 0; top: 0; width: 12px; height: 19px; transform-origin: 30% 40%; }
+.cursor-shard svg { display: block; overflow: visible; }
+.cursor-shard path { fill: #fff; stroke: #000; stroke-width: 1; stroke-linejoin: round; }
+.cursor-shatter .cursor-shard { animation: cursor-shatter .42s cubic-bezier(.15, .8, .3, 1) both; }
+.cursor-shatter .cursor-shard path { fill: color-mix(in srgb, var(--tint) 72%, #fff); }
+.cursor-reform .cursor-shard { animation: cursor-reform var(--ko-ms) cubic-bezier(.3, 0, .2, 1) both; }
+.cursor-reform .cursor-shard svg { filter: drop-shadow(0 0 3px #fff8); }
+
 /* Capture beam, portalled to <body>. All parts share one 1.3s clock (POKEMON_CAPTURE_MS):
    0–20% the beam fires from the Pokédex, 20% it strikes, 50% the energy breaks free,
    80% it lands in the Pokédex, then everything fades. */
@@ -385,6 +423,15 @@
 @keyframes sprite-frames { to { transform: translateX(-100%); } }
 @keyframes move-frames { from { transform: translateX(0); } to { transform: translateX(calc(100% / var(--frames) - 100%)); } }
 @keyframes pokemon-travel { from { transform: translate(0, 0); } to { transform: translate(var(--travel-x), var(--travel-y)); } }
+@keyframes pokemon-ambush-windup { 0% { transform: none; } 55% { transform: translateX(-10%) scale(.92, 1.08); } 80% { transform: translateX(-12%) scale(.9, 1.1) rotate(-4deg); } 100% { transform: translateX(10%) scale(1.08, .94); } }
+@keyframes pokemon-ambush-shake { 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
+@keyframes pokemon-dash { from { transform: translate(0, 0); } to { transform: translate(var(--travel-x), var(--travel-y)); } }
+@keyframes cursor-taunt { 0% { opacity: 0; scale: .7; } 14%, 75% { opacity: 1; scale: 1; } 100% { opacity: 0; } }
+@keyframes cursor-lock { from { opacity: 0; scale: 2.2; rotate: 0deg; } 30% { opacity: .9; } to { opacity: .9; scale: .6; rotate: 90deg; } }
+@keyframes cursor-shot { from { translate: 0 0; } to { translate: var(--dx) var(--dy); } }
+@keyframes cursor-impact { 0% { opacity: 0; scale: .4; } 15% { opacity: 1; scale: 1; } 75% { opacity: 1; } 100% { opacity: 0; scale: 1.15; } }
+@keyframes cursor-shatter { 0% { opacity: 1; translate: 0 0; rotate: 0deg; } 100% { opacity: 0; translate: var(--sx) var(--sy); rotate: var(--sr); } }
+@keyframes cursor-reform { 0%, 40% { opacity: 0; translate: calc(var(--sx) * 1.2) calc(var(--sy) * 1.2); rotate: var(--sr); } 100% { opacity: 1; translate: 0 0; rotate: 0deg; } }
 @keyframes pokemon-dodge { 0%, 100% { transform: translateX(0) scale(1); } 42% { transform: translateX(var(--dodge-x)) scale(.94); } 70% { transform: translateX(var(--dodge-x)) scale(.97); } }
 @keyframes pokemon-breathe { from { transform: scale(1, 1); } to { transform: scale(.985, 1.035); } }
 /* Dash offset 1 → 0 draws the beam out from the Pokédex; 0 → 1 reels it back in. */

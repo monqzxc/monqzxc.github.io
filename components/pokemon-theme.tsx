@@ -7,10 +7,12 @@ import { Check, ChevronDown, Pause, Play, Repeat, Shuffle, Sparkles, Star } from
 import { MoveEffect, PokemonMotion, PokemonSprite, ShinyBurst, ShinyGlow, ShinyStars } from "@/components/pokemon-sprite";
 import { PokemonCollection } from "@/components/pokemon-collection";
 import { PokemonScenery } from "@/components/pokemon-scenery";
-import { createCast, createPokemonRoutine, isEntranceActivity, isHiddenActivity, isSpecial, isTravelActivity, nextPokemonRoutine, recast, recastCapturedResident, rollPokemonCatch, type CastMember } from "@/lib/pokemon-behavior";
+import { CursorAmbushLayer } from "@/components/cursor-ambush";
+import { createCast, createPokemonRoutine, dashPokemonRoutine, isEntranceActivity, isHiddenActivity, isSpecial, isTravelActivity, nextPokemonRoutine, recast, recastCapturedResident, rollPokemonCatch, type CastMember } from "@/lib/pokemon-behavior";
 import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture, releaseAllPokemonCaptures, releasePokemonCapture, shouldAnimatePokemonCapture, type CapturedPokemon, type PokemonReleaseResult } from "@/lib/pokemon-collection";
 import { isPokemonCaptureAnimation, POKEMON_CAPTURE_END_EVENT, POKEMON_CAPTURE_MS, POKEMON_CAPTURE_START_EVENT, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
 import { MOTION } from "@/lib/pokemon-motion";
+import { AMBUSH_WINDUP_MS, POKEMON_AMBUSH_EVENT, POKEMON_AMBUSH_TAUNT_EVENT, rollAmbush, type AmbushPoint, type PokemonAmbushShot, type PokemonAmbushTaunt } from "@/lib/pokemon-ambush";
 import { MOVES, RESIDENTS, SPECIES, SPRITE_FEET, SPRITE_SIZE, THEME_ORDER, THEMES, type PokemonSpecies, type PokemonTheme } from "@/lib/pokemon-roster";
 import { DEFAULT_ROTATION, intervalMs, nextTheme, parseRotation, parseTheme, ROTATION_INTERVALS, ROTATION_MODES, ROTATION_STORAGE_KEY, THEME_STORAGE_KEY, type Rotation, type RotationMode } from "@/lib/theme-rotation";
 
@@ -316,6 +318,8 @@ const DODGE_MS = 320;
 const DODGE_FEEDBACK_MS = 900;
 /** Chance that a resident who goes offstage is replaced from the bench. */
 const SWAP_ODDS = .55;
+/** Shared by every resident, so only one of them picks a fight at a time. */
+let lastAmbushAt = -Infinity;
 
 function PokemonResident({ species, home, entering, slot, compact, bounds, scaleFactor, groundHeight, paused, reducedMotion, onOffstage, onCaptured, onSpotlight, capturedPokemon, capturePokemon }: {
   species: PokemonSpecies; home: number; entering: boolean; slot: number; compact: boolean; bounds: HabitatBounds; scaleFactor: number; groundHeight: number; paused: boolean;
@@ -338,6 +342,13 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   const [dodging, setDodging] = useState(false);
   const [hoverDodgeFeedback, setHoverDodgeFeedback] = useState(false);
   const [dodgeDirection, setDodgeDirection] = useState<1 | -1>(1);
+  // Not every Pokémon wants to be bothered: a hover can earn a move to the cursor and a getaway dash.
+  const [ambush, setAmbush] = useState<{ facing: 1 | -1 } | null>(null);
+  const [dashCycle, setDashCycle] = useState(-1);
+  const dashing = routine.cycle === dashCycle;
+  const aimRef = useRef<AmbushPoint>({ x: 0, y: 0 });
+  const ambushTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const slotRef = useRef<HTMLDivElement>(null);
   const residentRef = useRef<HTMLButtonElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dodgeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -345,7 +356,7 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   const alreadyCaptured = capturedPokemon.some(entry => entry.species === species && entry.shiny === routine.shiny);
   const interacting = happy || hovered || focused || dodging || hoverDodgeFeedback;
   const foreground = happy || dodging || hoverDodgeFeedback || capturing;
-  const stopped = paused || interacting || capturing;
+  const stopped = paused || interacting || capturing || ambush !== null;
   // Hovered, greeted or being caught: lift it above the page and dim everything else.
   const spotlight = interacting || foreground;
   const spotlightChange = useRef(onSpotlight);
@@ -358,8 +369,16 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
     if (dodgeTimer.current) clearTimeout(dodgeTimer.current);
+    if (ambushTimer.current) clearTimeout(ambushTimer.current);
   }, []);
   useEffect(() => { if (reducedMotion) setCapturing(false); }, [reducedMotion]);
+  // Keep aiming at the cursor while winding up; the shot leaves toward wherever it is then.
+  useEffect(() => {
+    if (!ambush) return;
+    const follow = (event: PointerEvent) => { aimRef.current = { x: event.clientX, y: event.clientY }; };
+    window.addEventListener("pointermove", follow, { passive: true });
+    return () => window.removeEventListener("pointermove", follow);
+  }, [ambush]);
 
   // Pause the routine clock together with CSS, including its remaining time.
   // A greeting or a background tab must never teleport a visible resident.
@@ -390,6 +409,7 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   }, [routine, slot]);
 
   function greet() {
+    if (ambush || dashing) return;
     if (timer.current) clearTimeout(timer.current);
     clearDodge();
     setHappy(true);
@@ -403,6 +423,44 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
     dodgeTimer.current = null;
     setDodging(false);
     setHoverDodgeFeedback(false);
+  }
+
+  /** Regulars only, fully on stage and minding their own business. Legendaries dodge instead. */
+  function canAmbush() {
+    const { activity } = routine;
+    return !reducedMotion && !paused && !isSpecial(info) && !happy && !capturing && !ambush && !dashing
+      && !isHiddenActivity(activity) && !isEntranceActivity(activity) && activity !== "vanish" && activity !== "burrow";
+  }
+
+  function startAmbush(cursor: AmbushPoint, facing: 1 | -1, resident: DOMRect) {
+    lastAmbushAt = performance.now();
+    // Said in the cursor layer, above the page, since the resident itself may sit behind a card.
+    const taunt: PokemonAmbushTaunt = { at: { x: resident.left + resident.width / 2, y: resident.top + resident.height * .12 }, text: `Hmph! ${info.moveName}!` };
+    window.dispatchEvent(new CustomEvent(POKEMON_AMBUSH_TAUNT_EVENT, { detail: taunt }));
+    aimRef.current = cursor;
+    setAmbush({ facing });
+    ambushTimer.current = setTimeout(() => fireAmbush(facing), AMBUSH_WINDUP_MS);
+  }
+
+  function fireAmbush(facing: 1 | -1) {
+    ambushTimer.current = null;
+    const resident = residentRef.current?.getBoundingClientRect();
+    const slotElement = slotRef.current;
+    if (!resident || !slotElement) return setAmbush(null);
+    const target = aimRef.current;
+    const origin = { x: resident.left + resident.width * (facing > 0 ? .64 : .36), y: resident.top + resident.height * .48 };
+    const shot: PokemonAmbushShot = { origin, target, move: info.move, attacker: shinyName, moveName: info.moveName };
+    window.dispatchEvent(new CustomEvent(POKEMON_AMBUSH_EVENT, { detail: shot }));
+    // Bolt from where it really stands: travel may have been paused mid-stride, so read the live offset.
+    const offset = new DOMMatrixReadOnly(getComputedStyle(slotElement).transform);
+    const position = {
+      x: routine.from.x + offset.m41 * 100 / Math.max(1, bounds.width - size),
+      y: air ? routine.from.y + offset.m42 * 100 / Math.max(1, bounds.height - size) : routine.from.y,
+    };
+    const dash = dashPokemonRoutine(species, slot, compact, routine, position, target.x < origin.x ? 1 : -1);
+    setDashCycle(dash.cycle);
+    setRoutine(dash);
+    setAmbush(null);
   }
 
   function catchResident() {
@@ -449,20 +507,22 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
     "--travel-x": `${(bounds.width - size) * (routine.to.x - routine.from.x) / 100}px`,
     "--travel-y": `${air ? (bounds.height - size) * (routine.to.y - routine.from.y) / 100 : 0}px`,
     "--activity-duration": `${routine.duration}ms`,
-    "--facing": routine.facing,
+    "--facing": ambush?.facing ?? routine.facing,
+    "--ambush-ms": `${AMBUSH_WINDUP_MS}ms`,
     "--bob-delay": `${-slot * .7}s`,
     "--dodge-x": `${dodgeDirection * Math.round(size * .16)}px`,
   } as CSSProperties;
 
   // On the move or mid-attack it turns side-on; it faces you again to idle, react, or be greeted.
-  const pose = MOTION[species] && !interacting ? (activity === "attack" ? "attack" : isTravelActivity(activity) ? "walk" : null) : null;
+  const pose = MOTION[species] && !interacting ? (ambush || activity === "attack" ? "attack" : isTravelActivity(activity) ? "walk" : null) : null;
   const classes = [
     "pokemon-slot", air ? "is-air" : "is-ground", info.ghost && "is-ghost", info.legendary && "is-legendary", info.mythical && "is-mythical", pose && `pose-${pose}`,
     routine.shiny && "is-shiny", interacting && "is-interacting", happy && `is-greeting reacts-${info.reaction}`, dodging && "is-dodging", foreground && "is-foreground", spotlight && "is-spotlight", capturing && "is-catching",
+    ambush && "is-ambushing", dashing && "is-dashing",
   ].filter(Boolean).join(" ");
 
   return (
-    <div className={classes} data-species={species} data-activity={activity} data-exit={info.exit} style={style}>
+    <div ref={slotRef} className={classes} data-species={species} data-activity={activity} data-exit={info.exit} style={style}>
       <div className="pokemon-traveler">
         {info.exit === "burrow"
           ? <MoveEffect move="mound" className="pokemon-mound" />
@@ -474,6 +534,11 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
           <button ref={residentRef} type="button" className="pokemon-resident" onClick={greet} aria-label={`Say hello to ${shinyName}`}
             onPointerEnter={event => {
               if (event.pointerType !== "mouse") return;
+              if (canAmbush() && rollAmbush(performance.now(), lastAmbushAt)) {
+                const rect = event.currentTarget.getBoundingClientRect();
+                startAmbush({ x: event.clientX, y: event.clientY }, event.clientX < rect.left + rect.width / 2 ? -1 : 1, rect);
+                return;
+              }
               setHovered(true);
               if (!isSpecial(info) || alreadyCaptured) return;
               if (dodgeTimer.current) clearTimeout(dodgeTimer.current);
@@ -509,7 +574,7 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
               : <MoveEffect key={`greet-${greeting}`} move="heart" className="fx-heart fx-greeting" />)}
           </span>
           {routine.shiny && <ShinyStars />}
-          {activity === "attack" && !happy && <span key={`call-${routine.cycle}`} className="pokemon-callout" aria-hidden="true">{info.moveName}!</span>}
+          {activity === "attack" && !happy && !ambush && <span key={`call-${routine.cycle}`} className="pokemon-callout" aria-hidden="true">{info.moveName}!</span>}
           {(hovered || focused) && !happy && !dodging && !hoverDodgeFeedback && (
             <span className="pokemon-hover-hello" aria-hidden="true">
               <PokemonSprite species={species} shiny={routine.shiny} className="pokemon-hover-sprite" />
@@ -623,6 +688,7 @@ export function PokemonHabitat() {
   return (
     <aside ref={habitatRef} className={`pokemon-habitat habitat-${theme} ${stopped ? "is-paused" : ""} ${spotlight ? "has-spotlight" : ""}`} data-ready={ready} aria-hidden={!ready || undefined} aria-label={`Pokémon ${THEMES[theme].habitat.toLowerCase()}`} style={{ "--habitat-ground-height": `${groundHeight}px` } as CSSProperties}>
       <PokemonScenery theme={theme} />
+      <CursorAmbushLayer />
       {ready && bounds.width > 0 && cast.map(({ species, home, entering }, slot) => <PokemonResident key={`${theme}-${species}-${compact}-${reducedMotion}`} species={species} home={home} entering={entering} onOffstage={onOffstage} onCaptured={onCaptured} onSpotlight={onSpotlight} slot={slot} compact={compact} bounds={bounds} scaleFactor={scaleFactor} groundHeight={groundHeight} paused={stopped} reducedMotion={reducedMotion} capturedPokemon={capturedPokemon} capturePokemon={capturePokemon} />)}
     </aside>
   );

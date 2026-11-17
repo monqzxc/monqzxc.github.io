@@ -170,6 +170,34 @@ export function recastCapturedResident(cast: CastMember[], slot: number, theme: 
   return replaceFromBench(cast, slot, theme, random, true);
 }
 
+/** Shortest dash worth making, in % of the habitat; a cornered resident bolts the other way instead. */
+const MIN_DASH = 4;
+
+/**
+ * A grumpy resident that has just fired at the cursor bolts away, starting from wherever it really
+ * stood (`position`, measured mid-stride) so nothing teleports. `away` is the direction away from the
+ * cursor. It keeps its zone and remaining acts, so its routine carries on as normal afterwards.
+ */
+export function dashPokemonRoutine(species: PokemonSpecies, slot: number, compact: boolean, current: PokemonRoutine, position: HabitatPoint, away: 1 | -1, random: Random = Math.random): PokemonRoutine {
+  const info = SPECIES[species];
+  const air = info.movement === "air";
+  const area = zoneFor(info, slot, compact, current.zone);
+  const clamp = (value: number) => Math.min(100, Math.max(0, value));
+  const from = { x: clamp(position.x), y: clamp(position.y) };
+  const ahead = away > 0 ? area.right : area.left;
+  const behind = away > 0 ? area.left : area.right;
+  const edge = (ahead - from.x) * away >= MIN_DASH ? ahead : behind;
+  // Stop a little short of the edge so repeated dashes don't all pile onto the same pixel.
+  const x = clamp(edge - (edge - from.x) * between(0, .2, random));
+  const y = air ? between(area.top, area.bottom, random) : area.top;
+  const distance = Math.hypot(x - from.x, air ? y - from.y : 0);
+  return {
+    activity: air ? "fly" : "run", from, to: { x, y }, duration: Math.round(Math.max(420, distance * 38)),
+    facing: x === from.x ? current.facing : x > from.x ? 1 : -1,
+    cycle: current.cycle + 1, zone: current.zone, shiny: current.shiny, actsLeft: current.actsLeft,
+  };
+}
+
 /** Choose destinations only between activities; hidden phases conceal teleportation and shiny rolls. */
 export function nextPokemonRoutine(species: PokemonSpecies, slot: number, compact: boolean, current: PokemonRoutine, random: Random = Math.random): PokemonRoutine {
   const info = SPECIES[species];
