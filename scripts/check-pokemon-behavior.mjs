@@ -3,7 +3,7 @@ import test from "node:test";
 import { CAST_SIZE, COMPACT_CAST_SIZE, compactPatch, createCast, createPokemonRoutine, isEntranceActivity, isHiddenActivity, isSpecial, LEGEND_HIDDEN_MS, LEGEND_VISIBLE_MS, nextPokemonRoutine, recast, SHINY_ODDS } from "../lib/pokemon-behavior.ts";
 import * as pokemonBehavior from "../lib/pokemon-behavior.ts";
 import * as pokemonCollection from "../lib/pokemon-collection.ts";
-import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture } from "../lib/pokemon-collection.ts";
+import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture, releasePokemonCapture } from "../lib/pokemon-collection.ts";
 import { RESIDENTS, SPECIES, THEME_ORDER, THEMES } from "../lib/pokemon-roster.ts";
 import { nextTheme, ROTATION_INTERVALS } from "../lib/theme-rotation.ts";
 
@@ -342,4 +342,29 @@ test("capturing the habitat partner replaces that on-stage appearance", () => {
   assert.equal(next[0].entering, true);
   assert.deepEqual(next.slice(1), cast.slice(1));
   assert.equal(new Set(next.map(member => member.species)).size, next.length);
+});
+
+test("releasing frees only that form and persists the smaller collection", () => {
+  const saved = new Map();
+  const storage = { setItem: (key, value) => saved.set(key, value) };
+  const collection = [{ species: "piplup", shiny: false }, { species: "piplup", shiny: true }];
+  const result = releasePokemonCapture(storage, collection, { species: "piplup", shiny: true });
+
+  assert.equal(result.result, "released");
+  assert.deepEqual(result.collection, [{ species: "piplup", shiny: false }]);
+  assert.deepEqual(JSON.parse(saved.get(POKEMON_COLLECTION_STORAGE_KEY)), result.collection);
+  assert.equal(recordPokemonCapture(storage, result.collection, { species: "piplup", shiny: true }).result, "captured");
+});
+
+test("releasing an uncaught form or failing to save leaves the collection unchanged", () => {
+  const collection = [{ species: "piplup", shiny: false }];
+  let writes = 0;
+  const missing = releasePokemonCapture({ setItem: () => { writes++; } }, collection, { species: "gengar", shiny: false });
+  assert.equal(missing.result, "not-captured");
+  assert.equal(missing.collection, collection);
+  assert.equal(writes, 0);
+
+  const failed = releasePokemonCapture({ setItem: () => { throw new Error("quota exceeded"); } }, collection, collection[0]);
+  assert.equal(failed.result, "storage-error");
+  assert.equal(failed.collection, collection);
 });
