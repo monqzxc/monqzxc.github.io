@@ -169,14 +169,25 @@ test("each theme has fifteen residents of its type, at most five on stage", () =
     charmander: ["torchic", "fennekin", "litten", "fuecoco", "charcadet"],
     bulbasaur: ["snivy", "turtwig", "seedot", "petilil", "smoliv"],
   };
+  // The third wave: ten more regulars and three more legendaries or mythicals per habitat.
+  const thirdWave = {
+    gengar: ["misdreavus", "shuppet", "banette", "dusclops", "spiritomb", "froslass", "golett", "honedge", "sinistea", "greavard", "lunala", "spectrier", "hoopa"],
+    gible: ["phanpy", "swinub", "hippopotas", "gligar", "sandile", "mudbray", "wooper", "baltoy", "dugtrio", "marowak", "landorus", "zygarde", "regirock"],
+    piplup: ["marill", "horsea", "staryu", "corphish", "slowpoke", "seel", "wingull", "froakie", "popplio", "sobble", "lugia", "suicune", "keldeo"],
+    charmander: ["growlithe", "houndour", "slugma", "torkoal", "chimchar", "tepig", "scorbunny", "litleo", "fletchinder", "larvesta", "moltres", "entei", "volcanion"],
+    bulbasaur: ["hoppip", "sunkern", "budew", "shroomish", "cherubi", "rowlet", "grookey", "sprigatito", "chespin", "bounsweet", "tapu_bulu", "shaymin", "zarude"],
+  };
   assert.equal(new Set(everyone).size, everyone.length, "nobody lives in two habitats");
   for (const theme of THEME_ORDER) {
     assert.ok(THEMES[theme].habitat);
-    assert.equal(RESIDENTS[theme].length, 15);
-    assert.deepEqual(RESIDENTS[theme].slice(-5), additions[theme], "the five new residents match their habitat");
-    assert.equal(new Set(RESIDENTS[theme]).size, 15);
-    assert.equal(RESIDENTS[theme].filter(species => SPECIES[species].legendary).length, 1);
-    assert.equal(RESIDENTS[theme].filter(species => SPECIES[species].mythical).length, 1);
+    assert.equal(RESIDENTS[theme].length, 28);
+    assert.deepEqual(RESIDENTS[theme].slice(10, 15), additions[theme], "the second wave matches its habitat");
+    assert.deepEqual(RESIDENTS[theme].slice(-13), thirdWave[theme], "the third wave matches its habitat");
+    assert.equal(new Set(RESIDENTS[theme]).size, 28);
+    assert.equal(RESIDENTS[theme].filter(species => isSpecial(SPECIES[species])).length, 5, "five rare visitors per habitat");
+    assert.equal(RESIDENTS[theme].filter(species => !isSpecial(SPECIES[species])).length, 23);
+    assert.ok(RESIDENTS[theme].some(species => SPECIES[species].legendary));
+    assert.ok(RESIDENTS[theme].some(species => SPECIES[species].mythical));
     assert.ok(!RESIDENTS[theme].some(species => SPECIES[species].legendary && SPECIES[species].mythical));
     assert.equal(RESIDENTS[theme][0], theme, "the theme's partner leads its roster");
     if (theme === "gengar") assert.ok(RESIDENTS[theme].every(species => SPECIES[species].ghost), "the graveyard is all Ghost types");
@@ -196,7 +207,7 @@ test("each theme has fifteen residents of its type, at most five on stage", () =
         cast = next;
         cast.forEach(member => seen.add(member.species));
       }
-      assert.equal(seen.size, 15, "the whole roster takes a turn");
+      assert.equal(seen.size, 28, "the whole roster takes a turn");
       assert.deepEqual(recast(cast, 0, theme, random), cast);
     }
   }
@@ -507,4 +518,14 @@ test("an afflicted cursor is pinned, follows, trails or mirrors the pointer by s
   for (let frame = 0; frame < 200; frame++) at = ambush.afflictedStep("confuse", at, { x: 10, y: 10 }, { x: 790, y: 590 }, bounds);
   assert.ok(at.x >= 0 && at.y >= 0);
   for (const status of Object.keys(ambush.STATUS_TEXT)) assert.ok(ambush.STATUS_MOTION[status], `${status} has a motion`);
+});
+
+test("every resident has a sprite sheet, and side-view strips unless it has none upstream", async () => {
+  const { existsSync } = await import("node:fs");
+  const { MOTION } = await import("../lib/pokemon-motion.ts");
+  const faceOn = new Set(["diglett", "dugtrio", "zarude", "duskull", "drifloon", "litwick", "phantump", "pumpkaboo", "sandshrew", "trapinch", "rhyhorn", "drilbur", "numel", "mudkip", "buizel", "poliwag", "clamperl", "finneon", "torchic", "fennekin", "litten", "fuecoco", "charcadet", "snivy", "turtwig", "seedot", "petilil", "smoliv"]);
+  for (const species of everyone) {
+    assert.ok(existsSync(new URL(`../public/sprites/pokemon/${species}.png`, import.meta.url)), `${species} has a sheet`);
+    if (!faceOn.has(species)) assert.ok(MOTION[species], `${species} has walk and attack strips`);
+  }
 });

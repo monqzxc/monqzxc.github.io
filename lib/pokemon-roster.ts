@@ -5,10 +5,15 @@
 export type PokemonTheme = "gengar" | "gible" | "piplup" | "charmander" | "bulbasaur";
 export type PokemonSpecies =
   | "gengar" | "haunter" | "gastly" | "giratina" | "mismagius" | "drifblim" | "chandelure" | "dusknoir" | "sableye" | "mimikyu" | "marshadow" | "duskull" | "drifloon" | "litwick" | "phantump" | "pumpkaboo"
+  | "misdreavus" | "shuppet" | "banette" | "dusclops" | "spiritomb" | "froslass" | "golett" | "honedge" | "sinistea" | "greavard" | "lunala" | "spectrier" | "hoopa"
   | "gible" | "garchomp" | "flygon" | "diglett" | "donphan" | "groudon" | "cubone" | "sandslash" | "hippowdon" | "gliscor" | "diancie" | "sandshrew" | "trapinch" | "rhyhorn" | "drilbur" | "numel"
+  | "phanpy" | "swinub" | "hippopotas" | "gligar" | "sandile" | "mudbray" | "wooper" | "baltoy" | "dugtrio" | "marowak" | "landorus" | "zygarde" | "regirock"
   | "piplup" | "squirtle" | "psyduck" | "totodile" | "vaporeon" | "lapras" | "gyarados" | "pelipper" | "kyogre" | "manaphy" | "mudkip" | "buizel" | "poliwag" | "clamperl" | "finneon"
+  | "marill" | "horsea" | "staryu" | "corphish" | "slowpoke" | "seel" | "wingull" | "froakie" | "popplio" | "sobble" | "lugia" | "suicune" | "keldeo"
   | "charmander" | "cyndaquil" | "vulpix" | "ponyta" | "arcanine" | "magmar" | "charizard" | "talonflame" | "ho_oh" | "victini" | "torchic" | "fennekin" | "litten" | "fuecoco" | "charcadet"
-  | "bulbasaur" | "venusaur" | "chikorita" | "treecko" | "oddish" | "leafeon" | "jumpluff" | "tropius" | "virizion" | "celebi" | "snivy" | "turtwig" | "seedot" | "petilil" | "smoliv";
+  | "growlithe" | "houndour" | "slugma" | "torkoal" | "chimchar" | "tepig" | "scorbunny" | "litleo" | "fletchinder" | "larvesta" | "moltres" | "entei" | "volcanion"
+  | "bulbasaur" | "venusaur" | "chikorita" | "treecko" | "oddish" | "leafeon" | "jumpluff" | "tropius" | "virizion" | "celebi" | "snivy" | "turtwig" | "seedot" | "petilil" | "smoliv"
+  | "hoppip" | "sunkern" | "budew" | "shroomish" | "cherubi" | "rowlet" | "grookey" | "sprigatito" | "chespin" | "bounsweet" | "tapu_bulu" | "shaymin" | "zarude";
 export type VisibleActivity = "idle" | "walk" | "run" | "jump" | "fly" | "float" | "roar" | "smile" | "attack";
 export type MoveId =
   | "shadow-ball" | "sludge" | "sludge-splat" | "spiral" | "dragon-flame" | "small-ember" | "ember" | "punch-impact" | "claw"
@@ -451,18 +456,333 @@ export const SPECIES: Record<PokemonSpecies, SpeciesInfo> = {
     move: "growth", moveName: "Absorb", reaction: "smile", cry: "Smo~liv! ♥",
   },
 
+  // ── gengar additions ──
+  misdreavus: {
+    name: "Misdreavus", movement: "air", exit: "fade", ghost: true, scale: 1.5, compactScale: 1,
+    repertoire: { float: 4, fly: 1.5, smile: 1.5, attack: 1 },
+    move: "shadow-ball", moveName: "Shadow Ball", reaction: "smile", cry: "Mis~dree! ♥",
+  },
+  shuppet: {
+    name: "Shuppet", movement: "air", exit: "fade", ghost: true, scale: 1.5, compactScale: 1,
+    repertoire: { float: 4, fly: 1.5, smile: 1.5, attack: 1 },
+    move: "spiral", moveName: "Night Shade", reaction: "smile", cry: "Shup shup~ ♥",
+  },
+  banette: {
+    name: "Banette", movement: "air", exit: "fade", ghost: true, scale: 2, compactScale: 1.5,
+    repertoire: { float: 4, fly: 1.5, smile: 1.5, attack: 1 },
+    move: "claw", moveName: "Shadow Claw", reaction: "smile", cry: "Ba-nette! ♥",
+  },
+  dusclops: {
+    name: "Dusclops", movement: "ground", exit: "fade", ghost: true, scale: 2.5, compactScale: 1.5,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "punch-impact", moveName: "Shadow Punch", reaction: "roar", cry: "Dusss…",
+  },
+  spiritomb: {
+    name: "Spiritomb", movement: "ground", exit: "fade", ghost: true, scale: 2, compactScale: 1.5,
+    repertoire: { idle: 3, smile: 2, attack: 1.5 },
+    move: "shadow-ball", moveName: "Dark Pulse", reaction: "roar", cry: "Ooooh…",
+  },
+  froslass: {
+    name: "Froslass", movement: "air", exit: "fade", ghost: true, scale: 2.5, compactScale: 1.5,
+    repertoire: { float: 4, fly: 1.5, smile: 1.5, attack: 1 },
+    move: "ice-chunk", moveName: "Ice Shard", reaction: "smile", cry: "Fros~lass ♥",
+  },
+  golett: {
+    name: "Golett", movement: "ground", exit: "fade", ghost: true, scale: 2, compactScale: 1.5,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "punch-impact", moveName: "Shadow Punch", reaction: "smile", cry: "Go… lett! ♥",
+  },
+  honedge: {
+    name: "Honedge", movement: "air", exit: "fade", ghost: true, scale: 1.5, compactScale: 1,
+    repertoire: { float: 4, fly: 1.5, smile: 1.5, attack: 1 },
+    move: "claw", moveName: "Fury Cutter", reaction: "smile", cry: "Shing! ♥",
+  },
+  sinistea: {
+    name: "Sinistea", movement: "air", exit: "fade", ghost: true, scale: 1, compactScale: 1,
+    repertoire: { float: 4, fly: 1.5, smile: 1.5, attack: 1 },
+    move: "sludge", moveName: "Astonish", reaction: "smile", cry: "Tea~ ♥",
+  },
+  greavard: {
+    name: "Greavard", movement: "ground", exit: "fade", ghost: true, scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "bite", moveName: "Bite", reaction: "smile", cry: "Woof~ ♥",
+  },
+  lunala: {
+    name: "Lunala", movement: "air", exit: "fade", ghost: true, legendary: true, scale: 6, compactScale: 2.5,
+    repertoire: {}, move: "spiral", moveName: "Moongeist Beam", reaction: "roar", cry: "LUNAAA!",
+  },
+  spectrier: {
+    name: "Spectrier", movement: "ground", exit: "fade", ghost: true, legendary: true, scale: 4, compactScale: 2.5,
+    repertoire: {}, move: "shadow-ball", moveName: "Astral Barrage", reaction: "roar", cry: "SPECTRRR!",
+  },
+  hoopa: {
+    name: "Hoopa", movement: "air", exit: "fade", ghost: true, mythical: true, scale: 1.5, compactScale: 1.25,
+    repertoire: {}, move: "spiral", moveName: "Hyperspace Hole", reaction: "smile", cry: "Hoopa~ ♥",
+  },
+  // ── gible additions ──
+  phanpy: {
+    name: "Phanpy", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "hit", moveName: "Rollout", reaction: "smile", cry: "Phan-py! ♥",
+  },
+  swinub: {
+    name: "Swinub", movement: "ground", exit: "burrow", scale: 1, compactScale: 1,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "ice-chunk", moveName: "Powder Snow", reaction: "smile", cry: "Swi~nub ♥",
+  },
+  hippopotas: {
+    name: "Hippopotas", movement: "ground", exit: "burrow", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "rock", moveName: "Sand Tomb", reaction: "smile", cry: "Hippo~ ♥",
+  },
+  gligar: {
+    name: "Gligar", movement: "air", exit: "fade", scale: 2, compactScale: 1.5,
+    repertoire: { fly: 3, float: 2, smile: 1, attack: 1.5 },
+    move: "air-cutter", moveName: "Wing Attack", reaction: "smile", cry: "Gli-gar! ♥",
+  },
+  sandile: {
+    name: "Sandile", movement: "ground", exit: "burrow", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "bite", moveName: "Crunch", reaction: "smile", cry: "Sandi~le ♥",
+  },
+  mudbray: {
+    name: "Mudbray", movement: "ground", exit: "fade", scale: 2, compactScale: 1.5,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "rock", moveName: "Mud Shot", reaction: "smile", cry: "Hee-haw! ♥",
+  },
+  wooper: {
+    name: "Wooper", movement: "ground", exit: "burrow", scale: 1, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "sludge-splat", moveName: "Mud Bomb", reaction: "smile", cry: "Woo~per ♥",
+  },
+  baltoy: {
+    name: "Baltoy", movement: "air", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { float: 4, fly: 1.5, smile: 1.5, attack: 1 },
+    move: "spiral", moveName: "Confusion", reaction: "smile", cry: "Bal-toy~ ♥",
+  },
+  dugtrio: {
+    name: "Dugtrio", movement: "ground", exit: "burrow", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 3, smile: 2, attack: 1.5 },
+    move: "rock", moveName: "Earthquake", reaction: "smile", cry: "Dug-trio! ♥",
+  },
+  marowak: {
+    name: "Marowak", movement: "ground", exit: "fade", scale: 2, compactScale: 1.5,
+    repertoire: { idle: 2, walk: 3, run: 1, roar: 1, attack: 1.5 },
+    move: "rock", moveName: "Bone Club", reaction: "roar", cry: "Marowak!",
+  },
+  landorus: {
+    name: "Landorus", movement: "air", exit: "fade", legendary: true, scale: 4.5, compactScale: 2.5,
+    repertoire: {}, move: "rock", moveName: "Earth Power", reaction: "roar", cry: "LANDOOR!",
+  },
+  zygarde: {
+    name: "Zygarde", movement: "ground", exit: "burrow", legendary: true, scale: 5, compactScale: 2.5,
+    repertoire: {}, move: "dragon-plume", moveName: "Thousand Arrows", reaction: "roar", cry: "ZYGAAAR!",
+  },
+  regirock: {
+    name: "Regirock", movement: "ground", exit: "fade", legendary: true, scale: 4.5, compactScale: 2.5,
+    repertoire: {}, move: "rock", moveName: "Stone Edge", reaction: "roar", cry: "REGI-ROCK!",
+  },
+  // ── piplup additions ──
+  marill: {
+    name: "Marill", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "water-gun", moveName: "Bubble", reaction: "smile", cry: "Ma-rill! ♥",
+  },
+  horsea: {
+    name: "Horsea", movement: "ground", exit: "fade", scale: 1, compactScale: 1,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "water-gun", moveName: "Water Gun", reaction: "smile", cry: "Hor~sea ♥",
+  },
+  staryu: {
+    name: "Staryu", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "swift", moveName: "Swift", reaction: "smile", cry: "Hyah! ♥",
+  },
+  corphish: {
+    name: "Corphish", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "claw", moveName: "Crabhammer", reaction: "smile", cry: "Corph! ♥",
+  },
+  slowpoke: {
+    name: "Slowpoke", movement: "ground", exit: "fade", scale: 2, compactScale: 1.5,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "spiral", moveName: "Confusion", reaction: "smile", cry: "…Slow? ♥",
+  },
+  seel: {
+    name: "Seel", movement: "ground", exit: "fade", scale: 2, compactScale: 1.5,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "ice-chunk", moveName: "Aurora Beam", reaction: "smile", cry: "Seel! ♥",
+  },
+  wingull: {
+    name: "Wingull", movement: "air", exit: "fade", roams: true, scale: 1.5, compactScale: 1,
+    repertoire: { fly: 3, float: 2, smile: 1, attack: 1.5 },
+    move: "gust", moveName: "Gust", reaction: "smile", cry: "Wiing~ ♥",
+  },
+  froakie: {
+    name: "Froakie", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "water-gun", moveName: "Water Pulse", reaction: "smile", cry: "Froa~ ♥",
+  },
+  popplio: {
+    name: "Popplio", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "water-splash", moveName: "Bubble Beam", reaction: "smile", cry: "Pop pop! ♥",
+  },
+  sobble: {
+    name: "Sobble", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "water-gun", moveName: "Water Gun", reaction: "smile", cry: "Sob… ♥",
+  },
+  lugia: {
+    name: "Lugia", movement: "air", exit: "fade", legendary: true, scale: 6.5, compactScale: 2.5,
+    repertoire: {}, move: "gust", moveName: "Aeroblast", reaction: "roar", cry: "LUUGIA!",
+  },
+  suicune: {
+    name: "Suicune", movement: "ground", exit: "fade", legendary: true, scale: 4.5, compactScale: 2.5,
+    repertoire: {}, move: "water-splash", moveName: "Hydro Pump", reaction: "roar", cry: "SUICUUUNE!",
+  },
+  keldeo: {
+    name: "Keldeo", movement: "ground", exit: "fade", mythical: true, scale: 2.5, compactScale: 1.5,
+    repertoire: {}, move: "water-gun", moveName: "Secret Sword", reaction: "smile", cry: "Kel~deo! ♥",
+  },
+  // ── charmander additions ──
+  growlithe: {
+    name: "Growlithe", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "ember", moveName: "Ember", reaction: "smile", cry: "Grrowl! ♥",
+  },
+  houndour: {
+    name: "Houndour", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "bite", moveName: "Bite", reaction: "roar", cry: "Arooo!",
+  },
+  slugma: {
+    name: "Slugma", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "fire-plume", moveName: "Lava Plume", reaction: "smile", cry: "Blub~ ♥",
+  },
+  torkoal: {
+    name: "Torkoal", movement: "ground", exit: "fade", scale: 2, compactScale: 1.5,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "fire-plume", moveName: "Overheat", reaction: "roar", cry: "Toorrk!",
+  },
+  chimchar: {
+    name: "Chimchar", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "punch-impact", moveName: "Fire Punch", reaction: "smile", cry: "Chim-char! ♥",
+  },
+  tepig: {
+    name: "Tepig", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "ember", moveName: "Ember", reaction: "smile", cry: "Te-pig! ♥",
+  },
+  scorbunny: {
+    name: "Scorbunny", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "small-ember", moveName: "Flame Charge", reaction: "smile", cry: "Scor~! ♥",
+  },
+  litleo: {
+    name: "Litleo", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "small-ember", moveName: "Ember", reaction: "roar", cry: "Rawr!",
+  },
+  fletchinder: {
+    name: "Fletchinder", movement: "air", exit: "fade", roams: true, scale: 2, compactScale: 1.5,
+    repertoire: { fly: 3, float: 2, smile: 1, attack: 1.5 },
+    move: "air-cutter", moveName: "Flame Charge", reaction: "smile", cry: "Fletch! ♥",
+  },
+  larvesta: {
+    name: "Larvesta", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "ember", moveName: "Ember", reaction: "smile", cry: "Larva~ ♥",
+  },
+  moltres: {
+    name: "Moltres", movement: "air", exit: "fade", legendary: true, scale: 5.5, compactScale: 2.5,
+    repertoire: {}, move: "fire-plume", moveName: "Sky Attack", reaction: "roar", cry: "MOLTREEES!",
+  },
+  entei: {
+    name: "Entei", movement: "ground", exit: "fade", legendary: true, scale: 4.5, compactScale: 2.5,
+    repertoire: {}, move: "fire-plume", moveName: "Sacred Fire", reaction: "roar", cry: "ENTEEEI!",
+  },
+  volcanion: {
+    name: "Volcanion", movement: "ground", exit: "fade", mythical: true, scale: 3.5, compactScale: 2,
+    repertoire: {}, move: "water-splash", moveName: "Steam Eruption", reaction: "roar", cry: "VOLCAAA!",
+  },
+  // ── bulbasaur additions ──
+  hoppip: {
+    name: "Hoppip", movement: "air", exit: "fade", scale: 1, compactScale: 1,
+    repertoire: { float: 4, fly: 1.5, smile: 1.5, attack: 1 },
+    move: "gust", moveName: "Fairy Wind", reaction: "smile", cry: "Hop~pip ♥",
+  },
+  sunkern: {
+    name: "Sunkern", movement: "ground", exit: "fade", scale: 1, compactScale: 1,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "growth", moveName: "Absorb", reaction: "smile", cry: "Kern! ♥",
+  },
+  budew: {
+    name: "Budew", movement: "ground", exit: "fade", scale: 1, compactScale: 1,
+    repertoire: { idle: 3, walk: 2, smile: 1.5, attack: 1 },
+    move: "growth", moveName: "Stun Spore", reaction: "smile", cry: "Bu~dew ♥",
+  },
+  shroomish: {
+    name: "Shroomish", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "sludge-splat", moveName: "Spore", reaction: "smile", cry: "Shroo~ ♥",
+  },
+  cherubi: {
+    name: "Cherubi", movement: "ground", exit: "fade", scale: 1, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "razor-leaf", moveName: "Bullet Seed", reaction: "smile", cry: "Cheru~! ♥",
+  },
+  rowlet: {
+    name: "Rowlet", movement: "air", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { fly: 3, float: 2, smile: 1, attack: 1.5 },
+    move: "razor-leaf", moveName: "Leafage", reaction: "smile", cry: "Hoo hoo! ♥",
+  },
+  grookey: {
+    name: "Grookey", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "hit", moveName: "Branch Poke", reaction: "smile", cry: "Grook! ♥",
+  },
+  sprigatito: {
+    name: "Sprigatito", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "fairy-sparkle", moveName: "Leafage", reaction: "smile", cry: "Nya~ ♥",
+  },
+  chespin: {
+    name: "Chespin", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "razor-leaf", moveName: "Pin Missile", reaction: "smile", cry: "Ches-pin! ♥",
+  },
+  bounsweet: {
+    name: "Bounsweet", movement: "ground", exit: "fade", scale: 1, compactScale: 1,
+    repertoire: { idle: 2, walk: 3, run: 1.5, jump: 1.5, smile: 1.5, attack: 1.5 },
+    move: "fairy-sparkle", moveName: "Sweet Scent", reaction: "smile", cry: "Bounce~ ♥",
+  },
+  tapu_bulu: {
+    name: "Tapu Bulu", movement: "air", exit: "fade", legendary: true, scale: 3.5, compactScale: 2,
+    repertoire: {}, move: "growth", moveName: "Nature's Madness", reaction: "roar", cry: "BULUUU!",
+  },
+  shaymin: {
+    name: "Shaymin", movement: "ground", exit: "fade", mythical: true, scale: 1.5, compactScale: 1.25,
+    repertoire: {}, move: "fairy-sparkle", moveName: "Seed Flare", reaction: "smile", cry: "Shay~min! ♥",
+  },
+  zarude: {
+    name: "Zarude", movement: "ground", exit: "fade", mythical: true, scale: 3, compactScale: 2,
+    repertoire: {}, move: "claw", moveName: "Jungle Healing", reaction: "roar", cry: "ZARUUUDE!",
+  },
 };
 
 /**
- * Fifteen of each theme's type; the first is the theme's partner and never leaves the stage.
+ * Twenty-eight of each theme's type, five of them legendary or mythical; the first is the theme's partner and never leaves the stage.
  * Drifblim and Sandslash are benched to make room for the mythicals; swap a name back in to return them.
  */
 export const RESIDENTS: Record<PokemonTheme, PokemonSpecies[]> = {
-  gengar: ["gengar", "haunter", "gastly", "giratina", "mismagius", "marshadow", "chandelure", "dusknoir", "sableye", "mimikyu", "duskull", "drifloon", "litwick", "phantump", "pumpkaboo"],
-  gible: ["gible", "garchomp", "flygon", "diglett", "donphan", "groudon", "cubone", "diancie", "hippowdon", "gliscor", "sandshrew", "trapinch", "rhyhorn", "drilbur", "numel"],
-  piplup: ["piplup", "squirtle", "psyduck", "totodile", "vaporeon", "lapras", "gyarados", "pelipper", "kyogre", "manaphy", "mudkip", "buizel", "poliwag", "clamperl", "finneon"],
-  charmander: ["charmander", "cyndaquil", "vulpix", "ponyta", "arcanine", "magmar", "charizard", "talonflame", "ho_oh", "victini", "torchic", "fennekin", "litten", "fuecoco", "charcadet"],
-  bulbasaur: ["bulbasaur", "venusaur", "chikorita", "treecko", "oddish", "leafeon", "jumpluff", "tropius", "virizion", "celebi", "snivy", "turtwig", "seedot", "petilil", "smoliv"],
+  gengar: ["gengar", "haunter", "gastly", "giratina", "mismagius", "marshadow", "chandelure", "dusknoir", "sableye", "mimikyu", "duskull", "drifloon", "litwick", "phantump", "pumpkaboo", "misdreavus", "shuppet", "banette", "dusclops", "spiritomb", "froslass", "golett", "honedge", "sinistea", "greavard", "lunala", "spectrier", "hoopa"],
+  gible: ["gible", "garchomp", "flygon", "diglett", "donphan", "groudon", "cubone", "diancie", "hippowdon", "gliscor", "sandshrew", "trapinch", "rhyhorn", "drilbur", "numel", "phanpy", "swinub", "hippopotas", "gligar", "sandile", "mudbray", "wooper", "baltoy", "dugtrio", "marowak", "landorus", "zygarde", "regirock"],
+  piplup: ["piplup", "squirtle", "psyduck", "totodile", "vaporeon", "lapras", "gyarados", "pelipper", "kyogre", "manaphy", "mudkip", "buizel", "poliwag", "clamperl", "finneon", "marill", "horsea", "staryu", "corphish", "slowpoke", "seel", "wingull", "froakie", "popplio", "sobble", "lugia", "suicune", "keldeo"],
+  charmander: ["charmander", "cyndaquil", "vulpix", "ponyta", "arcanine", "magmar", "charizard", "talonflame", "ho_oh", "victini", "torchic", "fennekin", "litten", "fuecoco", "charcadet", "growlithe", "houndour", "slugma", "torkoal", "chimchar", "tepig", "scorbunny", "litleo", "fletchinder", "larvesta", "moltres", "entei", "volcanion"],
+  bulbasaur: ["bulbasaur", "venusaur", "chikorita", "treecko", "oddish", "leafeon", "jumpluff", "tropius", "virizion", "celebi", "snivy", "turtwig", "seedot", "petilil", "smoliv", "hoppip", "sunkern", "budew", "shroomish", "cherubi", "rowlet", "grookey", "sprigatito", "chespin", "bounsweet", "tapu_bulu", "shaymin", "zarude"],
 };
 
 export type ThemeInfo = {

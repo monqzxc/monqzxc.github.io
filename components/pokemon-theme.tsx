@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { Popover } from "radix-ui";
-import { Check, ChevronDown, Pause, Play, Repeat, Shuffle, Sparkles, Star } from "lucide-react";
+import { Check, ChevronDown, Pause, Play, Repeat, Shuffle } from "lucide-react";
 import { MoveEffect, PokemonMotion, PokemonSprite, ShinyBurst, ShinyGlow, ShinyStars } from "@/components/pokemon-sprite";
 import { PokemonCollection } from "@/components/pokemon-collection";
 import { PokemonScenery } from "@/components/pokemon-scenery";
@@ -205,9 +205,9 @@ function Countdown({ ms, elapsed, children }: { ms: number; elapsed: () => numbe
   return children({ "--rotation-ms": `${ms}ms`, "--rotation-delay": `${delay}ms` } as CSSProperties);
 }
 
-/** The legendary and mythical who visit a habitat, for the selector's cards. */
-function specialsOf(theme: PokemonTheme) {
-  return RESIDENTS[theme].filter(species => isSpecial(SPECIES[species]));
+/** Regulars only: the legendaries and mythicals who visit are kept a surprise. */
+function regularsOf(theme: PokemonTheme) {
+  return RESIDENTS[theme].filter(species => !isSpecial(SPECIES[species]));
 }
 
 export function ThemeSelector() {
@@ -234,7 +234,7 @@ export function ThemeSelector() {
           <Popover.Content className="theme-panel" side="bottom" align="end" sideOffset={10} collisionPadding={12} aria-label="Habitat settings">
             <div className="theme-panel-head">
               <p className="theme-panel-title">Choose a habitat</p>
-              <p className="theme-panel-sub">{RESIDENTS[theme].length} Pokémon live in each, with a rare legendary or mythical visitor.</p>
+              <p className="theme-panel-sub">{regularsOf(theme).length} Pokémon live in each. Rumour has it something rarer passes through…</p>
             </div>
 
             <div className="theme-options" role="radiogroup" aria-label="Habitat">
@@ -249,15 +249,6 @@ export function ThemeSelector() {
                       <span className="theme-option-name">{SPECIES[option].name}<span className="theme-option-type">{info.type}</span></span>
                       <span className="theme-option-meta">
                         <span className="theme-option-habitat">{info.habitat}</span>
-                        <span className="theme-option-specials">
-                          {specialsOf(option).map(species => (
-                            <span key={species} className={SPECIES[species].mythical ? "is-mythical" : "is-legendary"} title={SPECIES[species].mythical ? "Mythical" : "Legendary"}>
-                              {SPECIES[species].mythical ? <Sparkles size={10} aria-hidden="true" /> : <Star size={10} aria-hidden="true" />}
-                              {SPECIES[species].name}
-                              <span className="sr-only"> ({SPECIES[species].mythical ? "mythical" : "legendary"})</span>
-                            </span>
-                          ))}
-                        </span>
                       </span>
                     </span>
                     <span className="theme-option-check" aria-hidden="true"><Check size={14} strokeWidth={3} /></span>

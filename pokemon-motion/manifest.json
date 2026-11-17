@@ -1599,5 +1599,1967 @@
     2
    ]
   }
+ },
+ "misdreavus": {
+  "walk": {
+   "width": 24,
+   "height": 48,
+   "durations": [
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "shuppet": {
+  "walk": {
+   "width": 24,
+   "height": 48,
+   "durations": [
+    6,
+    6,
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    3,
+    3,
+    3,
+    3,
+    3,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "banette": {
+  "walk": {
+   "width": 24,
+   "height": 40,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 72,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "dusclops": {
+  "walk": {
+   "width": 40,
+   "height": 48,
+   "durations": [
+    8,
+    12,
+    8,
+    12
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 88,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "spiritomb": {
+  "walk": {
+   "width": 32,
+   "height": 48,
+   "durations": [
+    6,
+    6,
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    1,
+    1,
+    2,
+    2
+   ]
+  }
+ },
+ "froslass": {
+  "walk": {
+   "width": 32,
+   "height": 48,
+   "durations": [
+    6,
+    4,
+    8,
+    10,
+    6,
+    4,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    6,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2
+   ]
+  }
+ },
+ "golett": {
+  "walk": {
+   "width": 32,
+   "height": 48,
+   "durations": [
+    6,
+    8,
+    6,
+    8
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 88,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "honedge": {
+  "walk": {
+   "width": 32,
+   "height": 56,
+   "durations": [
+    10,
+    10,
+    6,
+    6,
+    10,
+    10,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 80,
+   "height": 96,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "sinistea": {
+  "walk": {
+   "width": 24,
+   "height": 40,
+   "durations": [
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "greavard": {
+  "walk": {
+   "width": 32,
+   "height": 32,
+   "durations": [
+    8,
+    8,
+    8,
+    8
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 64,
+   "durations": [
+    4,
+    2,
+    4,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    4
+   ]
+  }
+ },
+ "lunala": {
+  "walk": {
+   "width": 80,
+   "height": 104,
+   "durations": [
+    8,
+    12,
+    8,
+    12
+   ]
+  },
+  "attack": {
+   "width": 104,
+   "height": 136,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "spectrier": {
+  "walk": {
+   "width": 40,
+   "height": 56,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 88,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  },
+  "scale": 1.25
+ },
+ "hoopa": {
+  "walk": {
+   "width": 32,
+   "height": 48,
+   "durations": [
+    7,
+    7,
+    9,
+    9,
+    9,
+    7,
+    7,
+    7
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "phanpy": {
+  "walk": {
+   "width": 32,
+   "height": 32,
+   "durations": [
+    6,
+    8,
+    6,
+    8
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    3,
+    3,
+    2,
+    2,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "swinub": {
+  "walk": {
+   "width": 24,
+   "height": 24,
+   "durations": [
+    8,
+    8,
+    8,
+    12
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "hippopotas": {
+  "walk": {
+   "width": 32,
+   "height": 32,
+   "durations": [
+    8,
+    8,
+    8,
+    8
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 64,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "gligar": {
+  "walk": {
+   "width": 32,
+   "height": 64,
+   "durations": [
+    6,
+    4,
+    4,
+    4,
+    8,
+    4,
+    4,
+    4
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    2,
+    2,
+    6,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "sandile": {
+  "walk": {
+   "width": 32,
+   "height": 32,
+   "durations": [
+    7,
+    7,
+    7,
+    7
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "mudbray": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "wooper": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    8,
+    6,
+    6,
+    6,
+    8,
+    6,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 72,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "baltoy": {
+  "walk": {
+   "width": 32,
+   "height": 48,
+   "durations": [
+    6,
+    6,
+    6,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    6,
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "marowak": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 88,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "landorus": {
+  "walk": {
+   "width": 48,
+   "height": 64,
+   "durations": [
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 120,
+   "height": 136,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  },
+  "scale": 1.25
+ },
+ "zygarde": {
+  "walk": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    10,
+    12,
+    10,
+    12
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 112,
+   "durations": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "regirock": {
+  "walk": {
+   "width": 32,
+   "height": 48,
+   "durations": [
+    8,
+    18,
+    8,
+    18
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "marill": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    10,
+    8,
+    10,
+    8
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "horsea": {
+  "walk": {
+   "width": 24,
+   "height": 48,
+   "durations": [
+    8,
+    12,
+    8,
+    12
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "staryu": {
+  "walk": {
+   "width": 24,
+   "height": 32,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 64,
+   "durations": [
+    2,
+    2,
+    4,
+    2,
+    2,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "corphish": {
+  "walk": {
+   "width": 32,
+   "height": 32,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "slowpoke": {
+  "walk": {
+   "width": 24,
+   "height": 32,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 64,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "seel": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    8,
+    6,
+    8,
+    10,
+    6,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 72,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "wingull": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    2,
+    4,
+    4,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "froakie": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    4,
+    6,
+    4,
+    6,
+    6,
+    4
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    4,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    4
+   ]
+  }
+ },
+ "popplio": {
+  "walk": {
+   "width": 32,
+   "height": 24,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 64,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "sobble": {
+  "walk": {
+   "width": 24,
+   "height": 32,
+   "durations": [
+    6,
+    10,
+    6,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "lugia": {
+  "walk": {
+   "width": 80,
+   "height": 96,
+   "durations": [
+    4,
+    4
+   ]
+  },
+  "attack": {
+   "width": 104,
+   "height": 112,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "suicune": {
+  "walk": {
+   "width": 40,
+   "height": 48,
+   "durations": [
+    10,
+    12,
+    10,
+    12
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 88,
+   "durations": [
+    2,
+    2,
+    6,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "keldeo": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "growlithe": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    6,
+    8,
+    6,
+    8
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    2,
+    6,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "houndour": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "slugma": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    14,
+    8,
+    16,
+    8
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "torkoal": {
+  "walk": {
+   "width": 40,
+   "height": 32,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 64,
+   "durations": [
+    2,
+    2,
+    2,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "chimchar": {
+  "walk": {
+   "width": 32,
+   "height": 48,
+   "durations": [
+    6,
+    4,
+    4,
+    4,
+    6,
+    6,
+    4
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "tepig": {
+  "walk": {
+   "width": 24,
+   "height": 32,
+   "durations": [
+    6,
+    10,
+    6,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 64,
+   "durations": [
+    4,
+    2,
+    4,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    4
+   ]
+  }
+ },
+ "scorbunny": {
+  "walk": {
+   "width": 24,
+   "height": 40,
+   "durations": [
+    6,
+    8,
+    6,
+    8
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    4,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "litleo": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    6,
+    4,
+    6,
+    6,
+    4,
+    6,
+    4
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    4,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "fletchinder": {
+  "walk": {
+   "width": 32,
+   "height": 48,
+   "durations": [
+    8,
+    6,
+    6,
+    8,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "larvesta": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    10,
+    10,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    4,
+    2,
+    4,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    4
+   ]
+  }
+ },
+ "moltres": {
+  "walk": {
+   "width": 80,
+   "height": 96,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 104,
+   "height": 136,
+   "durations": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "entei": {
+  "walk": {
+   "width": 40,
+   "height": 56,
+   "durations": [
+    10,
+    12,
+    10,
+    12
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 88,
+   "durations": [
+    2,
+    3,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "volcanion": {
+  "walk": {
+   "width": 56,
+   "height": 64,
+   "durations": [
+    8,
+    14,
+    8,
+    14
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    3,
+    4,
+    4,
+    4,
+    4,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "hoppip": {
+  "walk": {
+   "width": 32,
+   "height": 56,
+   "durations": [
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 88,
+   "durations": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sunkern": {
+  "walk": {
+   "width": 24,
+   "height": 40,
+   "durations": [
+    4,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 88,
+   "durations": [
+    4,
+    2,
+    4,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    4
+   ]
+  }
+ },
+ "budew": {
+  "walk": {
+   "width": 24,
+   "height": 32,
+   "durations": [
+    6,
+    4,
+    6,
+    4,
+    6,
+    4,
+    6,
+    4
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    2,
+    2,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "shroomish": {
+  "walk": {
+   "width": 24,
+   "height": 24,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "cherubi": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    10,
+    10,
+    10,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "rowlet": {
+  "walk": {
+   "width": 24,
+   "height": 32,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 64,
+   "durations": [
+    2,
+    2,
+    2,
+    4,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "grookey": {
+  "walk": {
+   "width": 32,
+   "height": 48,
+   "durations": [
+    6,
+    4,
+    4,
+    4,
+    6,
+    6,
+    4
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 80,
+   "durations": [
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "sprigatito": {
+  "walk": {
+   "width": 32,
+   "height": 40,
+   "durations": [
+    4,
+    6,
+    4,
+    6,
+    6,
+    4
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 80,
+   "durations": [
+    2,
+    4,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    4
+   ]
+  }
+ },
+ "chespin": {
+  "walk": {
+   "width": 24,
+   "height": 32,
+   "durations": [
+    8,
+    10,
+    8,
+    10
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 64,
+   "durations": [
+    2,
+    2,
+    4,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "bounsweet": {
+  "walk": {
+   "width": 24,
+   "height": 32,
+   "durations": [
+    10,
+    10,
+    10,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "tapu_bulu": {
+  "walk": {
+   "width": 32,
+   "height": 72,
+   "durations": [
+    10,
+    10,
+    10,
+    10
+   ]
+  },
+  "attack": {
+   "width": 72,
+   "height": 88,
+   "durations": [
+    2,
+    2,
+    4,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "shaymin": {
+  "walk": {
+   "width": 24,
+   "height": 24,
+   "durations": [
+    10,
+    12,
+    10,
+    12
+   ]
+  },
+  "attack": {
+   "width": 64,
+   "height": 72,
+   "durations": [
+    2,
+    2,
+    6,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ]
+  }
  }
 }

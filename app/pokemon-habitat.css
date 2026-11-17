@@ -84,10 +84,6 @@
 .theme-option-name { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; }
 .theme-option-type { padding: 1px 7px; border-radius: 100px; background: color-mix(in srgb, var(--swatch) 22%, transparent); color: color-mix(in srgb, var(--swatch) 55%, var(--foreground)); font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
 .theme-option-habitat { color: var(--muted-foreground); font-size: 12px; }
-.theme-option-specials { display: flex; flex-wrap: wrap; gap: 3px 8px; font-size: 11px; font-weight: 600; }
-.theme-option-specials > span { display: inline-flex; align-items: center; gap: 3px; }
-.theme-option-specials .is-legendary { color: #f5cf63; }
-.theme-option-specials .is-mythical { color: #f6a6e0; }
 .theme-option-check { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--swatch); color: #10101a; opacity: 0; transform: scale(.4); transition: opacity .18s, transform .25s cubic-bezier(.3, 1.5, .5, 1); }
 .theme-option.is-selected .theme-option-check { opacity: 1; transform: none; }
 

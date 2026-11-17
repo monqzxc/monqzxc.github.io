@@ -46,7 +46,7 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | Final purple/blue palette, panels, buttons, and character labels | `app/pokemon-theme.css` |
 | Gible (Ground) palette | `app/ground-theme.css` |
 | Piplup (Water), Charmander (Fire), and Bulbasaur (Grass) palettes, built from a few tokens each | `app/elemental-theme.css` |
-| Habitat rosters, legendaries and mythicals, and theme metadata | `lib/pokemon-roster.ts` |
+| Habitat rosters (28 per habitat: 23 regulars and 5 legendaries or mythicals), and theme metadata | `lib/pokemon-roster.ts` |
 | Automatic habitat changes (in order or shuffled, on a timer or each visit) | `lib/theme-rotation.ts` |
 | Side-view sprite download from PMD SpriteCollab | `scripts/fetch-habitat-motion.mjs` |
 | Grumpy residents: odds, cooldown, shot timing, cursor knock-out | `lib/pokemon-ambush.ts`, `components/cursor-ambush.tsx` |
@@ -84,6 +84,8 @@ Not every resident wants to be bothered. Hovering a regular with a mouse has a 1
 | Fell in love | Fairy Sparkle | Heart pounds, floats off in hearts |
 
 The status lasts 1.6 s, with the affected cursor drawn at twice its size while the real one is hidden. Frozen, crushed, tangled, melted and shattered cursors are pinned where they were hit; a burning cursor sticks to the pointer, soaked, possessed and charmed ones trail sluggishly behind it, a blown-away one tumbles off and drifts back, and a confused one moves the opposite way. Then it reassembles wherever the pointer is. The mappings are `MOVE_STATUS` and `STATUS_MOTION` in `lib/pokemon-ambush.ts`.
+
+Each habitat has 28 residents: 23 regulars and 5 legendaries or mythicals. The habitat picker only counts the regulars and never names the rare visitors, so who turns up is a surprise. Only one legendary or mythical is ever on stage at a time.
 
 Legendaries and mythicals are harder to catch. Each visit they slip the cursor 1–3 times (a shiny one more) before tiring enough to let you say hello: most teleport, squeezing to a sliver of light and reappearing in another part of the habitat with a taunt, while Ghost types usually phase instead, flickering intangibly so the cursor passes through them for 1.5 s. A failed catch (50%) makes them break free and get away again. With reduced motion they say “Dodged!” instead of moving.
 
