@@ -47,7 +47,7 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | Gible (Ground) palette | `app/ground-theme.css` |
 | Piplup (Water), Charmander (Fire), and Bulbasaur (Grass) palettes, built from a few tokens each | `app/elemental-theme.css` |
 | Habitat rosters (28 per habitat: 23 regulars and 5 legendaries or mythicals), and theme metadata | `lib/pokemon-roster.ts` |
-| Automatic habitat changes (in order or shuffled, on a timer or each visit) | `lib/theme-rotation.ts` |
+| Automatic habitat changes (in order or shuffled, on a timer or each visit; shuffled each visit by default) | `lib/theme-rotation.ts` |
 | Side-view sprite download from PMD SpriteCollab | `scripts/fetch-habitat-motion.mjs` |
 | Grumpy residents: odds, cooldown, shot timing, cursor knock-out | `lib/pokemon-ambush.ts`, `components/cursor-ambush.tsx` |
 | Self-hosted fonts and their OFL licenses | `public/fonts/` |
@@ -64,6 +64,10 @@ The walkthroughs are bundled under `public/project-previews/` so GitHub Pages ex
 The hero pairs bold name typography with the supplied MON, Gengar, and Gible artwork. The original image is used unchanged, with a soft purple-and-blue glow behind the characters.
 
 The hero keeps the professional name, role, and work link prominent, with the personality line “Serious about systems. Soft spot for Pokémon.” The purple and blue theme continues through navigation, project previews, badges, the career timeline, interest tabs, and the contact panel. `app/pokemon-theme.css` loads after the base glass and hero styles.
+
+## Habitat rotation
+
+By default every visit opens in a different habitat: a first visit can land in any of the five, and each later visit shuffles to one it wasn't in last time. The pre-paint script in `app/layout.tsx` picks it before the first frame, so there's no flash of the previous habitat. Visitors can change this in the habitat picker (off, in order, or shuffled, every visit or on a 30 s / 1 min / 5 min timer), and their choice is remembered. Change `DEFAULT_ROTATION` in `lib/theme-rotation.ts` to set a different default; renaming `ROTATION_STORAGE_KEY` makes everyone start from the new default once.
 
 ## Grumpy Pokémon
 

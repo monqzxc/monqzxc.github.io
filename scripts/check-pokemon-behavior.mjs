@@ -529,3 +529,41 @@ test("every resident has a sprite sheet, and side-view strips unless it has none
     if (!faceOn.has(species)) assert.ok(MOTION[species], `${species} has walk and attack strips`);
   }
 });
+
+test("by default every visit shuffles to a habitat, including the very first", async () => {
+  const rotation = await import("../lib/theme-rotation.ts");
+  assert.deepEqual(rotation.DEFAULT_ROTATION, { mode: "shuffle", every: "visit" });
+  assert.deepEqual(rotation.parseRotation(null), rotation.DEFAULT_ROTATION, "no saved choice means the default");
+  // Run the real pre-paint script against a fake browser.
+  const visit = (store, random) => {
+    const document = { documentElement: { dataset: {} } };
+    const localStorage = store === null ? { getItem() { throw new Error("blocked"); }, setItem() { throw new Error("blocked"); } }
+      : { getItem: key => store.get(key) ?? null, setItem: (key, value) => store.set(key, value) };
+    new Function("document", "localStorage", "Math", rotation.themeBootScript())(document, localStorage, { ...Math, floor: Math.floor, random });
+    return document.documentElement.dataset.pokemonTheme;
+  };
+  const firsts = new Set();
+  for (let seed = 0; seed < 60; seed++) firsts.add(visit(new Map(), seededRandom(seed * 104729 + 7)));
+  assert.deepEqual([...firsts].sort(), [...THEME_ORDER].sort(), "a first visit can open in any habitat");
+  const store = new Map();
+  const random = seededRandom(3);
+  let previous = visit(store, random);
+  for (let step = 0; step < 40; step++) {
+    const next = visit(store, random);
+    assert.notEqual(next, previous, "each visit moves to a different habitat");
+    assert.equal(store.get(rotation.THEME_STORAGE_KEY), next, "and remembers where it is");
+    previous = next;
+  }
+  // A visitor who turned it off stays put.
+  const off = new Map([[rotation.THEME_STORAGE_KEY, "piplup"], [rotation.ROTATION_STORAGE_KEY, JSON.stringify({ mode: "off", every: "visit" })]]);
+  assert.equal(visit(off, seededRandom(1)), "piplup");
+  assert.equal(visit(off, seededRandom(2)), "piplup");
+  // Blocked storage still gets a habitat and still shuffles.
+  assert.ok(THEME_ORDER.includes(visit(null, seededRandom(4))));
+  // The script and visitTheme agree.
+  for (let seed = 0; seed < 30; seed++) {
+    const saved = THEME_ORDER[seed % THEME_ORDER.length];
+    const s = new Map([[rotation.THEME_STORAGE_KEY, saved]]);
+    assert.equal(visit(s, seededRandom(seed)), rotation.visitTheme(saved, rotation.DEFAULT_ROTATION, seededRandom(seed)));
+  }
+});

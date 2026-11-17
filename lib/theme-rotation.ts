@@ -8,8 +8,10 @@ export type RotationInterval = "visit" | "30s" | "1m" | "5m";
 export type Rotation = { mode: RotationMode; every: RotationInterval };
 
 export const THEME_STORAGE_KEY = "mon-pokemon-theme";
-export const ROTATION_STORAGE_KEY = "mon-pokemon-rotation";
-export const DEFAULT_ROTATION: Rotation = { mode: "off", every: "1m" };
+/** Renamed (v2) when the default became a shuffle per visit, so older saved choices start over once. */
+export const ROTATION_STORAGE_KEY = "mon-pokemon-rotation-v2";
+/** Every visit lands in a different habitat until the visitor picks otherwise. */
+export const DEFAULT_ROTATION: Rotation = { mode: "shuffle", every: "visit" };
 
 export const ROTATION_MODES: { id: RotationMode; label: string }[] = [
   { id: "off", label: "Off" },
@@ -51,11 +53,24 @@ export function parseRotation(raw: string | null): Rotation {
 
 export const parseTheme = (raw: string | null | undefined): PokemonTheme => isPokemonTheme(raw) ? raw : THEME_ORDER[0];
 
+/** The habitat a page load opens on, given what was saved (null if nothing or unavailable). */
+export function visitTheme(saved: string | null, rotation: Rotation, random: () => number = Math.random): PokemonTheme {
+  const known = isPokemonTheme(saved);
+  const current = known ? saved : THEME_ORDER[0];
+  if (rotation.every !== "visit" || rotation.mode === "off") return current;
+  // A first visit can open anywhere; after that it always moves on.
+  if (!known) return rotation.mode === "order" ? THEME_ORDER[0] : THEME_ORDER[Math.min(THEME_ORDER.length - 1, Math.floor(Math.max(0, random()) * THEME_ORDER.length))];
+  return nextTheme(current, rotation.mode, random);
+}
+
 /**
- * Inline, pre-hydration script: restores the saved habitat and applies a "per visit" rotation
- * before paint. Kept dependency-free; the theme list is embedded at build time.
+ * Inline, pre-hydration script: picks the habitat for this visit (visitTheme) before paint, using
+ * the default rotation when none is saved. Kept dependency-free; the lists are embedded at build time.
  */
 export function themeBootScript() {
   const themes = JSON.stringify(THEME_ORDER);
-  return `(()=>{var t=${themes},d=document.documentElement,s=t[0];try{var v=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(t.indexOf(v)>=0)s=v;var r=JSON.parse(localStorage.getItem(${JSON.stringify(ROTATION_STORAGE_KEY)})||"null");if(r&&r.every==="visit"&&(r.mode==="order"||r.mode==="shuffle")){var i=t.indexOf(s);s=r.mode==="order"?t[(i+1)%t.length]:t[(i+1+Math.floor(Math.random()*(t.length-1)))%t.length];localStorage.setItem(${JSON.stringify(THEME_STORAGE_KEY)},s)}}catch(e){}d.dataset.pokemonTheme=s})()`;
+  const fallback = JSON.stringify(DEFAULT_ROTATION);
+  const themeKey = JSON.stringify(THEME_STORAGE_KEY);
+  const rotationKey = JSON.stringify(ROTATION_STORAGE_KEY);
+  return `(()=>{var t=${themes},n=t.length,d=document.documentElement,r=${fallback},v=null,ls=null;try{ls=localStorage;v=ls.getItem(${themeKey});var x=JSON.parse(ls.getItem(${rotationKey})||"null");if(x&&x.mode&&x.every)r=x}catch(e){}var k=t.indexOf(v)>=0,s=k?v:t[0];if(r.every==="visit"&&(r.mode==="order"||r.mode==="shuffle")){var i=t.indexOf(s);s=!k?(r.mode==="order"?t[0]:t[Math.floor(Math.random()*n)]):r.mode==="order"?t[(i+1)%n]:t[(i+1+Math.floor(Math.random()*(n-1)))%n];try{ls&&ls.setItem(${themeKey},s)}catch(e){}}d.dataset.pokemonTheme=s})()`;
 }
