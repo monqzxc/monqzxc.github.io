@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ArrowUpRight, FileText, Play, Sparkles } from "lucide-react";
 import { PixelConsole } from "@/components/pixel-console";
 import { PixelStage } from "@/components/pixel-stage";
-import { PokemonHabitat, ThemeSelector } from "@/components/pokemon-theme";
+import { HabitatDock, PokedexButton, PokemonHabitat } from "@/components/pokemon-theme";
 import { GAMES_HREF, PORTFOLIO_HREF } from "@/lib/navigation";
 import { personalProjects, projects } from "@/lib/projects";
 import styles from "./bento-board.module.css";
@@ -57,6 +57,7 @@ export default function BentoBoard() {
   return (
     <div className={styles.page}>
       <PokemonHabitat />
+      <HabitatDock />
 
       <main className={styles.board}>
         <nav className={styles.rail} aria-label="Portfolio navigation">
@@ -72,7 +73,7 @@ export default function BentoBoard() {
           </p>
           <div className={styles.profileBody}>
             <div className={styles.themePick}>
-              <ThemeSelector />
+              <PokedexButton />
             </div>
             <div className={styles.portrait} aria-hidden="true">
               <span className={styles.portraitRing} />

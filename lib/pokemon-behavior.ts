@@ -38,11 +38,12 @@ const airZones: Zone[] = [
   { left: 91, right: 99, top: 22, bottom: 43 },
   { left: 1, right: 8, top: 48, bottom: 73 },
   { left: 92, right: 99, top: 52, bottom: 78 },
-  { left: 5, right: 28, top: 85, bottom: 96 },
+  // Starts clear of the habitat dock in the bottom-left corner.
+  { left: 12, right: 30, top: 85, bottom: 96 },
   { left: 72, right: 95, top: 84, bottom: 96 },
 ];
 const groundZones: Zone[] = [
-  { left: 1, right: 22, top: 97, bottom: 97 },
+  { left: 12, right: 26, top: 97, bottom: 97 },
   { left: 30, right: 46, top: 97, bottom: 97 },
   { left: 54, right: 70, top: 97, bottom: 97 },
   { left: 78, right: 98, top: 97, bottom: 97 },

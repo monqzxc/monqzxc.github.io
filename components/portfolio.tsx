@@ -11,7 +11,7 @@ import { personalProjects, projects } from "@/lib/projects";
 import { googleCertificates, monCv } from "@/lib/cv-data";
 import VueCraft from "@/components/vue-craft";
 import Hero from "@/components/hero";
-import { PokemonHabitat, ThemeSelector } from "@/components/pokemon-theme";
+import { HabitatDock, PokedexButton, PokemonHabitat } from "@/components/pokemon-theme";
 import { PokemonSprite } from "@/components/pokemon-sprite";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import styles from "./portfolio.module.css";
@@ -64,10 +64,11 @@ export default function Portfolio() {
             <a href="/cv" onClick={() => setMenuOpen(false)}>CV Studio</a>
             <button className={`nav-contact ${styles.navContact}`} type="button" aria-haspopup="dialog" onClick={event => { (menuOpen ? menuButton.current : event.currentTarget)?.focus({ preventScroll: true }); setMenuOpen(false); openContact(); }}>Let’s talk <ArrowUpRight size={16} aria-hidden="true" /></button>
           </div>
-          <ThemeSelector />
+          <PokedexButton />
         </nav>
       </header>
       <PokemonHabitat />
+      <HabitatDock />
 
       <main id="main" ref={revealRef}>
         <Hero onContact={openContact} />

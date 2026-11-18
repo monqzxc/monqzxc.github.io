@@ -35,6 +35,7 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | Hero introduction and artwork | `components/hero.tsx` |
 | Contact and timeline | `components/portfolio.tsx` |
 | Floating Pokéball menu and shared section links | `components/floating-menu.tsx`, `lib/navigation.ts` |
+| Habitat dock (bottom-left picker with countdown ring and pause) and the Pokédex button | `HabitatDock` and `PokedexButton` in `components/pokemon-theme.tsx` |
 | Email modal and Formspree endpoint | `components/contact-modal.tsx` |
 | Selected work titles, descriptions, and preview paths | `lib/projects.ts` |
 | Project cards and interactive preview dialogs | `components/project-card.tsx` |
@@ -67,7 +68,7 @@ The hero keeps the professional name, role, and work link prominent, with the pe
 
 ## Habitat rotation
 
-Every visit opens in a shuffled habitat (any of the five on a first visit, never the one you saw last time) and keeps shuffling to a new habitat and cast every 30 seconds. Picking a habitat in the picker turns that off for the rest of the visit, so it stays where you put it; you can also switch to "In order", change the interval (30 s, 1 min or 5 min) or pause. None of this is saved: the next visit starts shuffling every 30 seconds again. Only the last habitat is remembered, so the next visit can open somewhere else. The pre-paint script in `app/layout.tsx` picks the first habitat before the first frame. Each open tab rotates on its own; only the Pokédex is shared between tabs. Change `DEFAULT_ROTATION` in `lib/theme-rotation.ts` for a different starting rotation.
+The habitat picker lives in a small dock at the bottom-left of the screen, away from the trainer card and the Pokédex: the partner Pokémon in a circle whose rim counts down to the next habitat, a badge showing the mode, and a pause button (inside the picker on phones, where the dock is just the circle). Every visit opens in a shuffled habitat (any of the five on a first visit, never the one you saw last time) and keeps shuffling to a new habitat and cast every 30 seconds. Picking a habitat in the picker turns that off for the rest of the visit, so it stays where you put it; you can also switch to "In order", change the interval (30 s, 1 min or 5 min) or pause. None of this is saved: the next visit starts shuffling every 30 seconds again. Only the last habitat is remembered, so the next visit can open somewhere else. The pre-paint script in `app/layout.tsx` picks the first habitat before the first frame. Each open tab rotates on its own; only the Pokédex is shared between tabs. Change `DEFAULT_ROTATION` in `lib/theme-rotation.ts` for a different starting rotation.
 
 ## Grumpy Pokémon
 

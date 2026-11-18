@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { Popover } from "radix-ui";
-import { Check, ChevronDown, Pause, Play, Repeat, Shuffle } from "lucide-react";
+import { Check, ChevronUp, Pause, Play, Repeat, Shuffle } from "lucide-react";
 import { MoveEffect, PokemonMotion, PokemonSprite, ShinyBurst, ShinyGlow, ShinyStars } from "@/components/pokemon-sprite";
 import { PokemonCollection } from "@/components/pokemon-collection";
 import { PokemonScenery } from "@/components/pokemon-scenery";
@@ -211,27 +211,42 @@ function regularsOf(theme: PokemonTheme) {
   return RESIDENTS[theme].filter(species => !isSpecial(SPECIES[species]));
 }
 
-export function ThemeSelector() {
-  const { theme, setTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, releasePokemon, releaseAllPokemon, ready } = usePokemonTheme();
+/** The Pokédex, on its own wherever a page puts it (the trainer card's shoulder, the header). */
+export function PokedexButton() {
+  const { capturedPokemon, collectionError, releasePokemon, releaseAllPokemon } = usePokemonTheme();
+  return (
+    <div className="theme-controls">
+      <PokemonCollection capturedPokemon={capturedPokemon} storageError={collectionError} onRelease={releasePokemon} onReleaseAll={releaseAllPokemon} />
+    </div>
+  );
+}
+
+/**
+ * The habitat picker, docked at the bottom-left of the screen away from the page's own controls:
+ * the partner in a circle whose rim is the countdown to the next habitat, a mode badge, and pause.
+ */
+export function HabitatDock() {
+  const { theme, setTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, ready } = usePokemonTheme();
   const [open, setOpen] = useState(false);
   const rotating = rotation.mode !== "off";
   const ms = intervalMs(rotation.every);
 
   return (
-    <div className="theme-controls">
+    <div className="habitat-dock">
       <Popover.Root open={open} onOpenChange={setOpen}>
-        <Popover.Trigger className="theme-trigger" disabled={!ready} aria-busy={!ready} aria-label={`Habitat: ${SPECIES[theme].name}, ${THEMES[theme].type} type${rotating ? `, changing ${rotation.mode === "order" ? "in order" : "at random"}` : ""}. Change habitat`}>
-          <span className="theme-trigger-sprite" aria-hidden="true"><ThemePartner className="theme-sprite" /></span>
-          {rotating && (
-            <span className={`theme-rotation-badge ${counting ? "" : "is-held"}`} aria-hidden="true">
-              <Countdown key={cycle} ms={ms} elapsed={elapsed}>{style => <svg viewBox="0 0 20 20" style={style}><circle cx="10" cy="10" r="8.5" /></svg>}</Countdown>
-              {MODE_ICONS[rotation.mode]}
-            </span>
-          )}
-          <ChevronDown className="theme-trigger-chevron" size={14} aria-hidden="true" />
+        <Popover.Trigger className="habitat-dock-trigger" disabled={!ready} aria-busy={!ready} aria-label={`Habitat: ${SPECIES[theme].name}, ${THEMES[theme].type} type${rotating ? `, changing ${rotation.mode === "order" ? "in order" : "at random"}` : ""}. Change habitat`}>
+          <span className="habitat-dock-stage" aria-hidden="true"><ThemePartner className="habitat-dock-sprite" /></span>
+          {/* The ring and the button are the same circle, so the countdown always sits on its rim. */}
+          {rotating && <Countdown key={cycle} ms={ms} elapsed={elapsed}>{style => (
+            <svg className={`habitat-dock-ring ${counting ? "" : "is-held"}`} viewBox="0 0 48 48" style={style} aria-hidden="true">
+              <circle className="habitat-dock-track" cx="24" cy="24" r="22.5" />
+              <circle className="habitat-dock-progress" cx="24" cy="24" r="22.5" pathLength={1} />
+            </svg>
+          )}</Countdown>}
+          <span className="habitat-dock-mode" aria-hidden="true">{rotating ? MODE_ICONS[rotation.mode] : <ChevronUp size={13} strokeWidth={3} />}</span>
         </Popover.Trigger>
         <Popover.Portal>
-          <Popover.Content className="theme-panel" side="bottom" align="end" sideOffset={10} collisionPadding={12} aria-label="Habitat settings">
+          <Popover.Content className="theme-panel" side="top" align="start" sideOffset={12} collisionPadding={12} aria-label="Habitat settings">
             <div className="theme-panel-head">
               <p className="theme-panel-title">Choose a habitat</p>
               <p className="theme-panel-sub">{regularsOf(theme).length} Pokémon live in each. Rumour has it something rarer passes through…</p>
@@ -242,9 +257,10 @@ export function ThemeSelector() {
                 const info = THEMES[option];
                 const selected = option === theme;
                 return (
-                  // Just the partner: its sprite and name. The type stays in the accessible name.
+                  // Just the partner: its sprite and name. The type stays in the accessible name. Choosing the
+                  // habitat already showing also counts as a pick, so it stops rotating there too.
                   <label key={option} className={`theme-option ${selected ? "is-selected" : ""}`} style={{ "--swatch": info.swatch } as CSSProperties} title={`${SPECIES[option].name} · ${info.type}`}>
-                    <input className="sr-only" type="radio" name="pokemon-habitat" value={option} checked={selected} onChange={() => setTheme(option)} aria-label={`${SPECIES[option].name}, ${info.type} type`} />
+                    <input className="sr-only" type="radio" name="pokemon-habitat" value={option} checked={selected} onChange={() => setTheme(option)} onClick={() => { if (selected) setTheme(option); }} aria-label={`${SPECIES[option].name}, ${info.type} type`} />
                     <span className="theme-option-stage" aria-hidden="true"><PokemonSprite species={option} className="theme-option-sprite" /></span>
                     <span className="theme-option-name" aria-hidden="true">{SPECIES[option].name}</span>
                     <span className="theme-option-check" aria-hidden="true"><Check size={10} strokeWidth={3.5} /></span>
@@ -286,14 +302,18 @@ export function ThemeSelector() {
                     <Countdown key={cycle} ms={ms} elapsed={elapsed}>{style => <span className={`theme-next-bar ${counting ? "" : "is-held"}`} style={style} aria-hidden="true"><i /></span>}</Countdown>
                   </>}
             </p>
+            {/* On phones the dock is just the partner circle, so pausing lives here instead. */}
+            <button className="theme-panel-pause" type="button" aria-pressed={paused} onClick={() => setPaused(!paused)}>
+              {paused ? <Play size={14} aria-hidden="true" /> : <Pause size={14} aria-hidden="true" />}
+              {paused ? "Resume Pokémon and habitat changes" : "Pause Pokémon and habitat changes"}
+            </button>
             <Popover.Arrow className="theme-panel-arrow" width={14} height={7} />
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
       <button className="habitat-pause" type="button" aria-label={paused ? "Resume Pokémon and habitat changes" : "Pause Pokémon and habitat changes"} aria-pressed={paused} title={paused ? "Resume Pokémon and habitat changes" : "Pause Pokémon and habitat changes"} onClick={() => setPaused(!paused)}>
-        {paused ? <Play size={13} aria-hidden="true" /> : <Pause size={13} aria-hidden="true" />}
+        {paused ? <Play size={14} aria-hidden="true" /> : <Pause size={14} aria-hidden="true" />}
       </button>
-      <PokemonCollection capturedPokemon={capturedPokemon} storageError={collectionError} onRelease={releasePokemon} onReleaseAll={releaseAllPokemon} />
     </div>
   );
 }
