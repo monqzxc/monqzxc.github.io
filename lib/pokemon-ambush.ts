@@ -8,11 +8,13 @@ export type PokemonAmbushShot = {
   /** For the screen-reader line: "Shiny Gengar used Shadow Ball!" */
   attacker: string;
   moveName: string;
+  /** A legendary or mythical's signature move: bigger, gold, and it knocks the cursor out for longer. */
+  legend?: boolean;
 };
 
 /** Fired as a resident starts winding up; `at` is just above its head, in viewport pixels. */
 export const POKEMON_AMBUSH_TAUNT_EVENT = "pokemon-ambush-taunt";
-export type PokemonAmbushTaunt = { at: AmbushPoint; text: string };
+export type PokemonAmbushTaunt = { at: AmbushPoint; text: string; legend?: boolean };
 
 /** Fired by a grumpy resident; the cursor layer flies the shot and decides hit or miss. */
 export const POKEMON_AMBUSH_EVENT = "pokemon-ambush-fire";
@@ -28,6 +30,12 @@ export const AMBUSH_WINDUP_MS = 420;
  * (the ice breaks, the rock lifts), then the reform. Clicks and hovers do nothing until it's back.
  */
 export const CURSOR_KO_MS = 3000;
+/** …and a little longer when a legendary or mythical lands its signature move. */
+export const LEGEND_KO_MS = 3500;
+/** Chance that a legendary or mythical slipping away from the cursor attacks it on the way out. */
+export const LEGEND_ATTACK_ODDS = .4;
+
+export const knockoutMs = (shot: Pick<PokemonAmbushShot, "legend">) => shot.legend ? LEGEND_KO_MS : CURSOR_KO_MS;
 /** Within this many pixels of the aim point when the shot lands counts as a hit. */
 export const CURSOR_HIT_RADIUS = 30;
 
@@ -37,8 +45,8 @@ const SHOT_MAX_MS = 340;
 
 type Random = () => number;
 
-export function rollAmbush(now: number, lastAmbushAt: number, random: Random = Math.random): boolean {
-  return now - lastAmbushAt >= AMBUSH_COOLDOWN_MS && random() < AMBUSH_ODDS;
+export function rollAmbush(now: number, lastAmbushAt: number, random: Random = Math.random, odds = AMBUSH_ODDS): boolean {
+  return now - lastAmbushAt >= AMBUSH_COOLDOWN_MS && random() < odds;
 }
 
 /** Fast enough that a still cursor gets hit, slow enough that a flick can dodge it. */

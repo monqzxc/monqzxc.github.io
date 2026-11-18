@@ -566,3 +566,17 @@ test("every visit opens on a shuffled habitat and keeps shuffling every 30 secon
     assert.equal(visit(new Map(last ? [[rotation.THEME_STORAGE_KEY, last]] : []), seededRandom(seed)), rotation.visitTheme(last, seededRandom(seed)));
   }
 });
+
+test("legendaries and mythicals can hit the cursor with their signature move, for longer", async () => {
+  const ambush = await import("../lib/pokemon-ambush.ts");
+  assert.equal(ambush.LEGEND_KO_MS, 3500);
+  assert.equal(ambush.knockoutMs({ legend: true }), 3500);
+  assert.equal(ambush.knockoutMs({}), ambush.CURSOR_KO_MS);
+  assert.ok(ambush.LEGEND_ATTACK_ODDS > 0 && ambush.LEGEND_ATTACK_ODDS < 1);
+  assert.equal(ambush.rollAmbush(10_000, -Infinity, () => .3, ambush.LEGEND_ATTACK_ODDS), true, "legend odds apply");
+  assert.equal(ambush.rollAmbush(10_000, -Infinity, () => .3), false, "regular odds are lower");
+  assert.equal(ambush.rollAmbush(10_000, 9_000, () => 0, ambush.LEGEND_ATTACK_ODDS), false, "the shared cooldown still holds");
+  // Every signature move is its own: no two rare visitors share one.
+  const specials = everyone.filter(species => isSpecial(SPECIES[species]));
+  assert.equal(new Set(specials.map(species => SPECIES[species].moveName)).size, specials.length);
+});

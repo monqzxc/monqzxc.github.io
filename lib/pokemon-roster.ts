@@ -97,7 +97,7 @@ export const SPECIES: Record<PokemonSpecies, SpeciesInfo> = {
   },
   giratina: {
     name: "Giratina", movement: "air", exit: "fade", ghost: true, legendary: true, scale: 6.5, compactScale: 2.5,
-    repertoire: {}, move: "dragon-flame", moveName: "Dragon Breath", reaction: "roar", cry: "GRAAAH!",
+    repertoire: {}, move: "shadow-ball", moveName: "Shadow Force", reaction: "roar", cry: "GRAAAH!",
   },
   mismagius: {
     name: "Mismagius", movement: "air", exit: "fade", ghost: true, scale: 2, compactScale: 1.5,
@@ -185,7 +185,7 @@ export const SPECIES: Record<PokemonSpecies, SpeciesInfo> = {
   },
   groudon: {
     name: "Groudon", movement: "ground", exit: "burrow", legendary: true, scale: 5.5, compactScale: 2.5,
-    repertoire: {}, move: "fire-plume", moveName: "Eruption", reaction: "roar", cry: "GROOOAR!",
+    repertoire: {}, move: "rock", moveName: "Precipice Blades", reaction: "roar", cry: "GROOOAR!",
   },
   cubone: {
     name: "Cubone", movement: "ground", exit: "fade", scale: 1.5, compactScale: 1,
@@ -572,7 +572,7 @@ export const SPECIES: Record<PokemonSpecies, SpeciesInfo> = {
   },
   landorus: {
     name: "Landorus", movement: "air", exit: "fade", legendary: true, scale: 4.5, compactScale: 2.5,
-    repertoire: {}, move: "rock", moveName: "Earth Power", reaction: "roar", cry: "LANDOOR!",
+    repertoire: {}, move: "gust", moveName: "Sandsear Storm", reaction: "roar", cry: "LANDOOR!",
   },
   zygarde: {
     name: "Zygarde", movement: "ground", exit: "burrow", legendary: true, scale: 5, compactScale: 2.5,
@@ -702,7 +702,7 @@ export const SPECIES: Record<PokemonSpecies, SpeciesInfo> = {
   },
   entei: {
     name: "Entei", movement: "ground", exit: "fade", legendary: true, scale: 4.5, compactScale: 2.5,
-    repertoire: {}, move: "fire-plume", moveName: "Sacred Fire", reaction: "roar", cry: "ENTEEEI!",
+    repertoire: {}, move: "fire-plume", moveName: "Eruption", reaction: "roar", cry: "ENTEEEI!",
   },
   volcanion: {
     name: "Volcanion", movement: "ground", exit: "fade", mythical: true, scale: 3.5, compactScale: 2,
@@ -769,7 +769,7 @@ export const SPECIES: Record<PokemonSpecies, SpeciesInfo> = {
   },
   zarude: {
     name: "Zarude", movement: "ground", exit: "fade", mythical: true, scale: 3, compactScale: 2,
-    repertoire: {}, move: "claw", moveName: "Jungle Healing", reaction: "roar", cry: "ZARUUUDE!",
+    repertoire: {}, move: "razor-leaf", moveName: "Power Whip", reaction: "roar", cry: "ZARUUUDE!",
   },
 };
 

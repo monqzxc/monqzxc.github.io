@@ -12,7 +12,7 @@ import { createCast, createPokemonRoutine, dashPokemonRoutine, LEGEND_PHASE_MS, 
 import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCapture, releaseAllPokemonCaptures, releasePokemonCapture, shouldAnimatePokemonCapture, type CapturedPokemon, type PokemonReleaseResult } from "@/lib/pokemon-collection";
 import { isPokemonCaptureAnimation, POKEMON_CAPTURE_END_EVENT, POKEMON_CAPTURE_MS, POKEMON_CAPTURE_START_EVENT, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
 import { MOTION } from "@/lib/pokemon-motion";
-import { AMBUSH_WINDUP_MS, POKEMON_AMBUSH_EVENT, POKEMON_AMBUSH_TAUNT_EVENT, rollAmbush, type AmbushPoint, type PokemonAmbushShot, type PokemonAmbushTaunt } from "@/lib/pokemon-ambush";
+import { AMBUSH_WINDUP_MS, LEGEND_ATTACK_ODDS, POKEMON_AMBUSH_EVENT, POKEMON_AMBUSH_TAUNT_EVENT, rollAmbush, type AmbushPoint, type PokemonAmbushShot, type PokemonAmbushTaunt } from "@/lib/pokemon-ambush";
 import { MOVES, RESIDENTS, SPECIES, SPRITE_FEET, SPRITE_SIZE, THEME_ORDER, THEMES, type PokemonSpecies, type PokemonTheme } from "@/lib/pokemon-roster";
 import { DEFAULT_ROTATION, intervalMs, nextTheme, parseTheme, ROTATION_INTERVALS, ROTATION_MODES, THEME_STORAGE_KEY, type Rotation, type RotationMode } from "@/lib/theme-rotation";
 
@@ -425,8 +425,9 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
     setHoverDodgeFeedback(false);
   }
 
-  function taunt(at: AmbushPoint, text: string) {
-    window.dispatchEvent(new CustomEvent<PokemonAmbushTaunt>(POKEMON_AMBUSH_TAUNT_EVENT, { detail: { at, text } }));
+  function taunt(at: AmbushPoint, text: string, legend = false) {
+    if (!text) return;
+    window.dispatchEvent(new CustomEvent<PokemonAmbushTaunt>(POKEMON_AMBUSH_TAUNT_EVENT, { detail: { at, text, legend } }));
   }
 
   /** Legendaries and mythicals, fully on stage and not already busy with you. */
@@ -436,8 +437,8 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
       && !isHiddenActivity(activity) && !isEntranceActivity(activity) && activity !== "vanish" && activity !== "burrow";
   }
 
-  /** Blink out and back in elsewhere, or go intangible so the cursor passes straight through. */
-  function evade(kind: LegendEvasion, text: string) {
+  /** Blink out and back in elsewhere, or go intangible so the cursor passes straight through. No text, no taunt. */
+  function evade(kind: LegendEvasion, text = "") {
     if (timer.current) clearTimeout(timer.current);
     if (evadeTimer.current) clearTimeout(evadeTimer.current);
     clearDodge();
@@ -466,15 +467,16 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
   /** Regulars only, fully on stage and minding their own business. Legendaries slip away instead. */
   function canAmbush() {
     const { activity } = routine;
-    return !reducedMotion && !paused && !isSpecial(info) && !happy && !capturing && !ambush && !dashing
+    return !reducedMotion && !paused && !happy && !capturing && !ambush && !dashing && evasion === null
       && !isHiddenActivity(activity) && !isEntranceActivity(activity) && activity !== "vanish" && activity !== "burrow";
   }
 
   function startAmbush(cursor: AmbushPoint, facing: 1 | -1, resident: DOMRect) {
     lastAmbushAt = performance.now();
     // Said in the cursor layer, above the page, since the resident itself may sit behind a card.
-    const taunt: PokemonAmbushTaunt = { at: { x: resident.left + resident.width / 2, y: resident.top + resident.height * .12 }, text: `Hmph! ${info.moveName}!` };
-    window.dispatchEvent(new CustomEvent(POKEMON_AMBUSH_TAUNT_EVENT, { detail: taunt }));
+    // A legendary or mythical announces its signature move with its own cry.
+    const legend = isSpecial(info);
+    taunt({ x: resident.left + resident.width / 2, y: resident.top + resident.height * .12 }, legend ? `${info.cry} ${info.moveName}!` : `Hmph! ${info.moveName}!`, legend);
     aimRef.current = cursor;
     setAmbush({ facing });
     ambushTimer.current = setTimeout(() => fireAmbush(facing), AMBUSH_WINDUP_MS);
@@ -487,8 +489,15 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
     if (!resident || !slotElement) return setAmbush(null);
     const target = aimRef.current;
     const origin = { x: resident.left + resident.width * (facing > 0 ? .64 : .36), y: resident.top + resident.height * .48 };
-    const shot: PokemonAmbushShot = { origin, target, move: info.move, attacker: shinyName, moveName: info.moveName };
+    const legend = isSpecial(info);
+    const shot: PokemonAmbushShot = { origin, target, move: info.move, attacker: shinyName, moveName: info.moveName, legend };
     window.dispatchEvent(new CustomEvent(POKEMON_AMBUSH_EVENT, { detail: shot }));
+    // A legendary or mythical doesn't run: it vanishes and reappears somewhere else.
+    if (legend) {
+      setAmbush(null);
+      evade("teleport");
+      return;
+    }
     // Bolt from where it really stands: travel may have been paused mid-stride, so read the live offset.
     const offset = new DOMMatrixReadOnly(getComputedStyle(slotElement).transform);
     const position = {
@@ -576,14 +585,20 @@ function PokemonResident({ species, home, entering, slot, compact, bounds, scale
           <button ref={residentRef} type="button" className="pokemon-resident" onClick={greet} aria-label={`Say hello to ${shinyName}`}
             onPointerEnter={event => {
               if (event.pointerType !== "mouse") return;
-              if (canAmbush() && rollAmbush(performance.now(), lastAmbushAt)) {
-                const rect = event.currentTarget.getBoundingClientRect();
-                startAmbush({ x: event.clientX, y: event.clientY }, event.clientX < rect.left + rect.width / 2 ? -1 : 1, rect);
+              const rect = event.currentTarget.getBoundingClientRect();
+              const facing = event.clientX < rect.left + rect.width / 2 ? -1 : 1;
+              if (!isSpecial(info) && canAmbush() && rollAmbush(performance.now(), lastAmbushAt)) {
+                startAmbush({ x: event.clientX, y: event.clientY }, facing, rect);
                 return;
               }
-              // A legendary or mythical you haven't caught slips away until it tires.
+              // A legendary or mythical you haven't caught slips away until it tires…
               const slips = isSpecial(info) && !alreadyCaptured && canEvade() && stamina.current > 0;
               if (slips) stamina.current -= 1;
+              // …and sometimes hits the cursor with its signature move on the way out.
+              if (slips && canAmbush() && rollAmbush(performance.now(), lastAmbushAt, Math.random, LEGEND_ATTACK_ODDS)) {
+                startAmbush({ x: event.clientX, y: event.clientY }, facing, rect);
+                return;
+              }
               if (slips && !reducedMotion) {
                 const kind = pickLegendEvasion(info);
                 evade(kind, pickTaunt(kind === "phase" ? PHASE_TAUNTS : TELEPORT_TAUNTS));

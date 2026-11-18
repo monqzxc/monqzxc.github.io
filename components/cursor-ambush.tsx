@@ -3,16 +3,15 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { MoveEffect } from "@/components/pokemon-sprite";
-import { afflictedStep, CURSOR_KO_MS, isCursorHit, MOVE_STATUS, MOVE_TINT, STATUS_TEXT, type CursorStatus, POKEMON_AMBUSH_EVENT, POKEMON_AMBUSH_TAUNT_EVENT, shotDuration, type AmbushPoint, type PokemonAmbushShot, type PokemonAmbushTaunt } from "@/lib/pokemon-ambush";
+import { afflictedStep, CURSOR_KO_MS, isCursorHit, knockoutMs, MOVE_STATUS, MOVE_TINT, STATUS_TEXT, type CursorStatus, POKEMON_AMBUSH_EVENT, POKEMON_AMBUSH_TAUNT_EVENT, shotDuration, type AmbushPoint, type PokemonAmbushShot, type PokemonAmbushTaunt } from "@/lib/pokemon-ambush";
 import { MOVES, type MoveId } from "@/lib/pokemon-roster";
 
 type Shot = PokemonAmbushShot & { id: number; ms: number };
-type Impact = { id: number; at: AmbushPoint; move: MoveId; hit: boolean };
+type Impact = { id: number; at: AmbushPoint; move: MoveId; hit: boolean; legend: boolean; ms: number };
 type Taunt = PokemonAmbushTaunt & { id: number };
 
-/** The hit flash and battle text stay up as long as the cursor is knocked out. */
-const IMPACT_MS = CURSOR_KO_MS;
-type Knockout = { id: number; status: CursorStatus; tint: string; dir: AmbushPoint; hit: AmbushPoint };
+/** The hit flash and battle text stay up as long as the cursor is knocked out (knockoutMs). */
+type Knockout = { id: number; status: CursorStatus; tint: string; dir: AmbushPoint; hit: AmbushPoint; ms: number };
 const TAUNT_MS = 900;
 
 // The arrow on a 12×19 grid, hotspot at its tip (0, 0), and the five pieces it shatters into:
@@ -49,7 +48,7 @@ function bits(count: number, className: string) {
 
 /**
  * What the move does to the cursor, drawn at twice its size around the arrow's tip at (0, 0). Each
- * status sets in, holds (looping its flames, drips, stars…) and finishes within CURSOR_KO_MS; the
+ * status sets in, holds (looping its flames, drips, stars…) and finishes within the knockout; the
  * last stretch belongs to the reform at the pointer.
  */
 function CursorStatusEffect({ status, tint, dir }: { status: CursorStatus; tint: string; dir: AmbushPoint }) {
@@ -88,7 +87,7 @@ function aim(origin: AmbushPoint, target: AmbushPoint) {
 /**
  * The habitat's grumpy side. Residents fire shots at the cursor through POKEMON_AMBUSH_EVENT; this
  * layer flies them, and if the cursor is still on the aim point when one lands, the move does its
- * thing to the cursor (burns, freezes, soaks it…) for CURSOR_KO_MS while the real one is hidden,
+ * thing to the cursor (burns, freezes, soaks it…) for knockoutMs while the real one is hidden,
  * then it pieces itself back together wherever the pointer has got to. Taunts are said here too.
  */
 export function CursorAmbushLayer() {
@@ -139,18 +138,19 @@ export function CursorAmbushLayer() {
         const length = Math.hypot(dx, dy);
         const dir = length > 0 ? { x: dx / length, y: dy / length } : { x: 1, y: 0 };
         setShots(current => current.filter(shot => shot.id !== id));
-        setImpacts(current => [...current, { id, at: detail.target, move: detail.move, hit }]);
-        later(() => setImpacts(current => current.filter(impact => impact.id !== id)), IMPACT_MS);
-        setAnnouncement(`${detail.attacker} used ${detail.moveName}! ${hit ? `It's super effective. Your cursor ${STATUS_TEXT[MOVE_STATUS[detail.move]]}` : "It missed!"}`);
+        setImpacts(current => [...current, { id, at: detail.target, move: detail.move, hit, legend: Boolean(detail.legend), ms: knockoutMs(detail) }]);
+        const ms = knockoutMs(detail);
+        later(() => setImpacts(current => current.filter(impact => impact.id !== id)), ms);
+        setAnnouncement(`${detail.attacker} used ${detail.moveName}! ${hit ? `${detail.legend ? "A critical hit" : "It's super effective"}. Your cursor ${STATUS_TEXT[MOVE_STATUS[detail.move]]}` : "It missed!"}`);
         if (!hit) return;
         // A second hit while knocked out just restarts the count.
         root.dataset.cursorKo = "";
-        setKo({ id, status: MOVE_STATUS[detail.move], tint: MOVE_TINT[detail.move], dir, hit: detail.target });
+        setKo({ id, status: MOVE_STATUS[detail.move], tint: MOVE_TINT[detail.move], dir, hit: detail.target, ms });
         clearTimeout(koTimer);
         koTimer = setTimeout(() => {
           delete root.dataset.cursorKo;
           setKo(null);
-        }, CURSOR_KO_MS);
+        }, ms);
       }, ms);
     };
 
@@ -188,8 +188,8 @@ export function CursorAmbushLayer() {
     <>
       <span className="sr-only" role="status">{announcement}</span>
       {(taunts.length > 0 || shots.length > 0 || impacts.length > 0 || ko !== null) && createPortal(
-        <div className="cursor-ambush-layer" style={{ "--ko-ms": `${CURSOR_KO_MS}ms` } as CSSProperties} aria-hidden="true">
-          {taunts.map(taunt => <span key={taunt.id} className="cursor-taunt" style={{ left: taunt.at.x, top: taunt.at.y }}>{taunt.text}</span>)}
+        <div className="cursor-ambush-layer" style={{ "--ko-ms": `${ko?.ms ?? CURSOR_KO_MS}ms` } as CSSProperties} aria-hidden="true">
+          {taunts.map(taunt => <span key={taunt.id} className={`cursor-taunt${taunt.legend ? " is-legend" : ""}`} style={{ left: taunt.at.x, top: taunt.at.y }}>{taunt.text}</span>)}
           {shots.map(shot => {
             const travels = MOVES[shot.move].kind !== "burst";
             const style = {
@@ -200,17 +200,17 @@ export function CursorAmbushLayer() {
             return (
               <span key={shot.id}>
                 {/* Lock-on: shrinks onto the aim point for as long as the shot is in the air. */}
-                <span className="cursor-lock" style={{ left: shot.target.x, top: shot.target.y, "--shot-ms": `${shot.ms}ms`, "--tint": MOVE_TINT[shot.move] } as CSSProperties} />
-                {travels && <span className="cursor-shot" style={style}>
+                <span className={`cursor-lock${shot.legend ? " is-legend" : ""}`} style={{ left: shot.target.x, top: shot.target.y, "--shot-ms": `${shot.ms}ms`, "--tint": MOVE_TINT[shot.move] } as CSSProperties} />
+                {travels && <span className={`cursor-shot${shot.legend ? " is-legend" : ""}`} style={style}>
                   <span className="cursor-shot-aim" style={{ transform: aim(shot.origin, shot.target) }}><MoveEffect move={shot.move} className="cursor-shot-move" /></span>
                 </span>}
               </span>
             );
           })}
           {impacts.map(impact => (
-            <span key={impact.id} className={`cursor-impact ${impact.hit ? "is-hit" : "is-miss"}`} style={{ left: impact.at.x, top: impact.at.y } as CSSProperties}>
+            <span key={impact.id} className={`cursor-impact ${impact.hit ? "is-hit" : "is-miss"}${impact.legend ? " is-legend" : ""}`} style={{ left: impact.at.x, top: impact.at.y, "--ko-ms": `${impact.ms}ms` } as CSSProperties}>
               <MoveEffect move={MOVES[impact.move].kind === "burst" ? impact.move : "hit"} className="cursor-impact-move" />
-              <span className="cursor-impact-text">{impact.hit ? <><b>It&rsquo;s super effective!</b>Your cursor {STATUS_TEXT[MOVE_STATUS[impact.move]]}</> : "It missed!"}</span>
+              <span className="cursor-impact-text">{impact.hit ? <><b>{impact.legend ? "A critical hit!" : <>It&rsquo;s super effective!</>}</b>Your cursor {STATUS_TEXT[MOVE_STATUS[impact.move]]}</> : "It missed!"}</span>
             </span>
           ))}
           {/* The cursor really is out of action: nothing under it can be clicked or hovered. */}
