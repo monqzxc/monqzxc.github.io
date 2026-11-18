@@ -72,6 +72,7 @@ function CursorStatusEffect({ status, tint, dir }: { status: CursorStatus; tint:
       {status === "confuse" && <span className="cursor-dizzy-ring">{bits(3, "cursor-dizzy")}</span>}
       {status === "blow" && <span className="cursor-gusts">{bits(4, "cursor-gust")}</span>}
       {status === "crush" && <><MoveEffect move="rock" className="cursor-rock" />{bits(4, "cursor-dust")}</>}
+      {status === "paralyze" && <><i className="cursor-zap" />{[0, 1, 2].map(index => <MoveEffect key={index} move="electricity" className="cursor-spark" style={{ "--i": index } as CSSProperties} />)}</>}
       {status === "charm" && [0, 1, 2, 3, 4].map(index => <MoveEffect key={index} move="heart" className="cursor-heart" style={{ "--i": index } as CSSProperties} />)}
     </span>
   );

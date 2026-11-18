@@ -115,6 +115,27 @@
   --media-bg: linear-gradient(140deg, #c9f0a5, #6fbf73 55%, #6fd0c4);
 }
 
+/* The other thirteen types: derived from the habitat's palette tokens (app/elemental-theme.css). */
+:global(:root[data-pokemon-theme]:not(:where([data-pokemon-theme="gengar"], [data-pokemon-theme="gible"], [data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]))) .page {
+  --board: var(--hab-surface);
+  --board-edge: color-mix(in srgb, var(--hab-tone) 17%, transparent);
+  --profile-bg: color-mix(in srgb, var(--hab-tone) 88%, #000);
+  --profile-fg: var(--hab-on-tone);
+  --portrait-disc: var(--hab-tone-2);
+  --seal-bg: color-mix(in srgb, var(--hab-tone) 4%, #fff);
+  --seal-fg: var(--hab-on-tone);
+  --seal-accent: color-mix(in srgb, var(--hab-tone) 50%, #000);
+  --tile-a-bg: var(--hab-tone-2);
+  --tile-a-fg: color-mix(in srgb, var(--hab-tone-2) 12%, #000);
+  --tile-b-bg: color-mix(in srgb, var(--hab-tone) 42%, #000);
+  --tile-b-fg: #ffffff;
+  --tile-c-bg: color-mix(in srgb, var(--hab-surface) 82%, var(--hab-tone));
+  --tile-c-fg: var(--foreground);
+  --tile-d-bg: var(--hab-tone-3, var(--hab-tone));
+  --tile-d-fg: color-mix(in srgb, var(--hab-tone-3, var(--hab-tone)) 12%, #000);
+  --media-bg: linear-gradient(140deg, color-mix(in srgb, var(--hab-tone) 55%, #fff), var(--hab-tone) 55%, var(--hab-tone-2));
+}
+
 .board {
   position: relative;
   z-index: 1;

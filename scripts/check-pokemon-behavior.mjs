@@ -161,7 +161,14 @@ test("special catches use a 50% roll while ordinary catches are guaranteed", () 
   assert.equal(rollPokemonCatch(true, () => 0.999999), false);
 });
 
-test("each theme has fifteen residents of its type, at most five on stage", () => {
+test("one habitat per type, each led by its partner", () => {
+  assert.equal(THEME_ORDER.length, 18);
+  assert.equal(new Set(THEME_ORDER.map(theme => THEMES[theme].type)).size, 18, "every type once");
+  assert.equal(new Set(THEME_ORDER.map(theme => THEMES[theme].swatch)).size, 18, "every swatch distinct");
+  for (const theme of THEME_ORDER) assert.match(THEMES[theme].swatch, /^#[0-9a-f]{6}$/);
+});
+
+test("each theme has twenty-eight residents of its type, at most five on stage", () => {
   const additions = {
     gengar: ["duskull", "drifloon", "litwick", "phantump", "pumpkaboo"],
     gible: ["sandshrew", "trapinch", "rhyhorn", "drilbur", "numel"],
@@ -181,13 +188,14 @@ test("each theme has fifteen residents of its type, at most five on stage", () =
   for (const theme of THEME_ORDER) {
     assert.ok(THEMES[theme].habitat);
     assert.equal(RESIDENTS[theme].length, 28);
-    assert.deepEqual(RESIDENTS[theme].slice(10, 15), additions[theme], "the second wave matches its habitat");
-    assert.deepEqual(RESIDENTS[theme].slice(-13), thirdWave[theme], "the third wave matches its habitat");
+    if (additions[theme]) assert.deepEqual(RESIDENTS[theme].slice(10, 15), additions[theme], "the second wave matches its habitat");
+    if (thirdWave[theme]) assert.deepEqual(RESIDENTS[theme].slice(-13), thirdWave[theme], "the third wave matches its habitat");
     assert.equal(new Set(RESIDENTS[theme]).size, 28);
     assert.equal(RESIDENTS[theme].filter(species => isSpecial(SPECIES[species])).length, 5, "five rare visitors per habitat");
     assert.equal(RESIDENTS[theme].filter(species => !isSpecial(SPECIES[species])).length, 23);
     assert.ok(RESIDENTS[theme].some(species => SPECIES[species].legendary));
-    assert.ok(RESIDENTS[theme].some(species => SPECIES[species].mythical));
+    // Not every type has a mythical to spare; the first five habitats each have one.
+    if (additions[theme]) assert.ok(RESIDENTS[theme].some(species => SPECIES[species].mythical));
     assert.ok(!RESIDENTS[theme].some(species => SPECIES[species].legendary && SPECIES[species].mythical));
     assert.equal(RESIDENTS[theme][0], theme, "the theme's partner leads its roster");
     if (theme === "gengar") assert.ok(RESIDENTS[theme].every(species => SPECIES[species].ghost), "the graveyard is all Ghost types");
@@ -242,7 +250,7 @@ test("shuffle always moves to a different habitat and reaches them all", () => {
   const random = seededRandom(11);
   const seen = new Set();
   let theme = "gible";
-  for (let step = 0; step < 100; step++) seen.add(theme = nextTheme(theme, "shuffle", random));
+  for (let step = 0; step < 400; step++) seen.add(theme = nextTheme(theme, "shuffle", random));
   assert.equal(seen.size, THEME_ORDER.length);
 });
 
@@ -523,7 +531,9 @@ test("an afflicted cursor is pinned, follows, trails or mirrors the pointer by s
 test("every resident has a sprite sheet, and side-view strips unless it has none upstream", async () => {
   const { existsSync } = await import("node:fs");
   const { MOTION } = await import("../lib/pokemon-motion.ts");
-  const faceOn = new Set(["diglett", "dugtrio", "zarude", "duskull", "drifloon", "litwick", "phantump", "pumpkaboo", "sandshrew", "trapinch", "rhyhorn", "drilbur", "numel", "mudkip", "buizel", "poliwag", "clamperl", "finneon", "torchic", "fennekin", "litten", "fuecoco", "charcadet", "snivy", "turtwig", "seedot", "petilil", "smoliv"]);
+  const faceOn = new Set(["diglett", "dugtrio", "zarude", "duskull", "drifloon", "litwick", "phantump", "pumpkaboo", "sandshrew", "trapinch", "rhyhorn", "drilbur", "numel", "mudkip", "buizel", "poliwag", "clamperl", "finneon", "torchic", "fennekin", "litten", "fuecoco", "charcadet", "snivy", "turtwig", "seedot", "petilil", "smoliv",
+    // No Walk or Attack animation on SpriteCollab yet.
+    "miraidon", "chien_pao", "glastrier", "throh", "koraidon", "shroodle", "okidogi", "pecharunt", "toucannon", "shelmet", "karrablast", "iron_boulder", "maschiff", "ting_lu", "copperajah", "gimmighoul", "aromatisse", "milcery"]);
   for (const species of everyone) {
     assert.ok(existsSync(new URL(`../public/sprites/pokemon/${species}.png`, import.meta.url)), `${species} has a sheet`);
     if (!faceOn.has(species)) assert.ok(MOTION[species], `${species} has walk and attack strips`);

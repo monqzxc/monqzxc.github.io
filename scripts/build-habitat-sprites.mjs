@@ -16,7 +16,9 @@ mkdirSync(spritesOut, { recursive: true });
 mkdirSync(movesOut, { recursive: true });
 
 const side = SPRITE_SIZE * 2;
-for (const species of [...Object.keys(SPECIES), ...PORTRAITS]) {
+// Portraits that also live in a habitat are packed once.
+const sheets = new Set([...Object.keys(SPECIES), ...PORTRAITS]);
+for (const species of sheets) {
   const sheet = { width: side, height: side, pixels: Buffer.alloc(side * side * 4) };
   ["", "-shiny"].forEach((variant, row) => [0, 1].forEach(column => {
     const frame = readPng(new URL(`pokemon-sprites/${species}${variant}-${column}.png`, root));
@@ -99,4 +101,4 @@ ${Object.entries(motion).map(([species, info]) => `  ${species}: ${JSON.stringif
 `);
 
 for (const move of Object.keys(MOVES)) copyFileSync(new URL(`pokemon-moves/${move}.png`, root), new URL(`${move}.png`, movesOut));
-console.log(`Packed ${Object.keys(SPECIES).length + PORTRAITS.length} Pokémon sheets, their walk and attack strips, and ${Object.keys(MOVES).length} move strips.`);
+console.log(`Packed ${sheets.size} Pokémon sheets, their walk and attack strips, and ${Object.keys(MOVES).length} move strips.`);

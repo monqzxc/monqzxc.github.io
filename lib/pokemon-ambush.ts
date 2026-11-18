@@ -64,19 +64,20 @@ export function isCursorHit(target: AmbushPoint, pointer: AmbushPoint | null, ra
  * What a hit does to the cursor, by the element of the move. The cursor is out for CURSOR_KO_MS
  * whatever happens to it; the leftovers (ash, a puddle, hearts) may linger a little longer.
  */
-export type CursorStatus = "shatter" | "burn" | "soak" | "freeze" | "tangle" | "melt" | "possess" | "confuse" | "blow" | "crush" | "charm";
+export type CursorStatus = "shatter" | "burn" | "soak" | "freeze" | "tangle" | "melt" | "possess" | "confuse" | "blow" | "crush" | "charm" | "paralyze";
 
 export const MOVE_STATUS: Record<MoveId, CursorStatus> = {
-  "punch-impact": "shatter", claw: "shatter", bite: "shatter", hit: "shatter", swift: "shatter",
+  "punch-impact": "shatter", claw: "shatter", bite: "shatter", hit: "shatter", swift: "shatter", fist: "shatter", pin: "shatter",
   "small-ember": "burn", ember: "burn", "fire-plume": "burn", "dragon-flame": "burn", "dragon-plume": "burn",
   "water-gun": "soak", "water-splash": "soak",
-  "ice-chunk": "freeze",
+  "ice-chunk": "freeze", icicle: "freeze",
   "razor-leaf": "tangle", growth: "tangle",
   sludge: "melt", "sludge-splat": "melt",
   "shadow-ball": "possess",
   spiral: "confuse",
   gust: "blow", "air-cutter": "blow",
-  rock: "crush", mound: "crush",
+  rock: "crush", mound: "crush", metal: "crush",
+  electricity: "paralyze",
   "fairy-sparkle": "charm", heart: "charm", ring: "charm",
 };
 
@@ -87,7 +88,7 @@ export const MOVE_STATUS: Record<MoveId, CursorStatus> = {
  */
 export type StatusMotion = { follow: number; mirror?: boolean };
 export const STATUS_MOTION: Record<CursorStatus, StatusMotion> = {
-  shatter: { follow: 0 }, freeze: { follow: 0 }, crush: { follow: 0 }, tangle: { follow: 0 }, melt: { follow: 0 },
+  shatter: { follow: 0 }, freeze: { follow: 0 }, crush: { follow: 0 }, tangle: { follow: 0 }, melt: { follow: 0 }, paralyze: { follow: 0 },
   burn: { follow: 1 }, blow: { follow: .25 }, charm: { follow: .12 }, soak: { follow: .08 }, possess: { follow: .06 },
   confuse: { follow: .3, mirror: true },
 };
@@ -106,7 +107,7 @@ export function afflictedStep(status: CursorStatus, at: AmbushPoint, hit: Ambush
 export const STATUS_TEXT: Record<CursorStatus, string> = {
   shatter: "fainted!", burn: "was burned!", soak: "got soaked!", freeze: "was frozen solid!",
   tangle: "got tangled up!", melt: "was badly poisoned!", possess: "was possessed!", confuse: "became confused!",
-  blow: "was blown away!", crush: "was crushed!", charm: "fell in love!",
+  blow: "was blown away!", crush: "was crushed!", charm: "fell in love!", paralyze: "is paralyzed! It can't move!",
 };
 
 /** What the knocked-out cursor's shards are tinted with, by the element of the move that hit it. */
@@ -115,12 +116,14 @@ export const MOVE_TINT: Record<MoveId, string> = {
   sludge: "#c065e6", "sludge-splat": "#c065e6",
   "dragon-flame": "#7d78ff", "dragon-plume": "#7d78ff",
   "small-ember": "#ff7a2a", ember: "#ff7a2a", "fire-plume": "#ff7a2a",
-  "punch-impact": "#ffd36b", claw: "#f1f1f1", bite: "#f1f1f1", hit: "#ffd36b",
+  "punch-impact": "#ffd36b", claw: "#f1f1f1", bite: "#f1f1f1", hit: "#ffd36b", fist: "#ff8a3c",
   gust: "#cdeeff", "air-cutter": "#cdeeff",
   rock: "#c8a46a", mound: "#c8a46a",
   "water-gun": "#3fa9ff", "water-splash": "#3fa9ff",
-  "ice-chunk": "#a6ecff",
-  "razor-leaf": "#62c96c", growth: "#62c96c",
+  "ice-chunk": "#a6ecff", icicle: "#a6ecff",
+  electricity: "#ffe14a",
+  metal: "#c9d3dc",
+  "razor-leaf": "#62c96c", growth: "#62c96c", pin: "#7fd36a",
   swift: "#ffd23f",
   heart: "#ff9be0", ring: "#ff9be0", "fairy-sparkle": "#ff9be0",
 };
