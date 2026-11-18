@@ -273,7 +273,6 @@ export function HabitatRoulette({ theme, onSelect, onSpinLand, onHold, upcoming,
         <button type="button" className="roulette-spin" onClick={spin} disabled={userSpinning}>
           <Shuffle size={18} strokeWidth={2.6} aria-hidden="true" />{userSpinning ? "Spinning…" : "Spin!"}
         </button>
-        <span className="roulette-or" aria-hidden="true">or</span>
         <button type="button" className="roulette-random" onClick={() => choose(THEME_ORDER.indexOf(nextTheme(theme, "shuffle")), true)} disabled={userSpinning}>
           <Dice5 size={16} aria-hidden="true" />Pick random
         </button>
