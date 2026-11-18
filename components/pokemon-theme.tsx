@@ -3,9 +3,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { Popover } from "radix-ui";
-import { Check, ChevronUp, Pause, Play, Repeat, Shuffle } from "lucide-react";
+import { ChevronUp, Pause, Play, Repeat, Shuffle } from "lucide-react";
 import { MoveEffect, PokemonMotion, PokemonSprite, ShinyBurst, ShinyGlow, ShinyStars } from "@/components/pokemon-sprite";
 import { PokemonCollection } from "@/components/pokemon-collection";
+import { HabitatRoulette } from "@/components/habitat-roulette";
 import { PokemonScenery } from "@/components/pokemon-scenery";
 import { CursorAmbushLayer } from "@/components/cursor-ambush";
 import { createCast, createPokemonRoutine, dashPokemonRoutine, LEGEND_PHASE_MS, LEGEND_TELEPORT_IN_MS, LEGEND_TELEPORT_OUT_MS, pickLegendEvasion, rollLegendStamina, teleportPokemonRoutine, type LegendEvasion, isEntranceActivity, isHiddenActivity, isSpecial, isTravelActivity, nextPokemonRoutine, recast, recastCapturedResident, rollPokemonCatch, type CastMember } from "@/lib/pokemon-behavior";
@@ -230,6 +231,8 @@ export function HabitatDock() {
   const [open, setOpen] = useState(false);
   const rotating = rotation.mode !== "off";
   const ms = intervalMs(rotation.every);
+  const nextIn = useCallback(() => ms - elapsed(), [ms, elapsed]);
+  const stopRotating = useCallback(() => setRotation({ ...rotation, mode: "off" }), [rotation, setRotation]);
 
   return (
     <div className="habitat-dock">
@@ -252,56 +255,44 @@ export function HabitatDock() {
               <p className="theme-panel-sub">{regularsOf(theme).length} Pokémon live in each. Rumour has it something rarer passes through…</p>
             </div>
 
-            <div className="theme-options" role="radiogroup" aria-label="Habitat">
-              {THEME_ORDER.map(option => {
-                const info = THEMES[option];
-                const selected = option === theme;
-                return (
-                  // Just the partner: its sprite and name. The type stays in the accessible name. Choosing the
-                  // habitat already showing also counts as a pick, so it stops rotating there too.
-                  <label key={option} className={`theme-option ${selected ? "is-selected" : ""}`} style={{ "--swatch": info.swatch } as CSSProperties} title={`${SPECIES[option].name} · ${info.type}`}>
-                    <input className="sr-only" type="radio" name="pokemon-habitat" value={option} checked={selected} onChange={() => setTheme(option)} onClick={() => { if (selected) setTheme(option); }} aria-label={`${SPECIES[option].name}, ${info.type} type`} />
-                    <span className="theme-option-stage" aria-hidden="true"><PokemonSprite species={option} className="theme-option-sprite" /></span>
-                    <span className="theme-option-name" aria-hidden="true">{SPECIES[option].name}</span>
-                    <span className="theme-option-check" aria-hidden="true"><Check size={10} strokeWidth={3.5} /></span>
-                  </label>
-                );
-              })}
+            <HabitatRoulette theme={theme} onSelect={setTheme} onSpinStart={stopRotating} upcoming={upcoming} counting={counting} cycle={cycle} nextIn={nextIn} markUpcoming={rotation.mode === "order"} />
+
+            {/* Timed changes, kept but quieter: when one is due the wheel spins itself and lands on it. */}
+            <div className="theme-auto">
+              <fieldset className="theme-setting">
+                <legend>Change automatically</legend>
+                <div className="theme-segmented" role="radiogroup" aria-label="Change automatically">
+                  {ROTATION_MODES.map(({ id, label }) => (
+                    <label key={id} className={rotation.mode === id ? "is-selected" : ""}>
+                      <input className="sr-only" type="radio" name="pokemon-rotation" value={id} checked={rotation.mode === id} onChange={() => setRotation({ ...rotation, mode: id })} />
+                      {id === "off" ? null : MODE_ICONS[id]}{label}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <fieldset className="theme-setting" disabled={!rotating}>
+                <legend>Every</legend>
+                <div className="theme-chips" role="radiogroup" aria-label="Change every">
+                  {ROTATION_INTERVALS.map(({ id, label }) => (
+                    <label key={id} className={rotation.every === id ? "is-selected" : ""}>
+                      <input className="sr-only" type="radio" name="pokemon-interval" value={id} checked={rotation.every === id} onChange={() => setRotation({ ...rotation, every: id })} />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <p className="theme-next" aria-live="polite">
+                {!rotating ? <>Stays with <strong>{SPECIES[theme].name}</strong> for this visit.</>
+                  : !upcoming ? null
+                  : <>
+                      <span className="theme-next-sprite" aria-hidden="true">{rotation.mode === "order" ? <PokemonSprite species={upcoming} /> : <Shuffle size={14} />}</span>
+                      <span>Up next: <strong>{rotation.mode === "order" ? SPECIES[upcoming].name : "a surprise"}</strong>{paused ? " · paused" : " · spins when the bar fills"}</span>
+                      <Countdown key={cycle} ms={ms} elapsed={elapsed}>{style => <span className={`theme-next-bar ${counting ? "" : "is-held"}`} style={style} aria-hidden="true"><i /></span>}</Countdown>
+                    </>}
+              </p>
             </div>
-
-            <fieldset className="theme-setting">
-              <legend>Change automatically</legend>
-              <div className="theme-segmented" role="radiogroup" aria-label="Change automatically">
-                {ROTATION_MODES.map(({ id, label }) => (
-                  <label key={id} className={rotation.mode === id ? "is-selected" : ""}>
-                    <input className="sr-only" type="radio" name="pokemon-rotation" value={id} checked={rotation.mode === id} onChange={() => setRotation({ ...rotation, mode: id })} />
-                    {id === "off" ? null : MODE_ICONS[id]}{label}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <fieldset className="theme-setting" disabled={!rotating}>
-              <legend>Every</legend>
-              <div className="theme-chips" role="radiogroup" aria-label="Change every">
-                {ROTATION_INTERVALS.map(({ id, label }) => (
-                  <label key={id} className={rotation.every === id ? "is-selected" : ""}>
-                    <input className="sr-only" type="radio" name="pokemon-interval" value={id} checked={rotation.every === id} onChange={() => setRotation({ ...rotation, every: id })} />
-                    {label}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <p className="theme-next" aria-live="polite">
-              {!rotating ? <>Stays with <strong>{SPECIES[theme].name}</strong> for this visit.</>
-                : !upcoming ? null
-                : <>
-                    <span className="theme-next-sprite" aria-hidden="true">{rotation.mode === "order" ? <PokemonSprite species={upcoming} /> : <Shuffle size={14} />}</span>
-                    <span>Up next: <strong>{rotation.mode === "order" ? SPECIES[upcoming].name : "a surprise"}</strong>{paused ? " · paused" : ""}</span>
-                    <Countdown key={cycle} ms={ms} elapsed={elapsed}>{style => <span className={`theme-next-bar ${counting ? "" : "is-held"}`} style={style} aria-hidden="true"><i /></span>}</Countdown>
-                  </>}
-            </p>
             {/* On phones the dock is just the partner circle, so pausing lives here instead. */}
             <button className="theme-panel-pause" type="button" aria-pressed={paused} onClick={() => setPaused(!paused)}>
               {paused ? <Play size={14} aria-hidden="true" /> : <Pause size={14} aria-hidden="true" />}

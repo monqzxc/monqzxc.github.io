@@ -590,3 +590,29 @@ test("legendaries and mythicals can hit the cursor with their signature move, fo
   const specials = everyone.filter(species => isSpecial(SPECIES[species]));
   assert.equal(new Set(specials.map(species => SPECIES[species].moveName)).size, specials.length);
 });
+
+test("the habitat roulette spins for 4s through its phases and lands exactly on the winner", async () => {
+  const { landingAngle, slotAtPointer, spinCurve, spinProgress, SPIN_MS, SPIN_PHASES, SPIN_TURNS } = await import("../lib/roulette-motion.ts");
+  assert.equal(SPIN_MS, 4000);
+  assert.deepEqual(SPIN_PHASES, { accelerate: 0, fast: 500, slow: 2500, landing: 3500 });
+  assert.equal(spinProgress(0), 0);
+  assert.equal(spinProgress(1), 1);
+  const curve = spinCurve();
+  for (let i = 1; i < curve.length; i++) assert.ok(curve[i].progress >= curve[i - 1].progress, "the wheel never turns back");
+  // Fastest while cruising, gentle at both ends: no abrupt start or stop.
+  const speed = (t, dt = .002) => (spinProgress(t + dt) - spinProgress(t)) / dt;
+  assert.ok(speed(.01) < speed(.3) / 4);
+  assert.ok(speed(.99) < speed(.3) / 50);
+  assert.ok(speed(.75) < speed(.3) && speed(.75) > speed(.95));
+  const count = THEME_ORDER.length;
+  for (const start of [0, 37.5, -1234, 7201]) {
+    for (let index = 0; index < count; index++) {
+      const spun = landingAngle(start, index, count, true);
+      assert.equal(slotAtPointer(spun, count), index);
+      assert.ok(spun - start >= SPIN_TURNS * 360 && spun - start < (SPIN_TURNS + 1) * 360);
+      const glide = landingAngle(start, index, count);
+      assert.equal(slotAtPointer(glide, count), index);
+      assert.ok(Math.abs(glide - start) <= 180, "a tap takes the short way round");
+    }
+  }
+});
