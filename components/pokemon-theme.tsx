@@ -14,7 +14,7 @@ import { isPokemonCaptureAnimation, POKEMON_CAPTURE_END_EVENT, POKEMON_CAPTURE_M
 import { MOTION } from "@/lib/pokemon-motion";
 import { AMBUSH_WINDUP_MS, POKEMON_AMBUSH_EVENT, POKEMON_AMBUSH_TAUNT_EVENT, rollAmbush, type AmbushPoint, type PokemonAmbushShot, type PokemonAmbushTaunt } from "@/lib/pokemon-ambush";
 import { MOVES, RESIDENTS, SPECIES, SPRITE_FEET, SPRITE_SIZE, THEME_ORDER, THEMES, type PokemonSpecies, type PokemonTheme } from "@/lib/pokemon-roster";
-import { DEFAULT_ROTATION, intervalMs, nextTheme, parseRotation, parseTheme, ROTATION_INTERVALS, ROTATION_MODES, ROTATION_STORAGE_KEY, THEME_STORAGE_KEY, type Rotation, type RotationMode } from "@/lib/theme-rotation";
+import { DEFAULT_ROTATION, intervalMs, nextTheme, parseTheme, ROTATION_INTERVALS, ROTATION_MODES, THEME_STORAGE_KEY, type Rotation, type RotationMode } from "@/lib/theme-rotation";
 
 type ThemeState = {
   theme: PokemonTheme;
@@ -60,14 +60,13 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
   const [collectionError, setCollectionError] = useState<string | null>(null);
 
   useEffect(() => {
-    // The pre-paint script in app/layout.tsx has already applied the saved (or per-visit) habitat.
+    // The pre-paint script in app/layout.tsx has already picked this visit's habitat. Rotation is
+    // never restored: every visit starts on DEFAULT_ROTATION. Each tab keeps its own habitat, so two
+    // open tabs don't drag each other along; only the Pokédex is shared between them.
+    const next = parseTheme(document.documentElement.dataset.pokemonTheme);
+    document.documentElement.dataset.pokemonTheme = next;
+    updateTheme(next);
     const read = () => {
-      let next = parseTheme(document.documentElement.dataset.pokemonTheme);
-      let saved = DEFAULT_ROTATION;
-      try {
-        next = parseTheme(localStorage.getItem(THEME_STORAGE_KEY) ?? next);
-        saved = parseRotation(localStorage.getItem(ROTATION_STORAGE_KEY));
-      } catch { /* Themes still work when browser storage is unavailable. */ }
       try {
         const collection = parsePokemonCollection(localStorage.getItem(POKEMON_COLLECTION_STORAGE_KEY));
         capturedPokemonRef.current = collection;
@@ -76,14 +75,11 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
       } catch {
         setCollectionError("The Pokédex couldn't read this browser's storage.");
       }
-      document.documentElement.dataset.pokemonTheme = next;
-      updateTheme(next);
-      updateRotation(saved);
     };
     read();
     setReady(true);
     const sync = (event: StorageEvent) => {
-      if (event.key === THEME_STORAGE_KEY || event.key === ROTATION_STORAGE_KEY || event.key === POKEMON_COLLECTION_STORAGE_KEY || event.key === null) read();
+      if (event.key === POKEMON_COLLECTION_STORAGE_KEY || event.key === null) read();
     };
     const onVisibility = () => setHidden(document.hidden);
     onVisibility();
@@ -100,13 +96,18 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
       updateTheme(next);
       document.documentElement.dataset.pokemonTheme = next;
     });
+    // Remembered only so the next visit opens somewhere else.
     try { localStorage.setItem(THEME_STORAGE_KEY, next); } catch { /* Optional persistence. */ }
   }, []);
 
-  const setRotation = useCallback((next: Rotation) => {
-    updateRotation(next);
-    try { localStorage.setItem(ROTATION_STORAGE_KEY, JSON.stringify(next)); } catch { /* Optional persistence. */ }
-  }, []);
+  /** A habitat picked by hand stays put for the rest of this visit. */
+  const pickTheme = useCallback((next: PokemonTheme) => {
+    apply(next);
+    updateRotation(current => current.mode === "off" ? current : { ...current, mode: "off" });
+  }, [apply]);
+
+  /** Rotation choices last for this visit only. */
+  const setRotation = useCallback((next: Rotation) => updateRotation(next), []);
 
   const capturePokemon = useCallback((capture: CapturedPokemon) => {
     try {
@@ -150,10 +151,10 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
 
   // The countdown keeps its remaining time across pauses and background tabs.
   const ms = intervalMs(every);
-  const counting = ready && mode !== "off" && ms !== null && !paused && !hidden && upcoming !== null;
+  const counting = ready && mode !== "off" && !paused && !hidden && upcoming !== null;
   const clock = useRef<{ cycle: number; remaining: number; since: number | null }>({ cycle: -1, remaining: 0, since: null });
   useEffect(() => {
-    if (clock.current.cycle !== cycle) clock.current = { cycle, remaining: ms ?? 0, since: null };
+    if (clock.current.cycle !== cycle) clock.current = { cycle, remaining: ms, since: null };
     if (!counting || !upcoming) return;
     const started = performance.now();
     clock.current.since = started;
@@ -167,11 +168,11 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
   }, [counting, cycle, ms, upcoming, apply]);
   const elapsed = useCallback(() => {
     const { cycle: counted, remaining, since } = clock.current;
-    if (counted !== cycle || !ms) return 0;
+    if (counted !== cycle) return 0;
     return Math.min(ms, ms - remaining + (since === null ? 0 : performance.now() - since));
   }, [cycle, ms]);
 
-  const value = useMemo<ThemeState>(() => ({ theme, setTheme: apply, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready }), [theme, apply, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready]);
+  const value = useMemo<ThemeState>(() => ({ theme, setTheme: pickTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready }), [theme, pickTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
@@ -215,7 +216,6 @@ export function ThemeSelector() {
   const [open, setOpen] = useState(false);
   const rotating = rotation.mode !== "off";
   const ms = intervalMs(rotation.every);
-  const timed = rotating && ms !== null;
 
   return (
     <div className="theme-controls">
@@ -224,7 +224,7 @@ export function ThemeSelector() {
           <span className="theme-trigger-sprite" aria-hidden="true"><ThemePartner className="theme-sprite" /></span>
           {rotating && (
             <span className={`theme-rotation-badge ${counting ? "" : "is-held"}`} aria-hidden="true">
-              {timed && <Countdown key={cycle} ms={ms} elapsed={elapsed}>{style => <svg viewBox="0 0 20 20" style={style}><circle cx="10" cy="10" r="8.5" /></svg>}</Countdown>}
+              <Countdown key={cycle} ms={ms} elapsed={elapsed}>{style => <svg viewBox="0 0 20 20" style={style}><circle cx="10" cy="10" r="8.5" /></svg>}</Countdown>
               {MODE_ICONS[rotation.mode]}
             </span>
           )}
@@ -278,8 +278,7 @@ export function ThemeSelector() {
             </fieldset>
 
             <p className="theme-next" aria-live="polite">
-              {!rotating ? <>Stays with <strong>{SPECIES[theme].name}</strong> until you pick another.</>
-                : !timed ? <>{rotation.mode === "order" ? "Moves to the next habitat" : "Picks a surprise habitat"} each time you visit.</>
+              {!rotating ? <>Stays with <strong>{SPECIES[theme].name}</strong> for this visit.</>
                 : !upcoming ? null
                 : <>
                     <span className="theme-next-sprite" aria-hidden="true">{rotation.mode === "order" ? <PokemonSprite species={upcoming} /> : <Shuffle size={14} />}</span>

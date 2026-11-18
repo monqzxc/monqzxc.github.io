@@ -213,6 +213,8 @@ export function CursorAmbushLayer() {
               <span className="cursor-impact-text">{impact.hit ? <><b>It&rsquo;s super effective!</b>Your cursor {STATUS_TEXT[MOVE_STATUS[impact.move]]}</> : "It missed!"}</span>
             </span>
           ))}
+          {/* The cursor really is out of action: nothing under it can be clicked or hovered. */}
+          {ko !== null && <div className="cursor-ko-shield" onContextMenu={event => event.preventDefault()} />}
           {ko !== null && (
             <span key={`afflicted-${ko.id}`} ref={afflicted} className="cursor-afflicted" style={{ translate: `${ko.hit.x}px ${ko.hit.y}px` }}>
               <CursorStatusEffect status={ko.status} tint={ko.tint} dir={ko.dir} />

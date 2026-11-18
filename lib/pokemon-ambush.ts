@@ -24,10 +24,10 @@ export const AMBUSH_COOLDOWN_MS = 7000;
 /** Turn, glare, and wind up before the shot leaves. */
 export const AMBUSH_WINDUP_MS = 420;
 /**
- * How long the cursor stays afflicted before it pieces itself back together: a quick onset, a
- * sustained status everyone can see, a finish (the ice breaks, the rock lifts), then the reform.
+ * How long the cursor is out of action: a quick onset, a sustained status everyone can see, a finish
+ * (the ice breaks, the rock lifts), then the reform. Clicks and hovers do nothing until it's back.
  */
-export const CURSOR_KO_MS = 1600;
+export const CURSOR_KO_MS = 3000;
 /** Within this many pixels of the aim point when the shot lands counts as a hit. */
 export const CURSOR_HIT_RADIUS = 30;
 

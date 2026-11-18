@@ -502,7 +502,7 @@ test("legendaries and mythicals teleport somewhere else and tire after a few esc
 
 test("an afflicted cursor is pinned, follows, trails or mirrors the pointer by status", async () => {
   const ambush = await import("../lib/pokemon-ambush.ts");
-  assert.ok(ambush.CURSOR_KO_MS >= 1500, "long enough to see the status");
+  assert.equal(ambush.CURSOR_KO_MS, 3000, "out of action for three seconds");
   const hit = { x: 100, y: 100 };
   const pointer = { x: 200, y: 140 };
   const bounds = { width: 800, height: 600 };
@@ -530,10 +530,11 @@ test("every resident has a sprite sheet, and side-view strips unless it has none
   }
 });
 
-test("by default every visit shuffles to a habitat, including the very first", async () => {
+test("every visit opens on a shuffled habitat and keeps shuffling every 30 seconds", async () => {
   const rotation = await import("../lib/theme-rotation.ts");
-  assert.deepEqual(rotation.DEFAULT_ROTATION, { mode: "shuffle", every: "visit" });
-  assert.deepEqual(rotation.parseRotation(null), rotation.DEFAULT_ROTATION, "no saved choice means the default");
+  assert.deepEqual(rotation.DEFAULT_ROTATION, { mode: "shuffle", every: "30s" });
+  assert.equal(rotation.intervalMs(rotation.DEFAULT_ROTATION.every), 30_000);
+  assert.ok(!("ROTATION_STORAGE_KEY" in rotation), "rotation choices are never saved, so every visit starts shuffling again");
   // Run the real pre-paint script against a fake browser.
   const visit = (store, random) => {
     const document = { documentElement: { dataset: {} } };
@@ -550,20 +551,18 @@ test("by default every visit shuffles to a habitat, including the very first", a
   let previous = visit(store, random);
   for (let step = 0; step < 40; step++) {
     const next = visit(store, random);
-    assert.notEqual(next, previous, "each visit moves to a different habitat");
-    assert.equal(store.get(rotation.THEME_STORAGE_KEY), next, "and remembers where it is");
+    assert.notEqual(next, previous, "each visit opens somewhere other than last time");
+    assert.equal(store.get(rotation.THEME_STORAGE_KEY), next);
     previous = next;
   }
-  // A visitor who turned it off stays put.
-  const off = new Map([[rotation.THEME_STORAGE_KEY, "piplup"], [rotation.ROTATION_STORAGE_KEY, JSON.stringify({ mode: "off", every: "visit" })]]);
-  assert.equal(visit(off, seededRandom(1)), "piplup");
-  assert.equal(visit(off, seededRandom(2)), "piplup");
-  // Blocked storage still gets a habitat and still shuffles.
+  // Even a habitat picked by hand last time is shuffled away from on the next visit.
+  const picked = new Map([[rotation.THEME_STORAGE_KEY, "piplup"]]);
+  assert.notEqual(visit(picked, seededRandom(1)), "piplup");
+  // Blocked storage still gets a habitat.
   assert.ok(THEME_ORDER.includes(visit(null, seededRandom(4))));
   // The script and visitTheme agree.
   for (let seed = 0; seed < 30; seed++) {
-    const saved = THEME_ORDER[seed % THEME_ORDER.length];
-    const s = new Map([[rotation.THEME_STORAGE_KEY, saved]]);
-    assert.equal(visit(s, seededRandom(seed)), rotation.visitTheme(saved, rotation.DEFAULT_ROTATION, seededRandom(seed)));
+    const last = seed % 6 === 5 ? null : THEME_ORDER[seed % THEME_ORDER.length];
+    assert.equal(visit(new Map(last ? [[rotation.THEME_STORAGE_KEY, last]] : []), seededRandom(seed)), rotation.visitTheme(last, seededRandom(seed)));
   }
 });
