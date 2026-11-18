@@ -14,7 +14,7 @@ import { POKEMON_COLLECTION_STORAGE_KEY, parsePokemonCollection, recordPokemonCa
 import { isPokemonCaptureAnimation, POKEMON_CAPTURE_END_EVENT, POKEMON_CAPTURE_MS, POKEMON_CAPTURE_START_EVENT, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
 import { MOTION } from "@/lib/pokemon-motion";
 import { AMBUSH_WINDUP_MS, LEGEND_ATTACK_ODDS, POKEMON_AMBUSH_EVENT, POKEMON_AMBUSH_TAUNT_EVENT, rollAmbush, type AmbushPoint, type PokemonAmbushShot, type PokemonAmbushTaunt } from "@/lib/pokemon-ambush";
-import { MOVES, RESIDENTS, SPECIES, SPRITE_FEET, SPRITE_SIZE, THEME_ORDER, THEMES, type PokemonSpecies, type PokemonTheme } from "@/lib/pokemon-roster";
+import { MOVES, SPECIES, SPRITE_FEET, SPRITE_SIZE, THEME_ORDER, THEMES, type PokemonSpecies, type PokemonTheme } from "@/lib/pokemon-roster";
 import { DEFAULT_ROTATION, intervalMs, nextTheme, parseTheme, ROTATION_INTERVALS, ROTATION_MODES, THEME_STORAGE_KEY, type Rotation, type RotationMode } from "@/lib/theme-rotation";
 
 type ThemeState = {
@@ -223,11 +223,6 @@ function Countdown({ ms, elapsed, children }: { ms: number; elapsed: () => numbe
   return children({ "--rotation-ms": `${ms}ms`, "--rotation-delay": `${delay}ms` } as CSSProperties);
 }
 
-/** Regulars only: the legendaries and mythicals who visit are kept a surprise. */
-function regularsOf(theme: PokemonTheme) {
-  return RESIDENTS[theme].filter(species => !isSpecial(SPECIES[species]));
-}
-
 /** The Pokédex, on its own wherever a page puts it (the trainer card's shoulder, the header). */
 export function PokedexButton() {
   const { capturedPokemon, collectionError, releasePokemon, releaseAllPokemon } = usePokemonTheme();
@@ -266,7 +261,7 @@ export function HabitatDock() {
         <Popover.Portal>
           <Popover.Content className="theme-panel" side="top" align="start" sideOffset={12} collisionPadding={12} aria-label="Habitat settings">
             <div className="theme-panel-head">
-              <p className="theme-panel-sub">{regularsOf(theme).length} Pokémon live in each. Rumour has it something rarer passes through…</p>
+              <p className="theme-panel-title">Choose a Pokémon</p>
             </div>
 
             <HabitatRoulette theme={theme} onSelect={setTheme} onSpinLand={spinTheme} onHold={setHeld} upcoming={upcoming} counting={counting} cycle={cycle} nextIn={nextIn} markUpcoming={rotation.mode === "order"} />

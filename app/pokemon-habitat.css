@@ -109,15 +109,15 @@
 .theme-panel[data-state="closed"] { animation: theme-panel-out .14s ease-in both; }
 .theme-panel-arrow { fill: color-mix(in srgb, var(--background) 92%, var(--primary)); }
 .theme-panel-head { padding: 0 4px; }
-.theme-panel-sub { margin: 0; color: var(--muted-foreground); font-size: 12px; line-height: 1.5; }
+.theme-panel-title { margin: 0; font-family: var(--font-display, inherit); font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
 
 /* ── Habitat roulette ─────────────────────────────────────────────────────────
    Eighteen partners round a prize wheel, the pointer at the top. Everything is sized in container
    units so the wheel scales from a 320px phone to the desktop panel. The wheel turns via
    --wheel at rest and Web Animations in motion; each .roulette-upright counter-turns so sprites stay
    level. Spin phases arrive as data-phase on .roulette. */
-.roulette-block { display: grid; gap: 10px; }
-.roulette { --wheel: 0deg; --ring: 37cqi; --slot: 12.6cqi; position: relative; width: min(100%, max(220px, min(344px, calc(var(--radix-popover-content-available-height, 100dvh) - var(--roulette-room, 330px))))); margin: 16px auto 0; aspect-ratio: 1; container-type: inline-size; }
+.roulette-block { --roulette-room: 360px; display: grid; gap: 10px; }
+.roulette { --wheel: 0deg; --ring: 37cqi; --slot: 12.6cqi; position: relative; width: min(100%, max(220px, min(344px, calc(var(--radix-popover-content-available-height, 100dvh) - var(--roulette-room))))); margin: 16px auto 0; aspect-ratio: 1; container-type: inline-size; }
 .roulette-face { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--primary) 6%, var(--background)) 0 22.5cqi, color-mix(in srgb, var(--background) 82%, var(--primary)) 23cqi 47cqi, transparent 47.2cqi); box-shadow: inset 0 0 0 1.4cqi color-mix(in srgb, var(--foreground) 6%, transparent), 0 0 0 1px color-mix(in srgb, var(--primary) 30%, transparent), 0 12px 32px -18px #000c; }
 /* Where the winner lands: a soft wedge of light under the pointer. Static, so it never spins. */
 .roulette-spot { position: absolute; left: 50%; top: calc(50% - var(--ring)); width: calc(var(--slot) * 1.32); aspect-ratio: 1; border-radius: 50%; translate: -50% -50%; background: radial-gradient(circle, color-mix(in srgb, var(--primary) 30%, transparent), color-mix(in srgb, var(--primary) 8%, transparent) 62%, transparent 72%); box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--primary) 50%, transparent); transition: opacity .3s; }
@@ -181,13 +181,14 @@
 .roulette-confetti i:nth-child(even) { background: #ffe27a; }
 
 /* One row: the spin first and widest, the quick pick beside it. */
-.roulette-actions { display: grid; grid-template-columns: 1.35fr 1fr; gap: 8px; width: min(100%, 344px); margin-inline: auto; }
+/* Stacked: Spin on top as the main action, Random under it. */
+.roulette-actions { display: grid; gap: 12px; width: min(100%, 300px); margin-inline: auto; }
 .roulette-spin { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; border: 0; border-radius: 100px; background: var(--primary); color: var(--primary-foreground); font: inherit; font-family: var(--font-display, inherit); font-size: 15px; font-weight: 800; letter-spacing: -.01em; cursor: pointer; box-shadow: 0 3px 0 color-mix(in srgb, var(--primary) 50%, #000), 0 8px 18px -12px var(--primary); transition: transform .15s, box-shadow .15s, filter .2s; }
 .roulette-spin:hover:not(:disabled) { filter: brightness(1.06); }
 .roulette-spin:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 color-mix(in srgb, var(--primary) 50%, #000), 0 6px 14px -10px var(--primary); }
 .roulette-spin:disabled { cursor: progress; filter: saturate(.6) brightness(.85); }
-.roulette-spin:disabled svg { animation: roulette-wobble .4s ease-in-out infinite; }
-.roulette-random { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; border: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent); border-radius: 100px; background: transparent; color: var(--foreground); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .2s, border-color .2s; }
+.roulette-spin:disabled svg { animation: fx-spin .7s linear infinite; }
+.roulette-random { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 38px; border: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent); border-radius: 100px; background: transparent; color: var(--foreground); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s, border-color .2s; }
 .roulette-random:hover:not(:disabled) { border-color: color-mix(in srgb, var(--primary) 50%, transparent); background: color-mix(in srgb, var(--primary) 10%, transparent); }
 .roulette-random:disabled { opacity: .5; cursor: not-allowed; }
 :is(.roulette-spin, .roulette-random):focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
@@ -879,12 +880,13 @@ html[data-cursor-ko], html[data-cursor-ko] * { cursor: none !important; }
 @media (max-width: 760px) {
   .site-header .nav { gap: 8px; padding-inline: 12px; }
   .theme-controls { margin-left: auto; gap: 1px; }
-  .theme-panel-head { display: none; }
   /* Phones: the dock is just the partner circle; pause moves into the panel. */
   .habitat-dock { padding: 4px; }
   .habitat-dock-trigger { width: 46px; height: 46px; }
   .habitat-dock-sprite { width: 34px; }
   .habitat-dock .habitat-pause { display: none; }
+  /* Phones also carry the pause button, so the wheel leaves a little more room. */
+  .roulette-block { --roulette-room: 404px; }
   .theme-panel-pause { display: flex; }
   .site-header .menu-toggle { padding: 7px; }
   /* Give every resident its own tappable patch on narrow screens. */

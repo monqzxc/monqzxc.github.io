@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { Dice5, Shuffle } from "lucide-react";
+import { Dices, RotateCw } from "lucide-react";
 import { PokemonSprite } from "@/components/pokemon-sprite";
 import { SPECIES, THEME_ORDER, THEMES, type PokemonTheme } from "@/lib/pokemon-roster";
 import { landingAngle, SPIN_MS, SPIN_PHASES, spinCurve, type SpinPhase } from "@/lib/roulette-motion";
@@ -271,10 +271,10 @@ export function HabitatRoulette({ theme, onSelect, onSpinLand, onHold, upcoming,
 
       <div className="roulette-actions">
         <button type="button" className="roulette-spin" onClick={spin} disabled={userSpinning}>
-          <Shuffle size={18} strokeWidth={2.6} aria-hidden="true" />{userSpinning ? "Spinning…" : "Spin!"}
+          <RotateCw size={18} strokeWidth={2.6} aria-hidden="true" />{userSpinning ? "Spinning…" : "Spin"}
         </button>
         <button type="button" className="roulette-random" onClick={() => choose(THEME_ORDER.indexOf(nextTheme(theme, "shuffle")), true)} disabled={userSpinning}>
-          <Dice5 size={16} aria-hidden="true" />Pick random
+          <Dices size={17} aria-hidden="true" />Random
         </button>
       </div>
       <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
