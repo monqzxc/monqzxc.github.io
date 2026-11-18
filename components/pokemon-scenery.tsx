@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { PokemonTheme } from "@/lib/pokemon-roster";
+import { TYPE_SCENES } from "./type-scenery";
 
 type SceneryProps = { theme: PokemonTheme };
 
@@ -202,12 +203,13 @@ function FlowerMeadow() {
   </svg>;
 }
 
-type Scene = {
+export type Scene = {
   /** Distant layers, drawn across the full width behind the edge scenes. */
   distance: ReactNode;
-  celestial: { glow: string; core: string; coreOpacity: string; kind: "moon" | "sun" };
+  /** `detail` is drawn over the disc: craters, a ring. */
+  celestial: { glow: string; core: string; coreOpacity: string; kind: "moon" | "sun"; detail?: ReactNode };
   edges: ReactNode;
-  particle: "firefly" | "dust" | "bubble" | "ember" | "leaf";
+  particle: "firefly" | "dust" | "bubble" | "ember" | "leaf" | "pollen" | "spark" | "snow" | "petal" | "feather" | "mote";
 };
 
 const SCENES: Record<PokemonTheme, Scene> = {
@@ -265,6 +267,7 @@ const SCENES: Record<PokemonTheme, Scene> = {
     edges: <><GreatTree /><FlowerMeadow /></>,
     particle: "leaf",
   },
+  ...TYPE_SCENES,
 };
 
 const PARTICLES = [[4, 39], [8, 72], [13, 91], [91, 35], [95, 65], [88, 87], [35, 95], [73, 93]];
@@ -279,6 +282,7 @@ export function PokemonScenery({ theme }: SceneryProps) {
       <circle cx="80" cy="80" r="43" fill={celestial.core} opacity={celestial.coreOpacity} />
       {theme === "gengar" && <g fill="#8d79a8" opacity=".28"><circle cx="65" cy="65" r="10" /><circle cx="90" cy="95" r="12" /><circle cx="95" cy="59" r="5" /></g>}
       {theme === "piplup" && <g fill="#9cc4de" opacity=".3"><circle cx="66" cy="70" r="8" /><circle cx="94" cy="92" r="6" /></g>}
+      {celestial.detail}
     </svg>
     {edges}
     <div className="scenery-ground-line" />

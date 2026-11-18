@@ -40,7 +40,20 @@
 :root[data-pokemon-theme="gible"] .for-theme:not([data-for="gible"]),
 :root[data-pokemon-theme="piplup"] .for-theme:not([data-for="piplup"]),
 :root[data-pokemon-theme="charmander"] .for-theme:not([data-for="charmander"]),
-:root[data-pokemon-theme="bulbasaur"] .for-theme:not([data-for="bulbasaur"]) { display: none; }
+:root[data-pokemon-theme="bulbasaur"] .for-theme:not([data-for="bulbasaur"]),
+:root[data-pokemon-theme="eevee"] .for-theme:not([data-for="eevee"]),
+:root[data-pokemon-theme="pikachu"] .for-theme:not([data-for="pikachu"]),
+:root[data-pokemon-theme="snorunt"] .for-theme:not([data-for="snorunt"]),
+:root[data-pokemon-theme="riolu"] .for-theme:not([data-for="riolu"]),
+:root[data-pokemon-theme="grimer"] .for-theme:not([data-for="grimer"]),
+:root[data-pokemon-theme="pidgey"] .for-theme:not([data-for="pidgey"]),
+:root[data-pokemon-theme="ralts"] .for-theme:not([data-for="ralts"]),
+:root[data-pokemon-theme="caterpie"] .for-theme:not([data-for="caterpie"]),
+:root[data-pokemon-theme="geodude"] .for-theme:not([data-for="geodude"]),
+:root[data-pokemon-theme="dratini"] .for-theme:not([data-for="dratini"]),
+:root[data-pokemon-theme="umbreon"] .for-theme:not([data-for="umbreon"]),
+:root[data-pokemon-theme="aron"] .for-theme:not([data-for="aron"]),
+:root[data-pokemon-theme="togepi"] .for-theme:not([data-for="togepi"]) { display: none; }
 
 /* ── Habitat dock: bottom-left, away from the trainer card and Pokédex ──────────
    The partner sits in a circle whose rim is the countdown to the next habitat (the ring and the
@@ -69,15 +82,15 @@
 .theme-panel-pause:hover { color: var(--foreground); background: color-mix(in srgb, var(--primary) 12%, transparent); }
 .theme-panel-pause[aria-pressed="true"] { color: var(--foreground); border-color: color-mix(in srgb, var(--primary) 45%, transparent); }
 
-.theme-panel { z-index: 60; width: min(352px, calc(100vw - 24px)); max-height: min(760px, var(--radix-popover-content-available-height, calc(100dvh - 90px))); overflow: auto; overscroll-behavior: contain; padding: 12px; border: 1px solid color-mix(in srgb, var(--primary) 26%, transparent); border-radius: 20px; background: color-mix(in srgb, var(--background) 92%, var(--primary)); color: var(--foreground); box-shadow: 0 30px 70px -28px #000d, inset 0 1px 0 color-mix(in srgb, var(--foreground) 8%, transparent); transform-origin: var(--radix-popover-content-transform-origin); animation: theme-panel-in .22s cubic-bezier(.2, .9, .3, 1.15); }
+.theme-panel { z-index: 60; width: min(384px, calc(100vw - 24px)); max-height: min(760px, var(--radix-popover-content-available-height, calc(100dvh - 90px))); overflow: auto; overscroll-behavior: contain; padding: 12px; border: 1px solid color-mix(in srgb, var(--primary) 26%, transparent); border-radius: 20px; background: color-mix(in srgb, var(--background) 92%, var(--primary)); color: var(--foreground); box-shadow: 0 30px 70px -28px #000d, inset 0 1px 0 color-mix(in srgb, var(--foreground) 8%, transparent); transform-origin: var(--radix-popover-content-transform-origin); animation: theme-panel-in .22s cubic-bezier(.2, .9, .3, 1.15); }
 .theme-panel[data-state="closed"] { animation: theme-panel-out .14s ease-in both; }
 .theme-panel-arrow { fill: color-mix(in srgb, var(--background) 92%, var(--primary)); }
 .theme-panel-head { padding: 2px 4px 9px; }
 .theme-panel-title { margin: 0; font-family: var(--font-display, inherit); font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
 .theme-panel-sub { margin: 2px 0 0; color: var(--muted-foreground); font-size: 12px; line-height: 1.5; }
 
-/* Five partner tiles in a row: sprite and name only. */
-.theme-options { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; container-type: inline-size; }
+/* Eighteen partner tiles, one per type, six to a row: sprite and name only. */
+.theme-options { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; container-type: inline-size; }
 .theme-option { --swatch: var(--primary); position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; padding: 6px 0 5px; border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--foreground) 3%, transparent); cursor: pointer; transition: background .2s, border-color .2s, transform .2s; }
 .theme-option:hover { border-color: color-mix(in srgb, var(--swatch) 40%, transparent); background: color-mix(in srgb, var(--swatch) 8%, transparent); }
 .theme-option:active { transform: scale(.985); }
@@ -220,6 +233,19 @@
 .habitat-piplup .pokemon-portal { border-color: #8fd6ff80; background: radial-gradient(ellipse, #3fa9ff26, transparent 66%); box-shadow: 0 0 18px #3fa9ff38, inset 0 0 12px #bfe9ff30; }
 .habitat-charmander .pokemon-portal { border-color: #ffa25c80; background: radial-gradient(ellipse, #ff6a2a30, transparent 66%); box-shadow: 0 0 20px #ff6a2a40, inset 0 0 12px #ffd36b30; }
 .habitat-bulbasaur .pokemon-portal { border-color: #9be38a75; background: radial-gradient(ellipse, #5fc66a26, transparent 66%); box-shadow: 0 0 18px #5fc66a33, inset 0 0 12px #c9f5a52a; }
+.habitat-eevee .pokemon-portal { border-color: #e3cfa880; background: radial-gradient(ellipse, #e3cfa82e, transparent 66%); box-shadow: 0 0 18px #e3cfa838, inset 0 0 12px #e3cfa82a; }
+.habitat-pikachu .pokemon-portal { border-color: #f7d84a80; background: radial-gradient(ellipse, #f7d84a2e, transparent 66%); box-shadow: 0 0 18px #f7d84a38, inset 0 0 12px #f7d84a2a; }
+.habitat-snorunt .pokemon-portal { border-color: #9fe6f280; background: radial-gradient(ellipse, #9fe6f22e, transparent 66%); box-shadow: 0 0 18px #9fe6f238, inset 0 0 12px #9fe6f22a; }
+.habitat-riolu .pokemon-portal { border-color: #f0725780; background: radial-gradient(ellipse, #f072572e, transparent 66%); box-shadow: 0 0 18px #f0725738, inset 0 0 12px #f072572a; }
+.habitat-grimer .pokemon-portal { border-color: #c98ae680; background: radial-gradient(ellipse, #c98ae62e, transparent 66%); box-shadow: 0 0 18px #c98ae638, inset 0 0 12px #c98ae62a; }
+.habitat-pidgey .pokemon-portal { border-color: #b2c6ff80; background: radial-gradient(ellipse, #b2c6ff2e, transparent 66%); box-shadow: 0 0 18px #b2c6ff38, inset 0 0 12px #b2c6ff2a; }
+.habitat-ralts .pokemon-portal { border-color: #ff86ba80; background: radial-gradient(ellipse, #ff86ba2e, transparent 66%); box-shadow: 0 0 18px #ff86ba38, inset 0 0 12px #ff86ba2a; }
+.habitat-caterpie .pokemon-portal { border-color: #bad84a80; background: radial-gradient(ellipse, #bad84a2e, transparent 66%); box-shadow: 0 0 18px #bad84a38, inset 0 0 12px #bad84a2a; }
+.habitat-geodude .pokemon-portal { border-color: #ccb48a80; background: radial-gradient(ellipse, #ccb48a2e, transparent 66%); box-shadow: 0 0 18px #ccb48a38, inset 0 0 12px #ccb48a2a; }
+.habitat-dratini .pokemon-portal { border-color: #949aff80; background: radial-gradient(ellipse, #949aff2e, transparent 66%); box-shadow: 0 0 18px #949aff38, inset 0 0 12px #949aff2a; }
+.habitat-umbreon .pokemon-portal { border-color: #a0a8c880; background: radial-gradient(ellipse, #a0a8c82e, transparent 66%); box-shadow: 0 0 18px #a0a8c838, inset 0 0 12px #a0a8c82a; }
+.habitat-aron .pokemon-portal { border-color: #c3cfd980; background: radial-gradient(ellipse, #c3cfd92e, transparent 66%); box-shadow: 0 0 18px #c3cfd938, inset 0 0 12px #c3cfd92a; }
+.habitat-togepi .pokemon-portal { border-color: #ffb3dc80; background: radial-gradient(ellipse, #ffb3dc2e, transparent 66%); box-shadow: 0 0 18px #ffb3dc38, inset 0 0 12px #ffb3dc2a; }
 .pokemon-slot.is-legendary .pokemon-portal, .pokemon-slot.is-mythical .pokemon-portal { inset: -6%; }
 .pokemon-slot.is-mythical .pokemon-portal { border-color: #ffc0ec99; background: radial-gradient(ellipse, #ff9be033, transparent 66%); box-shadow: 0 0 24px #ff9be04d, inset 0 0 14px #b8f0ff40; }
 .pokemon-slot[data-species="giratina"] .pokemon-portal { border-color: #e0405a66; background: radial-gradient(ellipse, #0009, transparent 70%); box-shadow: 0 0 26px #000b, inset 0 0 16px #e0405a33; }
@@ -243,6 +269,19 @@
 .habitat-piplup .pokemon-dust i { background: #a8dcf5; border-radius: 50%; }
 .habitat-charmander .pokemon-dust i { background: #ff9a52; }
 .habitat-bulbasaur .pokemon-dust i { background: #8fcf74; }
+.habitat-eevee .pokemon-dust i { background: #e3cfa8; }
+.habitat-pikachu .pokemon-dust i { background: #f7d84a; }
+.habitat-snorunt .pokemon-dust i { background: #9fe6f2; }
+.habitat-riolu .pokemon-dust i { background: #f07257; }
+.habitat-grimer .pokemon-dust i { background: #c98ae6; }
+.habitat-pidgey .pokemon-dust i { background: #b2c6ff; }
+.habitat-ralts .pokemon-dust i { background: #ff86ba; }
+.habitat-caterpie .pokemon-dust i { background: #bad84a; }
+.habitat-geodude .pokemon-dust i { background: #ccb48a; }
+.habitat-dratini .pokemon-dust i { background: #949aff; }
+.habitat-umbreon .pokemon-dust i { background: #a0a8c8; }
+.habitat-aron .pokemon-dust i { background: #c3cfd9; }
+.habitat-togepi .pokemon-dust i { background: #ffb3dc; }
 .pokemon-dust i:nth-child(2) { left: 60%; width: 4px; --dust-drift: 24px; }
 .pokemon-dust i:nth-child(3) { left: 48%; width: 3px; --dust-drift: -7px; }
 .pokemon-slot:is([data-activity="burrow"], [data-activity="emerge"]) .pokemon-dust i { animation: soil-scatter .65s ease-out infinite; }
@@ -263,6 +302,11 @@
 .move-fire-plume.fx-burst { left: 44%; top: -14%; width: 112%; }
 .move-sludge-splat.fx-burst { left: 58%; top: 30%; width: 58%; }
 .move-hit.fx-burst { left: 58%; top: 18%; width: 72%; }
+/* Charm and sparkle moves bloom in front of the attacker, like a burst. */
+.fx-fx { left: 50%; top: 10%; width: 64%; animation: fx-burst var(--activity-duration) ease-out both; }
+.fx-fx.is-strip .move-strip { --move-ms: 600ms; animation-delay: calc(var(--activity-duration) * .26); }
+/* The pin sprite points left; every projectile is drawn facing right. */
+.move-pin .move-strip { transform: scaleX(-1); }
 .fx-aura { left: -18%; top: -18%; width: 136%; animation: fx-aura var(--activity-duration) ease-in-out both; filter: drop-shadow(0 0 5px #8a4ce8) drop-shadow(0 0 2px #e0405a); }
 .fx-roar { position: absolute; inset: 0; }
 .fx-roar .move-effect { left: 10%; top: 0; width: 80%; opacity: 0; animation: fx-ring .8s ease-out 2 both; }
@@ -391,7 +435,7 @@ html[data-cursor-ko], html[data-cursor-ko] * { cursor: none !important; }
 .cursor-status i { position: absolute; display: block; font-style: normal; }
 .cursor-status .move-effect { position: absolute; }
 /* Particles that loop for the length of the hold. */
-:is(.cursor-flame, .cursor-drop, .cursor-leaf, .cursor-bubble, .cursor-ghost, .cursor-smoke, .cursor-aura, .cursor-heat, .cursor-dizzy-ring, .cursor-gusts, .cursor-heart, .cursor-frost) { opacity: 0; }
+:is(.cursor-flame, .cursor-drop, .cursor-leaf, .cursor-bubble, .cursor-ghost, .cursor-smoke, .cursor-aura, .cursor-heat, .cursor-dizzy-ring, .cursor-gusts, .cursor-heart, .cursor-frost, .cursor-zap, .cursor-spark) { opacity: 0; }
 
 /* Fainted: thrown apart, the pieces hang in the air, then fade. */
 .cursor-shatter .cursor-shard { animation: cursor-shatter var(--ko-ms) cubic-bezier(.15, .8, .3, 1) both; }
@@ -470,6 +514,14 @@ html[data-cursor-ko], html[data-cursor-ko] * { cursor: none !important; }
 .is-charm .cursor-arrow { animation: cursor-beat .55s ease-in-out infinite; }
 .is-charm .cursor-arrow path { animation: cursor-fill-charm var(--ko-ms) both; }
 .cursor-heart { left: calc(var(--i) * 4px - 6px); top: 2px; width: 9px; animation: cursor-heart 1s ease-out calc(var(--i) * 200ms) infinite, cursor-hold var(--ko-ms) both; }
+
+/* Paralyzed: locked rigid where it was hit, twitching and crackling with sparks, then it fizzles out. */
+.is-paralyze .cursor-body { animation: cursor-fade-out var(--ko-ms) ease-in both; }
+.is-paralyze .cursor-arrow { animation: cursor-jitter .08s steps(2) infinite; }
+.is-paralyze .cursor-arrow path { animation: cursor-fill-paralyze var(--ko-ms) both; }
+.cursor-zap { left: -8px; top: -6px; width: 28px; height: 30px; border-radius: 50%; background: radial-gradient(closest-side, #ffe14a88, transparent); animation: cursor-pulse .14s steps(2) infinite alternate, cursor-hold var(--ko-ms) both; }
+.cursor-spark { left: calc(var(--i) * 7px - 8px); top: calc(var(--i) * 5px - 7px); width: 14px; animation: cursor-hold var(--ko-ms) both; }
+.cursor-spark.is-strip .move-strip { --move-ms: 240ms; animation-iteration-count: infinite; animation-delay: calc(var(--i) * -80ms); }
 
 /* Capture beam, portalled to <body>. All parts share one 1.3s clock (POKEMON_CAPTURE_MS):
    0–20% the beam fires from the Pokédex, 20% it strikes, 50% the energy breaks free,
@@ -575,6 +627,7 @@ html[data-cursor-ko], html[data-cursor-ko] * { cursor: none !important; }
 @keyframes cursor-bubble { from { scale: .2; translate: 0 0; } 70% { scale: 1; translate: 0 -4px; } to { scale: 1.5; translate: 0 -5px; filter: opacity(0); } }
 @keyframes cursor-jitter { 0% { transform: translate(-1px, .5px) rotate(-5deg); } 100% { transform: translate(1px, -.5px) rotate(5deg); } }
 @keyframes cursor-fill-possess { 8%, 100% { fill: #5a2d86; } }
+@keyframes cursor-fill-paralyze { 0%, 4%, 12%, 20% { fill: #fffbe0; } 8%, 16%, 24%, 100% { fill: #ffd21f; } }
 @keyframes cursor-ghost { 0% { translate: 0 0; filter: blur(.4px) opacity(0); } 25% { filter: blur(.4px) opacity(.8); } 100% { translate: var(--gx) -18px; filter: blur(.8px) opacity(0); } }
 @keyframes cursor-smoke { 0% { opacity: 0; scale: .3; } 30% { opacity: 1; } 100% { opacity: 0; scale: 1.8; translate: 0 -6px; } }
 @keyframes cursor-spin { 0% { transform: rotate(0deg); } 50% { transform: rotate(200deg) translate(1px, -1px); } 100% { transform: rotate(360deg); } }

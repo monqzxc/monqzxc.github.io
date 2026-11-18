@@ -69,6 +69,18 @@
   --c-button-light: #f7a6bc;
 }
 
+/* The other thirteen types: derived from the habitat's palette tokens (app/elemental-theme.css). */
+:global(:root[data-pokemon-theme]:not(:where([data-pokemon-theme="gengar"], [data-pokemon-theme="gible"], [data-pokemon-theme="piplup"], [data-pokemon-theme="charmander"], [data-pokemon-theme="bulbasaur"]))) .console {
+  --c-body: color-mix(in srgb, var(--hab-tone) 70%, #fff);
+  --c-light: color-mix(in srgb, var(--hab-tone) 18%, #fff);
+  --c-shade: color-mix(in srgb, var(--hab-tone) 72%, #000);
+  --c-bezel: color-mix(in srgb, var(--hab-surface) 80%, var(--hab-tone));
+  --c-stripe-a: color-mix(in srgb, var(--hab-tone) 78%, #000);
+  --c-stripe-b: var(--hab-tone-2);
+  --c-button: color-mix(in srgb, var(--hab-tone-3, var(--hab-tone-2)) 82%, #000);
+  --c-button-light: color-mix(in srgb, var(--hab-tone-3, var(--hab-tone-2)) 50%, #fff);
+}
+
 .shell {
   display: block;
   width: 100%;
