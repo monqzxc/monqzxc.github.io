@@ -48,6 +48,7 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | Gible (Ground) palette | `app/ground-theme.css` |
 | Palettes for every habitat except Gengar and Gible, built from a few tokens each (the trainer card and handheld derive theirs from the same tokens for the newer types) | `app/elemental-theme.css` |
 | Edge scenery for the thirteen newer habitats | `components/type-scenery.tsx` |
+| National Pokédex numbers and types for every resident, generated from PokeAPI data by `scripts/build-pokedex.mjs` | `lib/pokemon-dex.ts` |
 | Habitat rosters (18 habitats, one per type; 28 per habitat: 23 regulars and 5 rare visitors), and theme metadata | `lib/pokemon-roster.ts` |
 | Automatic habitat changes (shuffled every 30 s from the start of each visit; in order or off from the picker) | `lib/theme-rotation.ts` |
 | Side-view sprite download from PMD SpriteCollab | `scripts/fetch-habitat-motion.mjs` |

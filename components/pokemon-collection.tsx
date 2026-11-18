@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Check, Sparkles } from "lucide-react";
 import { PokemonSprite } from "@/components/pokemon-sprite";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DEX } from "@/lib/pokemon-dex";
 import { RESIDENTS, SPECIES, THEME_ORDER, THEMES, type PokemonTheme } from "@/lib/pokemon-roster";
 import type { CapturedPokemon, PokemonReleaseResult } from "@/lib/pokemon-collection";
 import { clampPokemonCapturePoint, getPokemonCaptureBoltPoints, POKEMON_CAPTURE_END_EVENT, POKEMON_CAPTURE_START_EVENT, type PokemonCapturePoint } from "@/lib/pokemon-capture-animation";
@@ -155,11 +156,13 @@ export function PokemonCollection({ capturedPokemon, storageError, onRelease, on
           {count === 0 ? <p className="pokemon-collection-empty">No Pokémon captured yet. Say hello to a visitor and choose Catch!</p> : (
             <div ref={listRef} className="pokemon-collection-groups">
               {THEME_ORDER.map(theme => {
-                const captures = capturedPokemon.filter(({ species }) => RESIDENTS[theme].includes(species));
+                // Within a habitat, entries run in National Pokédex order, normal before shiny.
+                const captures = capturedPokemon.filter(({ species }) => RESIDENTS[theme].includes(species))
+                  .sort((a, b) => DEX[a.species].no - DEX[b.species].no || Number(a.shiny) - Number(b.shiny));
                 if (captures.length === 0) return null;
                 return (
                   <section key={theme} className="pokemon-collection-group" aria-labelledby={`pokedex-${theme}`}>
-                    <h3 id={`pokedex-${theme}`}>{THEMES[theme].habitat}</h3>
+                    <h3 id={`pokedex-${theme}`}>{THEMES[theme].habitat} <span className="pokemon-collection-group-count">{captures.length}</span></h3>
                     <ul className="pokemon-collection-list">
                       {captures.map(({ species, shiny }) => <CapturedEntry key={`${species}-${shiny}`} species={species} shiny={shiny} theme={theme} onRelease={from => release({ species, shiny }, from)} />)}
                     </ul>
@@ -249,24 +252,49 @@ function PokemonFarewell({ farewell }: { farewell: Farewell }) {
   );
 }
 
+/** An open Poké Ball: what "release" means here, so the button needs no words. */
+function ReleaseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d="M4 16a8 8 0 0 0 16 0Z" />
+      <circle cx="12" cy="16" r="1.8" />
+      {/* The lid, flipped open, and a little burst as the Pokémon leaves. */}
+      <path d="M3 12.5A8 8 0 0 1 15.5 5.5Z" />
+      <path d="m18 4 2-2m-.5 6H22" />
+    </svg>
+  );
+}
+
+const TYPE_LABEL = (type: string) => type[0].toUpperCase() + type.slice(1);
+
 function CapturedEntry({ species, shiny, theme, onRelease }: { species: CapturedPokemon["species"]; shiny: boolean; theme: PokemonTheme; onRelease: (from: HTMLElement) => void }) {
   const name = `${shiny ? "Shiny " : ""}${SPECIES[species].name}`;
+  const { no, types } = DEX[species];
   const spriteRef = useRef<HTMLSpanElement>(null);
   const { confirming, arm, reset } = useConfirmTap();
   return (
-    <li className="pokemon-collection-entry" style={{ "--collection-accent": THEMES[theme].swatch } as React.CSSProperties}>
-      <span ref={spriteRef} className="pokemon-collection-sprite-wrap"><PokemonSprite species={species} shiny={shiny} className="pokemon-collection-sprite" /></span>
-      <span className="pokemon-collection-entry-name">{SPECIES[species].name}</span>
-      {shiny && <span className="pokemon-collection-shiny">Shiny</span>}
-      {/* Two taps, so a rare shiny isn't lost to a stray click. */}
-      <button type="button" className={`pokemon-collection-release ${confirming ? "is-confirming" : ""}`}
+    <li className={`pokemon-collection-entry ${shiny ? "is-shiny" : ""}`} style={{ "--collection-accent": THEMES[theme].swatch } as CSSProperties}>
+      <span ref={spriteRef} className="pokemon-collection-sprite-wrap">
+        <PokemonSprite species={species} shiny={shiny} className="pokemon-collection-sprite" />
+        {shiny && <Sparkles className="pokemon-collection-sparkle" size={14} strokeWidth={2.5} aria-hidden="true" />}
+      </span>
+      <span className="pokemon-collection-info">
+        <span className="pokemon-collection-no">No. {String(no).padStart(4, "0")}</span>
+        <span className="pokemon-collection-entry-name">{SPECIES[species].name}{shiny && <span className="sr-only"> (shiny)</span>}</span>
+        <span className="pokemon-collection-types" aria-label={`${types.map(TYPE_LABEL).join(" and ")} type`}>
+          {types.map(type => <span key={type} className="pokemon-type" data-type={type} aria-hidden="true">{TYPE_LABEL(type)}</span>)}
+        </span>
+      </span>
+      {/* Two taps, so a rare shiny isn't lost to a stray click: the open ball turns into a check. */}
+      <button type="button" className={`pokemon-collection-release is-icon ${confirming ? "is-confirming" : ""}`}
         aria-label={confirming ? `Confirm releasing ${name}` : `Release ${name}`}
+        title={confirming ? "Tap again to release" : "Release"}
         onClick={event => {
           if (!confirming) { arm(); return; }
           onRelease(spriteRef.current ?? event.currentTarget);
         }}
         onBlur={reset}>
-        {confirming ? "Release?" : "Release"}
+        {confirming ? <Check size={18} strokeWidth={3} aria-hidden="true" /> : <ReleaseIcon />}
       </button>
     </li>
   );
