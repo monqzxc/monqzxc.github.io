@@ -3,9 +3,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { Popover } from "radix-ui";
-import { Check, ChevronUp, Pause, Play, Repeat, Shuffle } from "lucide-react";
+import { ChevronUp, Pause, Play, Repeat, Shuffle } from "lucide-react";
 import { MoveEffect, PokemonMotion, PokemonSprite, ShinyBurst, ShinyGlow, ShinyStars } from "@/components/pokemon-sprite";
 import { PokemonCollection } from "@/components/pokemon-collection";
+import { HabitatRoulette } from "@/components/habitat-roulette";
 import { PokemonScenery } from "@/components/pokemon-scenery";
 import { CursorAmbushLayer } from "@/components/cursor-ambush";
 import { createCast, createPokemonRoutine, dashPokemonRoutine, LEGEND_PHASE_MS, LEGEND_TELEPORT_IN_MS, LEGEND_TELEPORT_OUT_MS, pickLegendEvasion, rollLegendStamina, teleportPokemonRoutine, type LegendEvasion, isEntranceActivity, isHiddenActivity, isSpecial, isTravelActivity, nextPokemonRoutine, recast, recastCapturedResident, rollPokemonCatch, type CastMember } from "@/lib/pokemon-behavior";
@@ -19,6 +20,10 @@ import { DEFAULT_ROTATION, intervalMs, nextTheme, parseTheme, ROTATION_INTERVALS
 type ThemeState = {
   theme: PokemonTheme;
   setTheme: (theme: PokemonTheme) => void;
+  /** Where a roulette spin lands: saved like a pick, but a running rotation keeps going from there. */
+  spinTheme: (theme: PokemonTheme) => void;
+  /** Freezes the rotation countdown (keeping its remaining time) while the roulette spins. */
+  setHeld: (held: boolean) => void;
   rotation: Rotation;
   setRotation: (rotation: Rotation) => void;
   /** Where a running rotation goes next, decided ahead so the selector can show it. */
@@ -53,6 +58,7 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
   const [upcoming, setUpcoming] = useState<PokemonTheme | null>(null);
   const [cycle, setCycle] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [held, setHeld] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [ready, setReady] = useState(false);
   const [capturedPokemon, updateCapturedPokemon] = useState<CapturedPokemon[]>([]);
@@ -106,6 +112,17 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
     updateRotation(current => current.mode === "off" ? current : { ...current, mode: "off" });
   }, [apply]);
 
+  /** A spin is chance, not a choice: the rotation carries on, its countdown restarting from the winner. */
+  const spinTheme = useCallback((next: PokemonTheme) => {
+    // Released in the same update that applies the habitat, so the old countdown can't fire in between.
+    withTransition(() => {
+      updateTheme(next);
+      setHeld(false);
+      document.documentElement.dataset.pokemonTheme = next;
+    });
+    try { localStorage.setItem(THEME_STORAGE_KEY, next); } catch { /* Optional persistence. */ }
+  }, []);
+
   /** Rotation choices last for this visit only. */
   const setRotation = useCallback((next: Rotation) => updateRotation(next), []);
 
@@ -151,7 +168,7 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
 
   // The countdown keeps its remaining time across pauses and background tabs.
   const ms = intervalMs(every);
-  const counting = ready && mode !== "off" && !paused && !hidden && upcoming !== null;
+  const counting = ready && mode !== "off" && !paused && !hidden && !held && upcoming !== null;
   const clock = useRef<{ cycle: number; remaining: number; since: number | null }>({ cycle: -1, remaining: 0, since: null });
   useEffect(() => {
     if (clock.current.cycle !== cycle) clock.current = { cycle, remaining: ms, since: null };
@@ -172,7 +189,7 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
     return Math.min(ms, ms - remaining + (since === null ? 0 : performance.now() - since));
   }, [cycle, ms]);
 
-  const value = useMemo<ThemeState>(() => ({ theme, setTheme: pickTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready }), [theme, pickTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready]);
+  const value = useMemo<ThemeState>(() => ({ theme, setTheme: pickTheme, spinTheme, setHeld, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready }), [theme, pickTheme, spinTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
@@ -226,10 +243,11 @@ export function PokedexButton() {
  * the partner in a circle whose rim is the countdown to the next habitat, a mode badge, and pause.
  */
 export function HabitatDock() {
-  const { theme, setTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, ready } = usePokemonTheme();
+  const { theme, setTheme, spinTheme, setHeld, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, ready } = usePokemonTheme();
   const [open, setOpen] = useState(false);
   const rotating = rotation.mode !== "off";
   const ms = intervalMs(rotation.every);
+  const nextIn = useCallback(() => ms - elapsed(), [ms, elapsed]);
 
   return (
     <div className="habitat-dock">
@@ -252,56 +270,44 @@ export function HabitatDock() {
               <p className="theme-panel-sub">{regularsOf(theme).length} Pokémon live in each. Rumour has it something rarer passes through…</p>
             </div>
 
-            <div className="theme-options" role="radiogroup" aria-label="Habitat">
-              {THEME_ORDER.map(option => {
-                const info = THEMES[option];
-                const selected = option === theme;
-                return (
-                  // Just the partner: its sprite and name. The type stays in the accessible name. Choosing the
-                  // habitat already showing also counts as a pick, so it stops rotating there too.
-                  <label key={option} className={`theme-option ${selected ? "is-selected" : ""}`} style={{ "--swatch": info.swatch } as CSSProperties} title={`${SPECIES[option].name} · ${info.type}`}>
-                    <input className="sr-only" type="radio" name="pokemon-habitat" value={option} checked={selected} onChange={() => setTheme(option)} onClick={() => { if (selected) setTheme(option); }} aria-label={`${SPECIES[option].name}, ${info.type} type`} />
-                    <span className="theme-option-stage" aria-hidden="true"><PokemonSprite species={option} className="theme-option-sprite" /></span>
-                    <span className="theme-option-name" aria-hidden="true">{SPECIES[option].name}</span>
-                    <span className="theme-option-check" aria-hidden="true"><Check size={10} strokeWidth={3.5} /></span>
-                  </label>
-                );
-              })}
+            <HabitatRoulette theme={theme} onSelect={setTheme} onSpinLand={spinTheme} onHold={setHeld} upcoming={upcoming} counting={counting} cycle={cycle} nextIn={nextIn} markUpcoming={rotation.mode === "order"} />
+
+            {/* Timed changes, kept but quieter: when one is due the wheel spins itself and lands on it. */}
+            <div className="theme-auto">
+              <fieldset className="theme-setting">
+                <legend>Change automatically</legend>
+                <div className="theme-segmented" role="radiogroup" aria-label="Change automatically">
+                  {ROTATION_MODES.map(({ id, label }) => (
+                    <label key={id} className={rotation.mode === id ? "is-selected" : ""}>
+                      <input className="sr-only" type="radio" name="pokemon-rotation" value={id} checked={rotation.mode === id} onChange={() => setRotation({ ...rotation, mode: id })} />
+                      {id === "off" ? null : MODE_ICONS[id]}{label}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <fieldset className="theme-setting" disabled={!rotating}>
+                <legend>Every</legend>
+                <div className="theme-chips" role="radiogroup" aria-label="Change every">
+                  {ROTATION_INTERVALS.map(({ id, label }) => (
+                    <label key={id} className={rotation.every === id ? "is-selected" : ""}>
+                      <input className="sr-only" type="radio" name="pokemon-interval" value={id} checked={rotation.every === id} onChange={() => setRotation({ ...rotation, every: id })} />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <p className="theme-next" aria-live="polite">
+                {!rotating ? <>Stays with <strong>{SPECIES[theme].name}</strong> for this visit.</>
+                  : !upcoming ? null
+                  : <>
+                      <span className="theme-next-sprite" aria-hidden="true">{rotation.mode === "order" ? <PokemonSprite species={upcoming} /> : <Shuffle size={14} />}</span>
+                      <span>Up next: <strong>{rotation.mode === "order" ? SPECIES[upcoming].name : "a surprise"}</strong>{paused ? " · paused" : " · spins when the bar fills"}</span>
+                      <Countdown key={cycle} ms={ms} elapsed={elapsed}>{style => <span className={`theme-next-bar ${counting ? "" : "is-held"}`} style={style} aria-hidden="true"><i /></span>}</Countdown>
+                    </>}
+              </p>
             </div>
-
-            <fieldset className="theme-setting">
-              <legend>Change automatically</legend>
-              <div className="theme-segmented" role="radiogroup" aria-label="Change automatically">
-                {ROTATION_MODES.map(({ id, label }) => (
-                  <label key={id} className={rotation.mode === id ? "is-selected" : ""}>
-                    <input className="sr-only" type="radio" name="pokemon-rotation" value={id} checked={rotation.mode === id} onChange={() => setRotation({ ...rotation, mode: id })} />
-                    {id === "off" ? null : MODE_ICONS[id]}{label}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <fieldset className="theme-setting" disabled={!rotating}>
-              <legend>Every</legend>
-              <div className="theme-chips" role="radiogroup" aria-label="Change every">
-                {ROTATION_INTERVALS.map(({ id, label }) => (
-                  <label key={id} className={rotation.every === id ? "is-selected" : ""}>
-                    <input className="sr-only" type="radio" name="pokemon-interval" value={id} checked={rotation.every === id} onChange={() => setRotation({ ...rotation, every: id })} />
-                    {label}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <p className="theme-next" aria-live="polite">
-              {!rotating ? <>Stays with <strong>{SPECIES[theme].name}</strong> for this visit.</>
-                : !upcoming ? null
-                : <>
-                    <span className="theme-next-sprite" aria-hidden="true">{rotation.mode === "order" ? <PokemonSprite species={upcoming} /> : <Shuffle size={14} />}</span>
-                    <span>Up next: <strong>{rotation.mode === "order" ? SPECIES[upcoming].name : "a surprise"}</strong>{paused ? " · paused" : ""}</span>
-                    <Countdown key={cycle} ms={ms} elapsed={elapsed}>{style => <span className={`theme-next-bar ${counting ? "" : "is-held"}`} style={style} aria-hidden="true"><i /></span>}</Countdown>
-                  </>}
-            </p>
             {/* On phones the dock is just the partner circle, so pausing lives here instead. */}
             <button className="theme-panel-pause" type="button" aria-pressed={paused} onClick={() => setPaused(!paused)}>
               {paused ? <Play size={14} aria-hidden="true" /> : <Pause size={14} aria-hidden="true" />}
