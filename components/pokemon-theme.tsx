@@ -266,7 +266,6 @@ export function HabitatDock() {
         <Popover.Portal>
           <Popover.Content className="theme-panel" side="top" align="start" sideOffset={12} collisionPadding={12} aria-label="Habitat settings">
             <div className="theme-panel-head">
-              <p className="theme-panel-title">Choose a habitat</p>
               <p className="theme-panel-sub">{regularsOf(theme).length} Pokémon live in each. Rumour has it something rarer passes through…</p>
             </div>
 
