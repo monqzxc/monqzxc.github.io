@@ -36,12 +36,14 @@ const idleStyle = (index: number) => ({
   "--jitter-delay": `${-((index * 113) % 320)}ms`,
 });
 
-export function HabitatRoulette({ theme, onSelect, onSpinStart, upcoming, counting, cycle, nextIn, markUpcoming }: {
+export function HabitatRoulette({ theme, onSelect, onSpinLand, onHold, upcoming, counting, cycle, nextIn, markUpcoming }: {
   theme: PokemonTheme;
-  /** Every way of choosing (spin, tap, Pick Random) ends here, so they all share one saved selection. */
+  /** A pick by hand (tap, arrow keys, Pick Random): saved, and timed changes stop there. */
   onSelect: (theme: PokemonTheme) => void;
-  /** A spin is a pick by hand, so timed changes stop before the wheel starts turning. */
-  onSpinStart: () => void;
+  /** Where a spin lands: saved like a pick, but any timed changes carry on (and release the hold). */
+  onSpinLand: (theme: PokemonTheme) => void;
+  /** Holds the timed countdown while a spin is in flight, so a change can't fire mid-spin. */
+  onHold: (held: boolean) => void;
   upcoming: PokemonTheme | null;
   counting: boolean;
   cycle: number;
@@ -83,11 +85,13 @@ export function HabitatRoulette({ theme, onSelect, onSpinStart, upcoming, counti
     current.animations = [];
     delete rootRef.current?.dataset.phase;
     if (spinKind.current) {
+      // A spin cut short never lands, so nothing else will let the countdown go.
+      if (spinKind.current === "user") onHold(false);
       spinKind.current = null;
       setSpinning(null);
     }
     return angle.current;
-  }, [setRestingAngle]);
+  }, [onHold, setRestingAngle]);
 
   /**
    * Turns the wheel to `to`. The wheel and every sprite's upright wrapper run identical timings, so
@@ -148,22 +152,22 @@ export function HabitatRoulette({ theme, onSelect, onSpinStart, upcoming, counti
       const winner = THEME_ORDER[index];
       // A timed change is applied by the provider's own clock, landing at the same moment.
       setPointed(winner);
-      if (kind === "user") onSelect(winner);
+      if (kind === "user") onSpinLand(winner);
       setAnnouncement(`The wheel landed on ${SPECIES[winner].name}, ${THEMES[winner].type} type.`);
       celebrate(index, true);
     });
     return token;
-  }, [celebrate, onSelect, stop, turn]);
+  }, [celebrate, onSpinLand, stop, turn]);
 
   /** Taps, arrow keys and Pick Random: no spin, just a short glide to the chosen slot. */
-  const choose = useCallback((index: number, random = false) => {
+  const choose = useCallback((index: number, random = false, commit = onSelect) => {
     if (spinKind.current === "user") return;
     const from = stop();
     const to = landingAngle(from, index, COUNT);
     target.current = index;
     turn(to, settleMs(to - from), false);
     setPointed(THEME_ORDER[index]);
-    onSelect(THEME_ORDER[index]);
+    commit(THEME_ORDER[index]);
     celebrate(index, false);
     const picked = THEME_ORDER[index];
     setAnnouncement(`${random ? "Picked at random: " : ""}${SPECIES[picked].name}, ${THEMES[picked].type} type.`);
@@ -181,6 +185,8 @@ export function HabitatRoulette({ theme, onSelect, onSpinStart, upcoming, counti
       window.clearTimeout(celebrateTimer.current);
     };
   }, [setRestingAngle]);
+  // Closed mid-spin: the spin is abandoned, so the countdown picks up where it was held.
+  useEffect(() => () => { if (spinKind.current === "user") onHold(false); }, [onHold]);
 
   // The habitat changed from outside (a timed rotation that wasn't spun, another control): follow it.
   useEffect(() => {
@@ -218,9 +224,10 @@ export function HabitatRoulette({ theme, onSelect, onSpinStart, upcoming, counti
 
   function spin() {
     if (spinKind.current === "user") return;
-    onSpinStart();
-    if (reducedMotion()) return choose(THEME_ORDER.indexOf(nextTheme(theme, "shuffle")), true);
-    spinTo(THEME_ORDER.indexOf(nextTheme(theme, "shuffle")), "user");
+    const winner = THEME_ORDER.indexOf(nextTheme(theme, "shuffle"));
+    if (reducedMotion()) return choose(winner, true, onSpinLand);
+    onHold(true);
+    spinTo(winner, "user");
   }
 
   const userSpinning = spinning === "user";

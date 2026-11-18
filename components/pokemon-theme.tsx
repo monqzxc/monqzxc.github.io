@@ -20,6 +20,10 @@ import { DEFAULT_ROTATION, intervalMs, nextTheme, parseTheme, ROTATION_INTERVALS
 type ThemeState = {
   theme: PokemonTheme;
   setTheme: (theme: PokemonTheme) => void;
+  /** Where a roulette spin lands: saved like a pick, but a running rotation keeps going from there. */
+  spinTheme: (theme: PokemonTheme) => void;
+  /** Freezes the rotation countdown (keeping its remaining time) while the roulette spins. */
+  setHeld: (held: boolean) => void;
   rotation: Rotation;
   setRotation: (rotation: Rotation) => void;
   /** Where a running rotation goes next, decided ahead so the selector can show it. */
@@ -54,6 +58,7 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
   const [upcoming, setUpcoming] = useState<PokemonTheme | null>(null);
   const [cycle, setCycle] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [held, setHeld] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [ready, setReady] = useState(false);
   const [capturedPokemon, updateCapturedPokemon] = useState<CapturedPokemon[]>([]);
@@ -107,6 +112,17 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
     updateRotation(current => current.mode === "off" ? current : { ...current, mode: "off" });
   }, [apply]);
 
+  /** A spin is chance, not a choice: the rotation carries on, its countdown restarting from the winner. */
+  const spinTheme = useCallback((next: PokemonTheme) => {
+    // Released in the same update that applies the habitat, so the old countdown can't fire in between.
+    withTransition(() => {
+      updateTheme(next);
+      setHeld(false);
+      document.documentElement.dataset.pokemonTheme = next;
+    });
+    try { localStorage.setItem(THEME_STORAGE_KEY, next); } catch { /* Optional persistence. */ }
+  }, []);
+
   /** Rotation choices last for this visit only. */
   const setRotation = useCallback((next: Rotation) => updateRotation(next), []);
 
@@ -152,7 +168,7 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
 
   // The countdown keeps its remaining time across pauses and background tabs.
   const ms = intervalMs(every);
-  const counting = ready && mode !== "off" && !paused && !hidden && upcoming !== null;
+  const counting = ready && mode !== "off" && !paused && !hidden && !held && upcoming !== null;
   const clock = useRef<{ cycle: number; remaining: number; since: number | null }>({ cycle: -1, remaining: 0, since: null });
   useEffect(() => {
     if (clock.current.cycle !== cycle) clock.current = { cycle, remaining: ms, since: null };
@@ -173,7 +189,7 @@ export function PokemonThemeProvider({ children }: { children: ReactNode }) {
     return Math.min(ms, ms - remaining + (since === null ? 0 : performance.now() - since));
   }, [cycle, ms]);
 
-  const value = useMemo<ThemeState>(() => ({ theme, setTheme: pickTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready }), [theme, pickTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready]);
+  const value = useMemo<ThemeState>(() => ({ theme, setTheme: pickTheme, spinTheme, setHeld, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready }), [theme, pickTheme, spinTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, capturedPokemon, collectionError, capturePokemon, releasePokemon, releaseAllPokemon, ready]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
@@ -227,12 +243,11 @@ export function PokedexButton() {
  * the partner in a circle whose rim is the countdown to the next habitat, a mode badge, and pause.
  */
 export function HabitatDock() {
-  const { theme, setTheme, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, ready } = usePokemonTheme();
+  const { theme, setTheme, spinTheme, setHeld, rotation, setRotation, upcoming, cycle, counting, elapsed, paused, setPaused, ready } = usePokemonTheme();
   const [open, setOpen] = useState(false);
   const rotating = rotation.mode !== "off";
   const ms = intervalMs(rotation.every);
   const nextIn = useCallback(() => ms - elapsed(), [ms, elapsed]);
-  const stopRotating = useCallback(() => setRotation({ ...rotation, mode: "off" }), [rotation, setRotation]);
 
   return (
     <div className="habitat-dock">
@@ -255,7 +270,7 @@ export function HabitatDock() {
               <p className="theme-panel-sub">{regularsOf(theme).length} Pokémon live in each. Rumour has it something rarer passes through…</p>
             </div>
 
-            <HabitatRoulette theme={theme} onSelect={setTheme} onSpinStart={stopRotating} upcoming={upcoming} counting={counting} cycle={cycle} nextIn={nextIn} markUpcoming={rotation.mode === "order"} />
+            <HabitatRoulette theme={theme} onSelect={setTheme} onSpinLand={spinTheme} onHold={setHeld} upcoming={upcoming} counting={counting} cycle={cycle} nextIn={nextIn} markUpcoming={rotation.mode === "order"} />
 
             {/* Timed changes, kept but quieter: when one is due the wheel spins itself and lands on it. */}
             <div className="theme-auto">
