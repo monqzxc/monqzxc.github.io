@@ -122,29 +122,12 @@
 
 .certCard {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 20px 18px;
+  flex-direction: column;
+  padding: 20px 20px 18px;
   border: 1px solid var(--border);
   border-radius: 16px;
   background: color-mix(in srgb, var(--card) 70%, transparent);
   backdrop-filter: blur(14px);
-}
-
-.certIcon {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
-  background: color-mix(in srgb, var(--primary) 10%, transparent);
-  color: var(--primary);
-}
-
-.certIcon svg {
-  width: 18px;
-  height: 18px;
 }
 
 .certCard h4 {
@@ -157,9 +140,9 @@
 
 .certCard p {
   margin: 0;
-  color: color-mix(in srgb, var(--accent) 75%, white);
-  font: 12px/1.5 var(--font-mono);
-  letter-spacing: .04em;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .certCard .certDate {
@@ -200,4 +183,19 @@
   .certHeading, .personalHeading { flex-direction: column; gap: 6px; }
   .personalHeading { margin-top: 48px; }
   .certGrid { grid-template-columns: 1fr; }
+}
+
+/* The ring is full-bleed; only the heading keeps the page column. */
+.projects { pointer-events: none; }
+
+/* Year and copy only: the icon tiles repeated the title without adding meaning. */
+.timeline :global(.timeline-row) { grid-template-columns: 140px minmax(0, 1fr); }
+
+@media (max-width: 1100px) {
+  .timeline :global(.timeline-row) { grid-template-columns: 110px minmax(0, 1fr); }
+}
+
+@media (max-width: 760px) {
+  .timeline :global(.timeline-row) { grid-template-columns: 1fr; gap: 6px; }
+  .timeline :global(.timeline-year) { grid-column: auto; }
 }
