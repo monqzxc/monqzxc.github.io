@@ -8,6 +8,11 @@
 .site-header .wordmark { margin-right: auto; flex-shrink: 0; }
 .site-header .nav-links { order: 1; }
 .theme-controls { order: 2; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+/* Keeps a box in the slot while the Pokédex floats, so the observer can tell when it scrolls back. */
+.pokedex-anchor { min-width: 44px; min-height: 44px; }
+/* Above the page and habitat, below dialogs (z 50) and the capture beam. */
+.theme-controls.is-floating { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); z-index: 40; animation: pokedex-float-in .22s cubic-bezier(.2, .9, .3, 1.15) both; }
+.theme-controls.is-floating .pokemon-collection-trigger { background: color-mix(in srgb, var(--background) 82%, transparent); box-shadow: 0 10px 28px #0005; -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2); }
 .pokemon-collection-trigger { position: relative; display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 44px; min-height: 44px; padding: 0 10px; border: 1px solid var(--border); border-radius: 100px; background: color-mix(in srgb, var(--background) 70%, transparent); color: var(--foreground); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .2s, border-color .2s; }
 .pokemon-collection-trigger:hover { border-color: color-mix(in srgb, var(--primary) 45%, transparent); background: color-mix(in srgb, var(--primary) 12%, var(--background)); }
 .pokemon-collection-trigger:focus-visible, .pokemon-catch-button:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
@@ -786,6 +791,7 @@ html[data-cursor-ko], html[data-cursor-ko] * { cursor: none !important; }
   /* ...then collapses into the energy the orb carries away. */
   100% { opacity: 0; filter: brightness(0) saturate(100%) invert(19%) sepia(89%) saturate(5840%) hue-rotate(348deg) brightness(101%) contrast(110%) drop-shadow(0 0 10px #ff3948); transform: scale(.03); }
 }
+@keyframes pokedex-float-in { from { opacity: 0; transform: translateY(-8px) scale(.94); } }
 @keyframes pokemon-pokedex-ping { 0% { opacity: 0; transform: scale(.88); } 25% { opacity: 1; } 100% { opacity: 0; transform: scale(1.16); } }
 @keyframes pokemon-pokedex-count { 0%, 100% { transform: scale(1); } 35% { transform: scale(1.32); } 68% { transform: scale(.94); } }
 @keyframes pokemon-walk { 0%, 50%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-5%) rotate(-3deg); } 75% { transform: translateY(-5%) rotate(3deg); } }
@@ -902,7 +908,7 @@ html[data-cursor-ko], html[data-cursor-ko] * { cursor: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .pokemon-habitat *, .pokemon-habitat *::before, .pokemon-habitat *::after, .habitat-dock-trigger *, .roulette * { animation: none !important; transition: none !important; }
-  .pokemon-capture-layer, .pokemon-capture-layer *, .pokemon-release-layer *, .pokemon-farewell, .pokemon-farewell *, .pokemon-collection-ping, .pokemon-collection-count.is-pinging, .pokemon-collection-sparkle { animation: none !important; }
+  .pokemon-capture-layer, .pokemon-capture-layer *, .pokemon-release-layer *, .pokemon-farewell, .pokemon-farewell *, .pokemon-collection-ping, .pokemon-collection-count.is-pinging, .pokemon-collection-sparkle, .theme-controls.is-floating { animation: none !important; }
   .theme-panel, .theme-panel[data-state="closed"] { animation: none; }
   /* The countdown still shows, as a static amount rather than a moving one. */
   .habitat-dock-progress, .theme-next-bar i { animation: none !important; }
