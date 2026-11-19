@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { flushSync } from "react-dom";
+import { createPortal, flushSync } from "react-dom";
 import { Popover } from "radix-ui";
 import { ChevronUp, Pause, Play, Repeat, Shuffle } from "lucide-react";
 import { MoveEffect, PokemonMotion, PokemonSprite, ShinyBurst, ShinyGlow, ShinyStars } from "@/components/pokemon-sprite";
@@ -224,13 +224,29 @@ function Countdown({ ms, elapsed, children }: { ms: number; elapsed: () => numbe
 }
 
 /** The Pokédex, on its own wherever a page puts it (the trainer card's shoulder, the header). */
-export function PokedexButton() {
+/**
+ * With `floatWhenScrolledAway`, the Pokédex pins itself to the top-right corner once its slot leaves the
+ * viewport, so the beam still has somewhere to fire from when a catch happens further down the page.
+ * Floating, it renders in <body>: outside the page wrapper, the capture spotlight's dimming can't reach it.
+ */
+export function PokedexButton({ floatWhenScrolledAway = false }: { floatWhenScrolledAway?: boolean }) {
   const { capturedPokemon, collectionError, releasePokemon, releaseAllPokemon } = usePokemonTheme();
-  return (
-    <div className="theme-controls">
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const [floating, setFloating] = useState(false);
+  useEffect(() => {
+    const anchor = anchorRef.current;
+    if (!floatWhenScrolledAway || !anchor) return;
+    const observer = new IntersectionObserver(([entry]) => setFloating(!entry.isIntersecting));
+    observer.observe(anchor);
+    return () => observer.disconnect();
+  }, [floatWhenScrolledAway]);
+  const controls = (
+    <div className={`theme-controls ${floating ? "is-floating" : ""}`}>
       <PokemonCollection capturedPokemon={capturedPokemon} storageError={collectionError} onRelease={releasePokemon} onReleaseAll={releaseAllPokemon} />
     </div>
   );
+  if (!floatWhenScrolledAway) return controls;
+  return <div ref={anchorRef} className="pokedex-anchor">{floating ? createPortal(controls, document.body) : controls}</div>;
 }
 
 /**

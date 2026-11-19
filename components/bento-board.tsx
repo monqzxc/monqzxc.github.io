@@ -73,7 +73,7 @@ export default function BentoBoard() {
           </p>
           <div className={styles.profileBody}>
             <div className={styles.themePick}>
-              <PokedexButton />
+              <PokedexButton floatWhenScrolledAway />
             </div>
             <div className={styles.portrait} aria-hidden="true">
               <span className={styles.portraitRing} />
