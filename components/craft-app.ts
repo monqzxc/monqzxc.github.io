@@ -3,37 +3,37 @@ const interests = [{
   id: "running",
   label: "Running",
   title: "A different kind of progress.",
-  text: "Long-distance running is my reset. One steady effort at a time, building patience and consistency beyond the screen.",
+  text: "Long runs are my reset. Patience, one kilometre at a time.",
   icon: "M4 17l4-5 4 2 4-7M13 7h3v3M4 21h16"
 }, {
   id: "traveling",
   label: "Traveling",
   title: "A little further from the familiar.",
-  text: "I enjoy exploring new places and the change of perspective that comes with being somewhere different.",
+  text: "New places, new perspective.",
   icon: "M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6M9 3v15M15 6v15"
 }, {
   id: "anime",
   label: "Watching anime",
   title: "Another world to get lost in.",
-  text: "Watching anime is how I unwind: imaginative worlds, memorable characters, and stories that stay with me.",
+  text: "How I unwind: big worlds and stories that stay with me.",
   icon: "M4 4h16v12H4zM8 20h8M12 16v4M10 7l5 3-5 3V7"
 }, {
   id: "infrastructure",
   label: "Infrastructure",
   title: "Curious about what’s underneath.",
-  text: "Exploring Docker, Kubernetes, and cloud infrastructure to understand how reliable applications are delivered and kept running.",
+  text: "Docker, Kubernetes and cloud: how apps ship and stay up.",
   icon: "M12 3l9 5v9l-9 5-9-5V8l9-5M3 8l9 5 9-5M12 13v9"
 }, {
   id: "automation",
   label: "Python & automation",
   title: "Make room for the interesting work.",
-  text: "Experimenting with Python and Pillow for image processing, data transformation, and the repetitive tasks worth automating.",
+  text: "Python and Pillow for images, data, and chores worth automating.",
   icon: "M8 4L3 12l5 8M16 4l5 8-5 8M14 3l-4 18"
 }, {
   id: "freelance",
   label: "Collaboration",
   title: "Different perspectives. Better ideas.",
-  text: "Freelance projects bring new problems and new people into the mix. I enjoy turning a shared idea into something useful.",
+  text: "Freelance work: new problems, new people, useful results.",
   icon: "M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M16 4a4 4 0 010 8M22 21v-2a4 4 0 00-3-4M13 7a4 4 0 11-8 0 4 4 0 018 0"
 }];
 // The installed primitives are React-only. This Vue island uses semantic tabs,

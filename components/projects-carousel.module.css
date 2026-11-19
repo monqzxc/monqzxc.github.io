@@ -112,9 +112,7 @@
   padding: 32px 36px;
   border: 1px solid var(--border);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--card) 76%, transparent);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
+  background: color-mix(in srgb, var(--card) 90%, transparent);
 }
 
 /* Only the text swaps; the panel stays put so the change reads as content, not layout. */
@@ -161,7 +159,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 22px;
+  gap: 10px;
   margin-top: 22px;
 }
 
@@ -184,15 +182,21 @@
 .primary:active { transform: scale(.97); }
 
 .secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 44px;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
   color: var(--foreground);
-  font-size: 14px;
+  transition: border-color .2s, background-color .2s, transform .15s var(--ease-out);
 }
 
-.secondary:hover { text-decoration: underline; text-underline-offset: 4px; }
+.secondary:hover {
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+}
+.secondary:active { transform: scale(.94); }
 
 .primary:focus-visible, .secondary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 

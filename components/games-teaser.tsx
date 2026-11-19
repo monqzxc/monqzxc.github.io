@@ -8,7 +8,7 @@ export default function GamesTeaser() {
         <span className="games-teaser-icon" aria-hidden="true"><Gamepad2 size={22} /></span>
         <span className="games-teaser-copy">
           <h2 id="games-heading">Games</h2>
-          <p id="games-desc">10+ browser games live on Raro, my separate games site.</p>
+          <p id="games-desc">10+ browser games on Raro.</p>
         </span>
         <span className="games-browse-link">Play on Raro <ArrowUpRight size={17} aria-hidden="true" /></span>
       </a>

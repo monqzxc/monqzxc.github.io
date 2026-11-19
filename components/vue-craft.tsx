@@ -20,5 +20,5 @@ export default function VueCraft() {
       unmount?.();
     };
   }, []);
-  return <div className="vue-craft"><div ref={host} data-framework="vue" />{!ready && <div className="craft-detail"><h3>Endurance. Exploration. New perspectives.</h3><p>Traveling, running, watching anime, and experimenting with technology keep me curious beyond the screen.</p></div>}</div>;
+  return <div className="vue-craft"><div ref={host} data-framework="vue" />{!ready && <div className="craft-detail"><h3>A different kind of progress.</h3><p>Long runs are my reset. Patience, one kilometre at a time.</p></div>}</div>;
 }
