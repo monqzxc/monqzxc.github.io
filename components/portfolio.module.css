@@ -188,15 +188,3 @@
 .projects { pointer-events: none; }
 /* Projects ends on its own detail panel, so it needs far less trailing room than a plain section. */
 .projects:global(.section) { padding-bottom: 24px; }
-
-/* Year and copy only: the icon tiles repeated the title without adding meaning. */
-.timeline :global(.timeline-row) { grid-template-columns: 140px minmax(0, 1fr); }
-
-@media (max-width: 1100px) {
-  .timeline :global(.timeline-row) { grid-template-columns: 110px minmax(0, 1fr); }
-}
-
-@media (max-width: 760px) {
-  .timeline :global(.timeline-row) { grid-template-columns: 1fr; gap: 6px; }
-  .timeline :global(.timeline-year) { grid-column: auto; }
-}

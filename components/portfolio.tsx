@@ -10,12 +10,13 @@ import { portfolioSections } from "@/lib/navigation";
 import { googleCertificates, monCv } from "@/lib/cv-data";
 import VueCraft from "@/components/vue-craft";
 import Hero from "@/components/hero";
+import JourneyPath, { type Milestone } from "@/components/journey-path";
 import { HabitatDock, PokedexButton, PokemonHabitat } from "@/components/pokemon-theme";
 import { PokemonSprite } from "@/components/pokemon-sprite";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import styles from "./portfolio.module.css";
 
-const milestones = [
+const milestones: Milestone[] = [
   { year: "2018", title: "ASEAN Skills Competition, Bangkok", text: "Medallion for Excellence." },
   { year: "2019", title: "WorldSkills Kazan", text: "Represented the Philippines in IT Software Solutions.", link: monCv.awards.find(award => award.title === "WorldSkills Kazan")?.url },
   { year: "2020", title: "Joined TESDA", text: "Building HR and operations systems for the public sector." },
@@ -79,18 +80,7 @@ export default function Portfolio() {
 
         <section id="timeline" className="shell section">
           <div className="section-heading"><h2>Journey</h2></div>
-          <ol className={`timeline ${styles.timeline}`}>
-            {milestones.map(({ year, title, text, link }) => (
-              <li className="timeline-row" key={year}>
-                <span className="timeline-year">{year}</span>
-                <div>
-                  <h3>{title}</h3>
-                  <p>{text}</p>
-                  {link && <a className={styles.verifyLink} href={link} target="_blank" rel="noopener noreferrer" aria-label={`Verify ${title} on Credly (opens in a new tab)`}>Verify on Credly <ArrowUpRight size={14} aria-hidden="true" /></a>}
-                </div>
-              </li>
-            ))}
-          </ol>
+          <JourneyPath milestones={milestones} />
           <div id="certifications" className={styles.certifications}>
             <div className={styles.certHeading}><h3 id="certifications-heading">Certifications</h3></div>
             <ul className={styles.certGrid} aria-labelledby="certifications-heading">
