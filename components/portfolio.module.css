@@ -126,8 +126,7 @@
   padding: 20px 20px 18px;
   border: 1px solid var(--border);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--card) 70%, transparent);
-  backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--card) 90%, transparent);
 }
 
 .certCard h4 {
@@ -187,15 +186,5 @@
 
 /* The ring is full-bleed; only the heading keeps the page column. */
 .projects { pointer-events: none; }
-
-/* Year and copy only: the icon tiles repeated the title without adding meaning. */
-.timeline :global(.timeline-row) { grid-template-columns: 140px minmax(0, 1fr); }
-
-@media (max-width: 1100px) {
-  .timeline :global(.timeline-row) { grid-template-columns: 110px minmax(0, 1fr); }
-}
-
-@media (max-width: 760px) {
-  .timeline :global(.timeline-row) { grid-template-columns: 1fr; gap: 6px; }
-  .timeline :global(.timeline-year) { grid-column: auto; }
-}
+/* Projects ends on its own detail panel, so it needs far less trailing room than a plain section. */
+.projects:global(.section) { padding-bottom: 24px; }

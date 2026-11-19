@@ -1,0 +1,264 @@
+/* Every colour derives from the habitat's --primary / --accent, so the road re-tints per theme. */
+.journey {
+  --tone: var(--primary);
+  --tone-2: var(--accent);
+  --on-tone: var(--hab-on-tone, var(--primary-foreground));
+  --pad: 150px;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  position: relative;
+  margin: 0;
+  padding: 8px 0 12px;
+  list-style: none;
+}
+
+.road {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.road path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+/* A wide, faint stroke stands in for a blur filter: same glow, no per-frame filter cost. */
+.roadGlow { stroke: color-mix(in srgb, var(--tone) 22%, transparent); stroke-width: 34; }
+.roadBed { stroke: color-mix(in srgb, var(--tone) 52%, var(--background)); stroke-width: 18; }
+.roadLine { stroke: color-mix(in srgb, var(--foreground) 55%, transparent); stroke-width: 2; stroke-dasharray: 14 12; }
+
+/* The road draws itself once, top to bottom, the first time the journey is seen. */
+.roadGlow, .roadBed {
+  stroke-dasharray: var(--road-length) var(--road-length);
+  stroke-dashoffset: var(--road-length);
+  transition: stroke-dashoffset 1.8s cubic-bezier(.5, 0, .2, 1);
+}
+.roadLine { opacity: 0; transition: opacity .6s ease 1.4s; }
+.journey[data-drawn="true"] :is(.roadGlow, .roadBed) { stroke-dashoffset: 0; }
+.journey[data-drawn="true"] .roadLine { opacity: 1; }
+
+.stop {
+  --x: 0%;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  margin-left: var(--x);
+  max-width: calc(100% - var(--x));
+}
+.stop + .stop { margin-top: 14px; }
+/* The portal and its flag stand taller than a badge, so the last stop needs headroom. */
+.stop + .stop:last-of-type { margin-top: 60px; }
+
+/* Desktop: the stops wander left and right the way a trail would. */
+.stop:nth-of-type(1) { --x: 24%; }
+.stop:nth-of-type(2) { --x: 9%; }
+.stop:nth-of-type(3) { --x: 45%; }
+.stop:nth-of-type(4) { --x: 5%; }
+.stop:nth-of-type(5) { --x: 50%; }
+
+/* Floating platform: a lit disc on a faceted rock, with a badge and a flag on top. */
+.pad {
+  position: relative;
+  flex: none;
+  width: var(--pad);
+  height: var(--pad);
+  animation: bob 5.5s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -1.1s);
+}
+
+@keyframes bob { to { transform: translateY(-7px); } }
+
+.disc {
+  position: absolute;
+  z-index: 2;
+  left: 7%;
+  top: 31%;
+  width: 86%;
+  height: 22%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--tone) 34%, var(--background)), color-mix(in srgb, var(--tone) 14%, var(--background)) 70%);
+  box-shadow:
+    inset 0 0 0 3px color-mix(in srgb, var(--tone) 80%, white),
+    inset 0 -6px 10px color-mix(in srgb, var(--background) 60%, transparent),
+    0 0 26px -2px color-mix(in srgb, var(--tone) 65%, transparent);
+}
+
+.rock {
+  position: absolute;
+  z-index: 1;
+  left: 12%;
+  top: 40%;
+  width: 76%;
+  height: 50%;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--tone) 30%, #15131f),
+    color-mix(in srgb, var(--tone) 10%, #0b0a12) 75%);
+  clip-path: polygon(0 4%, 100% 4%, 94% 30%, 86% 52%, 72% 64%, 62% 88%, 50% 100%, 40% 84%, 27% 70%, 14% 50%, 5% 30%);
+}
+/* A lighter facet so the rock reads as a solid with a lit side. */
+.rock::after {
+  content: "";
+  position: absolute;
+  inset: 0 50% 0 0;
+  background: color-mix(in srgb, var(--tone) 16%, transparent);
+  clip-path: polygon(0 4%, 100% 4%, 100% 100%, 54% 84%, 27% 70%, 14% 50%, 5% 30%);
+}
+
+.badge {
+  position: absolute;
+  z-index: 3;
+  left: calc(50% - 29px);
+  top: 4%;
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--tone) 60%, white);
+  background: linear-gradient(150deg,
+    color-mix(in srgb, var(--tone) 70%, var(--background)),
+    color-mix(in srgb, var(--tone) 30%, var(--background)));
+  color: var(--foreground);
+  box-shadow: 0 10px 22px -10px #000c, 0 0 22px -6px color-mix(in srgb, var(--tone) 80%, transparent), inset 0 1px 0 #ffffff40;
+}
+
+/* The last stop is a doorway rather than a badge: the road leads somewhere still open. */
+.portal {
+  position: absolute;
+  z-index: 3;
+  left: calc(50% - 30px);
+  top: -14%;
+  width: 60px;
+  height: 80px;
+  border: 5px solid color-mix(in srgb, var(--tone) 40%, #2a2638);
+  border-bottom: 0;
+  border-radius: 30px 30px 4px 4px;
+  background: radial-gradient(ellipse at 50% 85%, #fff 0, color-mix(in srgb, var(--tone-2) 80%, white) 18%, color-mix(in srgb, var(--tone) 70%, transparent) 55%, color-mix(in srgb, var(--tone) 25%, var(--background)) 100%);
+  box-shadow: 0 0 34px -4px color-mix(in srgb, var(--tone) 80%, transparent), inset 0 0 18px color-mix(in srgb, var(--tone) 60%, transparent);
+  animation: portal 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes portal { to { opacity: .82; } }
+
+.flag {
+  position: absolute;
+  z-index: 4;
+  left: 30%;
+  top: -18%;
+  width: 2px;
+  height: 46px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--foreground) 70%, var(--tone));
+}
+.stop:last-of-type .flag { left: 50%; top: -42%; }
+.flag::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 1px;
+  width: 32px;
+  height: 20px;
+  background: linear-gradient(90deg, var(--tone), color-mix(in srgb, var(--tone) 70%, var(--tone-2)));
+  clip-path: polygon(0 0, 100% 12%, 78% 50%, 100% 88%, 0 100%);
+  transform-origin: left center;
+  animation: wave 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes wave { to { transform: skewY(-6deg) scaleX(.92); } }
+
+.card {
+  position: relative;
+  flex: 0 1 440px;
+  min-width: 0;
+  margin-left: -6px;
+  padding: 24px 24px 20px;
+  border: 1px solid color-mix(in srgb, var(--tone) 38%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--tone) 7%, var(--background));
+  box-shadow: 0 20px 40px -26px #000d, inset 0 1px 0 color-mix(in srgb, var(--tone) 22%, transparent);
+  transition: border-color .25s, transform .35s var(--ease-out);
+}
+.card:hover { border-color: color-mix(in srgb, var(--tone) 70%, transparent); transform: translateY(-2px); }
+
+/* Two slanted ticks in the corner, echoing the road's dashes. */
+.card::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  width: 22px;
+  height: 9px;
+  background: linear-gradient(115deg, transparent 22%, var(--tone) 22% 42%, transparent 42% 58%, var(--tone) 58% 78%, transparent 78%);
+  opacity: .7;
+}
+
+.year {
+  position: absolute;
+  top: -13px;
+  left: 18px;
+  padding: 3px 12px;
+  border-radius: 100px;
+  background: var(--tone);
+  color: var(--on-tone);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
+  box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--tone) 80%, transparent);
+}
+
+.card h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -.02em;
+}
+
+.card p {
+  margin: 0;
+  color: var(--hab-text, var(--muted-foreground));
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.verify {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  color: var(--tone);
+  font-size: 13px;
+}
+.verify:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+@media (max-width: 1100px) {
+  .journey { --pad: 130px; }
+  .stop:nth-of-type(1) { --x: 14%; }
+  .stop:nth-of-type(2) { --x: 2%; }
+  .stop:nth-of-type(3) { --x: 30%; }
+  .stop:nth-of-type(4) { --x: 0%; }
+  .stop:nth-of-type(5) { --x: 32%; }
+}
+
+/* Phones: a single column, so the road runs straight down the platforms' spine. */
+@media (max-width: 760px) {
+  .journey { --pad: 92px; }
+  .stop:nth-of-type(n) { --x: 0%; }
+  .stop + .stop { margin-top: 26px; }
+  .badge { width: 42px; height: 42px; left: calc(50% - 21px); border-radius: 12px; }
+  .badge svg { width: 20px; height: 20px; }
+  .portal { width: 44px; height: 60px; left: calc(50% - 22px); border-width: 4px; }
+  .flag { height: 30px; top: -30%; left: 24%; }
+  .stop:last-of-type .flag { top: -52%; }
+  .flag::after { width: 22px; height: 14px; }
+  .card { padding: 22px 18px 18px; margin-left: 4px; }
+  .card h3 { font-size: 17px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pad, .portal, .flag::after { animation: none; }
+  .roadGlow, .roadBed { transition: none; stroke-dashoffset: 0; }
+  .roadLine { transition: none; opacity: 1; }
+}

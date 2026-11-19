@@ -10,17 +10,18 @@ import { portfolioSections } from "@/lib/navigation";
 import { googleCertificates, monCv } from "@/lib/cv-data";
 import VueCraft from "@/components/vue-craft";
 import Hero from "@/components/hero";
+import JourneyPath, { type Milestone } from "@/components/journey-path";
 import { HabitatDock, PokedexButton, PokemonHabitat } from "@/components/pokemon-theme";
 import { PokemonSprite } from "@/components/pokemon-sprite";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import styles from "./portfolio.module.css";
 
-const milestones = [
+const milestones: Milestone[] = [
   { year: "2018", title: "ASEAN Skills Competition, Bangkok", text: "Medallion for Excellence." },
-  { year: "2019", title: "WorldSkills Kazan", text: "Represented the Philippines in IT Software Solutions for Business.", link: monCv.awards.find(award => award.title === "WorldSkills Kazan")?.url },
-  { year: "2020", title: "Joined TESDA", text: "Started building HR and operations systems for the public sector." },
-  { year: "2022", title: "Laravel, Vue and Inertia", text: "Moved our apps to reactive interfaces on a dependable backend." },
-  { year: "2024–now", title: "Full-stack, Laravel to AI", text: "Performance, recruitment and personnel platforms, plus TESDA-TRACK, an AI recommender in Python." },
+  { year: "2019", title: "WorldSkills Kazan", text: "Represented the Philippines in IT Software Solutions.", link: monCv.awards.find(award => award.title === "WorldSkills Kazan")?.url },
+  { year: "2020", title: "Joined TESDA", text: "Building HR and operations systems for the public sector." },
+  { year: "2022", title: "Laravel, Vue and Inertia", text: "Moved our apps to a reactive stack." },
+  { year: "2024–now", title: "Full-stack, Laravel to AI", text: "Performance, recruitment and HR platforms, plus an AI recommender." },
 ];
 
 export default function Portfolio() {
@@ -73,27 +74,13 @@ export default function Portfolio() {
         <Hero onContact={openContact} />
 
         <section id="projects" className={`section ${styles.projects}`}>
-          <div className="shell section-heading">
-            <h2>Projects</h2>
-            <p>Seven systems built for public service, and one for fun. Drag or use the arrows, then open one to click through it.</p>
-          </div>
+          <div className="shell section-heading"><h2>Projects</h2></div>
           <ProjectsCarousel />
         </section>
 
         <section id="timeline" className="shell section">
           <div className="section-heading"><h2>Journey</h2></div>
-          <ol className={`timeline ${styles.timeline}`}>
-            {milestones.map(({ year, title, text, link }) => (
-              <li className="timeline-row" key={year}>
-                <span className="timeline-year">{year}</span>
-                <div>
-                  <h3>{title}</h3>
-                  <p>{text}</p>
-                  {link && <a className={styles.verifyLink} href={link} target="_blank" rel="noopener noreferrer" aria-label={`Verify ${title} on Credly (opens in a new tab)`}>Verify on Credly <ArrowUpRight size={14} aria-hidden="true" /></a>}
-                </div>
-              </li>
-            ))}
-          </ol>
+          <JourneyPath milestones={milestones} />
           <div id="certifications" className={styles.certifications}>
             <div className={styles.certHeading}><h3 id="certifications-heading">Certifications</h3></div>
             <ul className={styles.certGrid} aria-labelledby="certifications-heading">
@@ -115,10 +102,7 @@ export default function Portfolio() {
 
         <section id="craft-hobbies" className="shell section craft-section">
           <div className="craft-layout">
-            <div className="craft-intro">
-              <h2>Off the clock</h2>
-              <p>Long runs, new places, anime, and small experiments.</p>
-            </div>
+            <div className="craft-intro"><h2>Off the clock</h2></div>
             <VueCraft />
           </div>
           <GamesTeaser />
@@ -127,7 +111,7 @@ export default function Portfolio() {
         <section id="contact" className="shell contact-section">
           <div className="contact-top"><h2>Still running it on spreadsheets?</h2></div>
           <div className="contact-bottom">
-            <p>I turn paper forms and Excel workflows into systems people actually use. Open to collaborations and enterprise projects, here or on Upwork.</p>
+            <p>I turn paper forms and Excel into systems people use. Open for projects, here or on Upwork.</p>
             <div className="contact-links">
               <div className={styles.companions} aria-hidden="true">
                 {(["gengar", "gible", "flygon"] as const).map(species => (

@@ -11,7 +11,7 @@ export default function Hero({ onContact }: { onContact: () => void }) {
         <div className="hero-copy entrance">
           <h1><span>Anthony</span><span>Cabigayan<span className="name-period">.</span></span></h1>
           <p className="hero-moniker">Software engineer in Manila. Call me <strong>Mon.</strong></p>
-          <p className="hero-description">I build the systems behind public service in the Philippines, from HR and recruitment to AI recommendations.</p>
+          <p className="hero-description">I build public-service systems in the Philippines, from HR to AI.</p>
           <div className="hero-actions">
             <a className="button-primary" href="#projects">See my work <ArrowDown size={17} aria-hidden="true" /></a>
             <SocialLinks onContact={onContact} />

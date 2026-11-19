@@ -10,6 +10,7 @@ import "./pokemon-scenery.css";
 import "./scroll-reveal.css";
 import "./project-previews.css";
 import "./games.css";
+import "./portfolio-overrides.css";
 import { PokemonThemeProvider } from "@/components/pokemon-theme";
 import { themeBootScript } from "@/lib/theme-rotation";
 

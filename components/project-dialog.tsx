@@ -52,7 +52,7 @@ export default function ProjectDialog({ project, onClose, returnFocus }: Props) 
         >
           <div className="walkthrough-dialog-header">
             <DialogTitle>{project.title}</DialogTitle>
-            <DialogDescription>Click through the {project.steps}-step walkthrough with the step list or the Back and Next buttons.</DialogDescription>
+            <DialogDescription>{project.steps}-step walkthrough · sample data</DialogDescription>
           </div>
           <div className="walkthrough-frame-wrap" aria-busy={!loaded}>
             {!loaded && <p className="preview-loading" role="status">Loading preview…</p>}
@@ -65,7 +65,6 @@ export default function ProjectDialog({ project, onClose, returnFocus }: Props) 
             />
           </div>
           <div className="walkthrough-dialog-footer">
-            <p>Simplified screens with sample data.</p>
             <a href={url} target="_blank" rel="noopener noreferrer">Open in new tab <ExternalLink size={15} aria-hidden="true" /></a>
           </div>
         </DialogContent>

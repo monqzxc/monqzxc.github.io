@@ -289,10 +289,10 @@ export default function ProjectsCarousel() {
                 className={styles.primary}
                 onClick={event => { opener.current = event.currentTarget; setOpen(project); }}
               >
-                <Play size={15} aria-hidden="true" /> Try the walkthrough
+                <Play size={15} aria-hidden="true" /> Try it
               </button>
-              <a className={styles.secondary} href={url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.title} in a new tab`}>
-                Open in new tab <ArrowUpRight size={15} aria-hidden="true" />
+              <a className={styles.secondary} href={url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.title} in a new tab`} title="Open in new tab">
+                <ArrowUpRight size={17} aria-hidden="true" />
               </a>
             </div>
           </div>
