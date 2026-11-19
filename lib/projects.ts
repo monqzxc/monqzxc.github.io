@@ -89,3 +89,13 @@ export type Project = (typeof projects)[number] | (typeof personalProjects)[numb
 export function projectPreviewUrl(project: Project) {
   return `/project-previews/${project.id}/index.html`;
 }
+
+/** Portrait cover composed from the project's own walkthrough screens. */
+export function projectCoverUrl(project: Project) {
+  return `/project-previews/${project.id}/cover.webp`;
+}
+
+export const showcase = [
+  ...projects.map(project => ({ project: project as Project, personal: false })),
+  ...personalProjects.map(project => ({ project: project as Project, personal: true })),
+];

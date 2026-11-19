@@ -1,13 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, ArrowUpRight, BadgeCheck, Building2, Code2, Home, Layers, Menu, Trophy, X } from "lucide-react";
-import ProjectCard from "@/components/project-card";
+import { ArrowUp, ArrowUpRight, Home, Menu, X } from "lucide-react";
+import ProjectsCarousel from "@/components/projects-carousel";
 import GamesTeaser from "@/components/games-teaser";
 import FloatingMenu from "@/components/floating-menu";
 import ContactModal from "@/components/contact-modal";
 import SocialLinks from "@/components/social-links";
 import { portfolioSections } from "@/lib/navigation";
-import { personalProjects, projects } from "@/lib/projects";
 import { googleCertificates, monCv } from "@/lib/cv-data";
 import VueCraft from "@/components/vue-craft";
 import Hero from "@/components/hero";
@@ -17,11 +16,11 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import styles from "./portfolio.module.css";
 
 const milestones = [
-  { year: "2018", icon: Trophy, title: "ASEAN Skills Competition, Bangkok", text: "Medallion for Excellence." },
-  { year: "2019", icon: Trophy, title: "WorldSkills Kazan", text: "Represented the Philippines in IT Software Solutions for Business.", link: monCv.awards.find(award => award.title === "WorldSkills Kazan")?.url },
-  { year: "2020", icon: Building2, title: "Joined TESDA", text: "Started building HR and operations systems for the public sector." },
-  { year: "2022", icon: Code2, title: "Laravel, Vue and Inertia", text: "Moved our apps to reactive interfaces on a dependable backend." },
-  { year: "2024—now", icon: Layers, title: "Full-stack, Laravel to AI", text: "Performance, recruitment and personnel platforms, plus TESDA-TRACK, an AI recommender in Python." },
+  { year: "2018", title: "ASEAN Skills Competition, Bangkok", text: "Medallion for Excellence." },
+  { year: "2019", title: "WorldSkills Kazan", text: "Represented the Philippines in IT Software Solutions for Business.", link: monCv.awards.find(award => award.title === "WorldSkills Kazan")?.url },
+  { year: "2020", title: "Joined TESDA", text: "Started building HR and operations systems for the public sector." },
+  { year: "2022", title: "Laravel, Vue and Inertia", text: "Moved our apps to reactive interfaces on a dependable backend." },
+  { year: "2024–now", title: "Full-stack, Laravel to AI", text: "Performance, recruitment and personnel platforms, plus TESDA-TRACK, an AI recommender in Python." },
 ];
 
 export default function Portfolio() {
@@ -73,24 +72,20 @@ export default function Portfolio() {
       <main id="main" ref={revealRef}>
         <Hero onContact={openContact} />
 
-        <section id="projects" className="shell section">
-          <div className="section-heading">
-            <h2>Selected work</h2>
-            <p>Seven systems built for public service, and one for fun. Open any to click through it.</p>
+        <section id="projects" className={`section ${styles.projects}`}>
+          <div className="shell section-heading">
+            <h2>Projects</h2>
+            <p>Seven systems built for public service, and one for fun. Drag or use the arrows, then open one to click through it.</p>
           </div>
-          <div className="project-grid">
-            {projects.map(project => <ProjectCard key={project.id} project={project} />)}
-            {personalProjects.map(project => <ProjectCard key={project.id} project={project} group="After hours" />)}
-          </div>
+          <ProjectsCarousel />
         </section>
 
         <section id="timeline" className="shell section">
           <div className="section-heading"><h2>Journey</h2></div>
-          <ol className="timeline">
-            {milestones.map(({ year, icon: Icon, title, text, link }) => (
+          <ol className={`timeline ${styles.timeline}`}>
+            {milestones.map(({ year, title, text, link }) => (
               <li className="timeline-row" key={year}>
                 <span className="timeline-year">{year}</span>
-                <span className="timeline-icon" aria-hidden="true"><Icon /></span>
                 <div>
                   <h3>{title}</h3>
                   <p>{text}</p>
@@ -104,7 +99,6 @@ export default function Portfolio() {
             <ul className={styles.certGrid} aria-labelledby="certifications-heading">
               {googleCertificates.map(({ title, issuer, issued, coursera, credly }) => (
                 <li className={styles.certCard} key={title} data-reveal>
-                  <span className={styles.certIcon} aria-hidden="true"><BadgeCheck /></span>
                   <div>
                     <h4>{title}</h4>
                     <p>{issuer} · {issued}</p>
@@ -131,9 +125,9 @@ export default function Portfolio() {
         </section>
 
         <section id="contact" className="shell contact-section">
-          <div className="contact-top"><h2>Let’s build something.</h2></div>
+          <div className="contact-top"><h2>Still running it on spreadsheets?</h2></div>
           <div className="contact-bottom">
-            <p>Open to collaborations and enterprise projects, here or on Upwork.</p>
+            <p>I turn paper forms and Excel workflows into systems people actually use. Open to collaborations and enterprise projects, here or on Upwork.</p>
             <div className="contact-links">
               <div className={styles.companions} aria-hidden="true">
                 {(["gengar", "gible", "flygon"] as const).map(species => (

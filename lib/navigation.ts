@@ -4,7 +4,7 @@ export const GAMES_HREF = "https://monqzxc.github.io/raro/";
 
 export const portfolioSections = [
   { id: "about", label: "About" },
-  { id: "projects", label: "Selected work" },
+  { id: "projects", label: "Projects" },
   { id: "timeline", label: "Journey" },
   { id: "craft-hobbies", label: "Beyond code" },
 ] as const;

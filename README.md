@@ -37,8 +37,8 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | Floating Pokéball menu and shared section links | `components/floating-menu.tsx`, `lib/navigation.ts` |
 | Habitat dock (bottom-left picker with countdown ring and pause) and the Pokédex button | `HabitatDock` and `PokedexButton` in `components/pokemon-theme.tsx` |
 | Email modal and Formspree endpoint | `components/contact-modal.tsx` |
-| Selected work titles, descriptions, and preview paths | `lib/projects.ts` |
-| Project cards and interactive preview dialogs | `components/project-card.tsx` |
+| Project titles, descriptions, and preview paths | `lib/projects.ts` |
+| Projects carousel and interactive preview dialog | `components/projects-carousel.tsx`, `components/project-dialog.tsx` |
 | Preview card and dialog styles | `app/project-previews.css` |
 | Supplied HTML walkthroughs and shared embed styles | `public/project-previews/` |
 | Base layout and responsive rules | `app/globals.css` |
@@ -60,7 +60,7 @@ The hosted preview uses the same application components with the Sites Vinext ad
 | MON, Gengar, and Gible hero artwork | `public/images/mon-pokemon-hero.png` |
 | Favicon | `public/favicon.svg` |
 
-Selected work includes TESDA-TRACK, Application Exam Management, HRIS Process, Job Application, PCR Management, PDS Generation, and ARTA Client Survey. A separate Personal projects group shows Zepimon (`personalProjects` in `lib/projects.ts`). Each card shows its supplied HTML walkthrough and opens an interactive preview with working step navigation. A separate link opens the complete walkthrough in a new tab. The previews use simplified screens and sample data. The email and GitHub links come from your supplied HTML; placeholder social-profile links were omitted.
+Projects includes TESDA-TRACK, Application Exam Management, HRIS Process, Job Application, PCR Management, PDS Generation, and ARTA Client Survey. A separate Personal projects group shows Zepimon (`personalProjects` in `lib/projects.ts`). They sit in a looping carousel where the middle card is the smallest and cards grow toward the edges. Each cover (`public/project-previews/<id>/cover.webp`) is composed from that project's own walkthrough screens; replace the file to change it. The centred project opens an interactive preview with working step navigation. A separate link opens the complete walkthrough in a new tab. The previews use simplified screens and sample data. The email and GitHub links come from your supplied HTML; placeholder social-profile links were omitted.
 
 The walkthroughs are bundled under `public/project-previews/` so GitHub Pages exports include their HTML, CSS, and JavaScript. Original source folders remain separate. The shared `embed.js` and `embed.css` adapt the same HTML for thumbnails and dialogs; opening a page without a preview parameter shows the full original introduction. Walkthrough fonts request Google Fonts with local system fallbacks.
 
