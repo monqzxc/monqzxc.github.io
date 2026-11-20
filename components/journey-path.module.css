@@ -21,20 +21,13 @@
 
 .road path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
+/* Unlit, the road is plain stone grey. The lit layers sit on top of it and are revealed by a
+   dash offset that follows the scroll, so scrolling up "turns the lights off" again. */
+.roadBed { stroke: color-mix(in srgb, var(--foreground) 16%, var(--background)); stroke-width: 18; }
+.roadLine { stroke: color-mix(in srgb, var(--foreground) 45%, transparent); stroke-width: 2; stroke-dasharray: 14 12; }
 /* A wide, faint stroke stands in for a blur filter: same glow, no per-frame filter cost. */
-.roadGlow { stroke: color-mix(in srgb, var(--tone) 22%, transparent); stroke-width: 34; }
-.roadBed { stroke: color-mix(in srgb, var(--tone) 52%, var(--background)); stroke-width: 18; }
-.roadLine { stroke: color-mix(in srgb, var(--foreground) 55%, transparent); stroke-width: 2; stroke-dasharray: 14 12; }
-
-/* The road draws itself once, top to bottom, the first time the journey is seen. */
-.roadGlow, .roadBed {
-  stroke-dasharray: var(--road-length) var(--road-length);
-  stroke-dashoffset: var(--road-length);
-  transition: stroke-dashoffset 1.8s cubic-bezier(.5, 0, .2, 1);
-}
-.roadLine { opacity: 0; transition: opacity .6s ease 1.4s; }
-.journey[data-drawn="true"] :is(.roadGlow, .roadBed) { stroke-dashoffset: 0; }
-.journey[data-drawn="true"] .roadLine { opacity: 1; }
+.litGlow { stroke: color-mix(in srgb, var(--tone) 26%, transparent); stroke-width: 36; }
+.litBed { stroke: color-mix(in srgb, var(--tone) 62%, var(--background)); stroke-width: 18; }
 
 .stop {
   --x: 0%;
@@ -67,6 +60,13 @@
 }
 
 @keyframes bob { to { transform: translateY(-7px); } }
+
+/* Unlit stops are drained of colour; they power on as the road's light reaches them. */
+.pad { transition: filter .5s var(--ease-out); }
+.stop[data-lit="false"] .pad { filter: grayscale(1) brightness(.62); }
+.stop[data-lit="false"] .card { border-color: color-mix(in srgb, var(--foreground) 12%, transparent); background: color-mix(in srgb, var(--foreground) 3%, var(--background)); }
+.stop[data-lit="false"] .year { background: color-mix(in srgb, var(--foreground) 22%, var(--background)); color: var(--foreground); box-shadow: none; }
+.stop[data-lit="false"] .card::after { background: linear-gradient(115deg, transparent 22%, currentColor 22% 42%, transparent 42% 58%, currentColor 58% 78%, transparent 78%); opacity: .25; }
 
 .disc {
   position: absolute;
@@ -177,7 +177,7 @@
   border-radius: 16px;
   background: color-mix(in srgb, var(--tone) 7%, var(--background));
   box-shadow: 0 20px 40px -26px #000d, inset 0 1px 0 color-mix(in srgb, var(--tone) 22%, transparent);
-  transition: border-color .25s, transform .35s var(--ease-out);
+  transition: border-color .5s, background-color .5s, transform .35s var(--ease-out);
 }
 .card:hover { border-color: color-mix(in srgb, var(--tone) 70%, transparent); transform: translateY(-2px); }
 
@@ -206,6 +206,7 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: .01em;
   box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--tone) 80%, transparent);
+  transition: background-color .5s, color .5s, box-shadow .5s;
 }
 
 .card h3 {
@@ -259,6 +260,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pad, .portal, .flag::after { animation: none; }
-  .roadGlow, .roadBed { transition: none; stroke-dashoffset: 0; }
-  .roadLine { transition: none; opacity: 1; }
+  .pad, .card, .year { transition: none; }
 }
