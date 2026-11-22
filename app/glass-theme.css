@@ -6,6 +6,13 @@
   font-display: swap;
 }
 @font-face {
+  font-family: "Oxanium";
+  src: url("/fonts/oxanium-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+}
+@font-face {
   font-family: "DM Sans";
   src: url("/fonts/dm-sans-latin.woff2") format("woff2");
   font-style: normal;
@@ -15,7 +22,7 @@
 
 :root {
   --font-sans: "DM Sans", "Helvetica Neue", Arial, sans-serif;
-  --font-display: "Manrope", "DM Sans", Arial, sans-serif;
+  --font-display: "Oxanium", "DM Sans", Arial, sans-serif;
   --background: #10151b;
   --foreground: #f2f4ef;
   --muted-foreground: #aab4bc;
@@ -39,6 +46,9 @@ h1, h2, h3, [data-slot="dialog-title"], .wordmark strong, .footer-mark {
   font-optical-sizing: auto;
 }
 h1, h2, h3 { text-wrap: balance; }
+/* Small UI labels share the game-HUD display face with the headings; body copy stays DM Sans. */
+.eyebrow, .project-category, .timeline-type, .timeline-year, .tech-label,
+.craft-kicker, .dialog-kicker, .pokemon-collection-trigger { font-family: var(--font-display); }
 p { text-wrap: pretty; }
 .hero h1 {
   font-size: clamp(48px, 5.15vw, 74px);
