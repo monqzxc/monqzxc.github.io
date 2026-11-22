@@ -166,6 +166,7 @@
 }
 
 .rail a {
+  font-family: var(--font-display);
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   padding: 12px 10px;
@@ -255,6 +256,7 @@
 }
 
 .profileTab {
+  font-family: var(--font-display);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -633,6 +635,7 @@
 }
 
 .mediaCaption strong {
+  font-family: var(--font-display);
   font-size: 15px;
   font-weight: 700;
 }
@@ -695,6 +698,7 @@
   gap: 12px;
   background: var(--tile-c-bg);
   color: var(--tile-c-fg);
+  font-family: var(--font-display);
   font-size: 17px;
   font-weight: 500;
 }
@@ -722,6 +726,7 @@
 }
 
 .splitTag {
+  font-family: var(--font-display);
   position: absolute;
   left: 14px;
   bottom: 12px;

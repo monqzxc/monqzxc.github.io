@@ -33,7 +33,7 @@ export default function RootLayout({
       <head>
         {/* Restores the habitat (and applies a per-visit rotation) before the first paint. */}
         <script dangerouslySetInnerHTML={{ __html: themeBootScript() }} />
-        <link rel="preload" href="/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/oxanium-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>
       <body className="antialiased"><PokemonThemeProvider>{children}</PokemonThemeProvider></body>
